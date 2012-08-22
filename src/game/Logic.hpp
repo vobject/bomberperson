@@ -4,7 +4,7 @@
 #include <memory>
 #include <list>
 
-class SDL_KeyboardEvent;
+struct SDL_KeyboardEvent;
 
 class Renderer;
 class Background;

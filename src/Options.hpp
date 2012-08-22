@@ -18,19 +18,19 @@ struct DefaultOptions
 
    static const int MAINLOOP_UPDATE_DELTA   = 2_ms;
 
-   static const int SCREEN_WIDTH            = 640_px * 2;
-   static const int SCREEN_HEIGHT           = 480_px * 2;
+   static const int SCREEN_WIDTH            = 640_px;
+   static const int SCREEN_HEIGHT           = 480_px;
 
    static const std::string RESOURCE_DIR;
 
    static const int ARENA_BG_WIDTH  = SCREEN_WIDTH;
    static const int ARENA_BG_HEIGHT = SCREEN_HEIGHT;
-   static const int ARENA_BG_BORDER_WIDTH  = 20_px * 2;
-   static const int ARENA_BG_BORDER_HEIGHT = 16_px * 2;
+   static const int ARENA_BG_BORDER_WIDTH  = 20_px;
+   static const int ARENA_BG_BORDER_HEIGHT = 16_px;
    static const std::string ARENA_BG_ID;
 
-   static const int ARENA_WIDTH             = ARENA_BG_WIDTH - (ARENA_BG_BORDER_WIDTH * 2);
-   static const int ARENA_HEIGHT            = 432 * 2 - (ARENA_BG_BORDER_HEIGHT * 2);
+   static const int ARENA_WIDTH             = ARENA_BG_WIDTH - ARENA_BG_BORDER_WIDTH;
+   static const int ARENA_HEIGHT            = 432 - ARENA_BG_BORDER_HEIGHT;
    static const int ARENA_CELLS_X           = 15;
    static const int ARENA_CELLS_Y           = 11;
    static const std::string ARENA_ID;
@@ -65,6 +65,8 @@ struct DefaultOptions
    static const std::string PLAYER_ID_2;
    static const int PLAYER_1_CELL_X         = 0;
    static const int PLAYER_1_CELL_Y         = 0;
+   static const int PLAYER_2_CELL_X         = 14;
+   static const int PLAYER_2_CELL_Y         = 10;
 };
 
 #endif // DEFAULT_OPTIONS_HPP

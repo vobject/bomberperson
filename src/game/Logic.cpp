@@ -27,7 +27,7 @@ Logic::Logic(const std::shared_ptr<Renderer>& renderer)
 
    const std::vector<std::shared_ptr<Player>> players = {
       std::make_shared<Player>(DefaultOptions::PLAYER_ID_1)
-//    , std::make_shared<Player>(DefaultOptions::PLAYER_ID_2)
+    , std::make_shared<Player>(DefaultOptions::PLAYER_ID_2)
    };
 
    mFieldGen = std::make_shared<ArenaGenerator>();
@@ -48,13 +48,14 @@ Logic::Logic(const std::shared_ptr<Renderer>& renderer)
    players[0]->SetSize({ DefaultOptions::PLAYER_WIDTH,
                          DefaultOptions::PLAYER_HEIGHT });
 
-//   const auto input_p2 = std::make_shared<KeyboardInput>(SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_LCTRL);
-//   const auto parent_cell_p2 = area->GetCellFromCoordinates(arena_size_x - 2, arena_size_y - 2);
-//   players[1]->SetInputDevice(input_p2);
-//   players[1]->SetParentCell(parent_cell_p2);
-//   players[1]->SetPosition(parent_cell_p2->GetPosition());
-//   players[1]->SetSize({ DefaultOptions::PLAYER_WIDTH,
-//                         DefaultOptions::PLAYER_HEIGHT });
+   const auto input_p2 = std::make_shared<KeyboardInput>(SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_LCTRL);
+   const auto parent_cell_p2 = arena->GetCellFromCoordinates(DefaultOptions::PLAYER_2_CELL_X,
+                                                             DefaultOptions::PLAYER_2_CELL_Y);
+   players[1]->SetInputDevice(input_p2);
+   players[1]->SetParentCell(parent_cell_p2);
+   players[1]->SetPosition(parent_cell_p2->GetPosition());
+   players[1]->SetSize({ DefaultOptions::PLAYER_WIDTH,
+                         DefaultOptions::PLAYER_HEIGHT });
 
    mMatch = std::make_shared<Match>(arena, players);
 }

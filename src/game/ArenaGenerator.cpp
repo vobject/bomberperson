@@ -46,14 +46,14 @@ std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
    const auto cells = CreateDefaultCells(cells_x, cells_y, arena);
 
    if (players >= 1) {
-      cells[0 + (0 * cells_x)]->SetWall(nullptr);
-      cells[0 + (1 * cells_x)]->SetWall(nullptr);
-      cells[1 + (0 * cells_x)]->SetWall(nullptr);
+      cells[0]->SetWall(nullptr);
+      cells[1]->SetWall(nullptr);
+      cells[cells_x]->SetWall(nullptr);
    }
    if (players >= 2) {
-      cells[(cells_x - 3) + ((cells_x - 2) * cells_x)]->SetWall(nullptr);
-      cells[(cells_x - 2) + ((cells_x - 3) * cells_x)]->SetWall(nullptr);
-      cells[(cells_x - 2) + ((cells_x - 2) * cells_x)]->SetWall(nullptr);
+      cells[cells_x * cells_y - 1]->SetWall(nullptr);
+      cells[cells_x * cells_y - 2]->SetWall(nullptr);
+      cells[cells_x * cells_y - cells_x - 1]->SetWall(nullptr);
    }
 
    for (auto& cell : cells)

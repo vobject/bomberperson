@@ -257,20 +257,20 @@ void ResourceCache::LoadPlayerResources()
                             LoadTexture("sprite/player_1_right_2.png", size) });
    mPlayerRes[player_1.GetId()] = player_1;
 
-//   PlayerResource player_2(DefaultOptions::PLAYER_ID_2);
-//   player_2.SetWalkFrames(Direction::Up,
-//                          { LoadTexture("sprite/player_2_up_1.png"),
-//                            LoadTexture("sprite/player_2_up_2.png") });
-//   player_2.SetWalkFrames(Direction::Down,
-//                          { LoadTexture("sprite/player_2_down_1.png"),
-//                            LoadTexture("sprite/player_2_down_2.png") });
-//   player_2.SetWalkFrames(Direction::Left,
-//                          { LoadTexture("sprite/player_2_left_1.png"),
-//                            LoadTexture("sprite/player_2_left_2.png") });
-//   player_2.SetWalkFrames(Direction::Right,
-//                          { LoadTexture("sprite/player_2_right_1.png"),
-//                            LoadTexture("sprite/player_2_right_2.png") });
-//   mPlayerRes[player_2.GetId()] = player_2;
+   PlayerResource player_2(DefaultOptions::PLAYER_ID_2);
+   player_2.SetWalkFrames(Direction::Up,
+                          { LoadTexture("sprite/player_2_up_1.png", size),
+                            LoadTexture("sprite/player_2_up_2.png", size) });
+   player_2.SetWalkFrames(Direction::Down,
+                          { LoadTexture("sprite/player_2_down_1.png", size),
+                            LoadTexture("sprite/player_2_down_2.png", size) });
+   player_2.SetWalkFrames(Direction::Left,
+                          { LoadTexture("sprite/player_2_left_1.png", size),
+                            LoadTexture("sprite/player_2_left_2.png", size) });
+   player_2.SetWalkFrames(Direction::Right,
+                          { LoadTexture("sprite/player_2_right_1.png", size),
+                            LoadTexture("sprite/player_2_right_2.png", size) });
+   mPlayerRes[player_2.GetId()] = player_2;
 }
 
 SDL_Surface* ResourceCache::LoadTexture(const std::string& file, const Size& size)

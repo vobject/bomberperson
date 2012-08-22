@@ -8,8 +8,8 @@
 #include <vector>
 
 class Cell;
-class Point;
-class Size;
+struct Point;
+struct Size;
 enum class CellItem;
 
 class Arena : public SceneObject
