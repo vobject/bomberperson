@@ -39,7 +39,7 @@ void BomberPersonApp::Mainloop()
 //   auto high = std::chrono::high_resolution_clock::now();
 
    // Milliseconds to wait for a game update.
-   const int delta_time = DefaultOptions::MAINLOOP_UPDATE_DELTA;
+   const int delta_time = 2_ms;
    int old_time = SDL_GetTicks();
    int game_time = 0;
    int accumulator = 0;
@@ -73,10 +73,9 @@ void BomberPersonApp::Initialize()
 
    InitNui();
 
-   const Size screen_size = { DefaultOptions::SCREEN_WIDTH,
-                              DefaultOptions::SCREEN_HEIGHT };
+   const Size screen_size = { DefaultSize::SCREEN_WIDTH, DefaultSize::SCREEN_HEIGHT };
    mRenderer = std::make_shared<SdlRenderer>(screen_size);
-   mWndFrame = std::make_shared<WindowFrame>(DefaultOptions::APP_NAME);
+   mWndFrame = std::make_shared<WindowFrame>("BomberPerson");
    mLogic = std::make_shared<Logic>(mRenderer);
 }
 

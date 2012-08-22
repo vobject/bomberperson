@@ -28,7 +28,7 @@ public:
    void Detonate();
 
 private:
-   static const int DEFAULT_LIFETIME = 3000_ms;
+   static const int DEFAULT_LIFETIME = 2500_ms;
 
    void PlantCenterExplosion() const;
    void PlantRangeExplosion(Direction dir) const;

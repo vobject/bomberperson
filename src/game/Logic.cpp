@@ -19,43 +19,34 @@ Logic::Logic(const std::shared_ptr<Renderer>& renderer)
    // This should usually just be done when the app cahnges from mainmenu-state
    //  or from the choose-match-options-state into the actual game-state.
 
-   mBackground = std::make_shared<Background>(DefaultOptions::ARENA_BG_ID);
-   mBackground->SetSize({ DefaultOptions::ARENA_BG_WIDTH,
-                          DefaultOptions::ARENA_BG_HEIGHT });
-   mBackground->SetBorderSize({ DefaultOptions::ARENA_BG_BORDER_WIDTH,
-                                DefaultOptions::ARENA_BG_BORDER_HEIGHT });
+   mBackground = std::make_shared<Background>("bg_arena_1");
+   mBackground->SetSize({ DefaultSize::ARENA_BG_WIDTH, DefaultSize::ARENA_BG_HEIGHT });
 
    const std::vector<std::shared_ptr<Player>> players = {
-      std::make_shared<Player>(DefaultOptions::PLAYER_ID_1)
-    , std::make_shared<Player>(DefaultOptions::PLAYER_ID_2)
+      std::make_shared<Player>("player_1")
+    , std::make_shared<Player>("player_2")
+//    , std::make_shared<Player>("player_3")
+//    , std::make_shared<Player>("player_4")
    };
 
    mFieldGen = std::make_shared<ArenaGenerator>();
-   mFieldGen->SetArenaPosition({ mBackground->GetBorderSize().Width,
-                                 mBackground->GetBorderSize().Height });
-   mFieldGen->SetArenaSize({ DefaultOptions::ARENA_WIDTH,
-                             DefaultOptions::ARENA_HEIGHT });
-   auto arena = mFieldGen->GetDefaultArena(DefaultOptions::ARENA_CELLS_X,
-                                           DefaultOptions::ARENA_CELLS_Y,
-                                           players.size());
+   mFieldGen->SetArenaPosition({ DefaultSize::ARENA_POS_X, DefaultSize::ARENA_POS_Y });
+   mFieldGen->SetArenaSize({ DefaultSize::ARENA_WIDTH, DefaultSize::ARENA_HEIGHT });
+   auto arena = mFieldGen->GetDefaultArena(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, players.size());
 
    const auto input_p1 = std::make_shared<KeyboardInput>(SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE);
-   const auto parent_cell_p1 = arena->GetCellFromCoordinates(DefaultOptions::PLAYER_1_CELL_X,
-                                                             DefaultOptions::PLAYER_1_CELL_Y);
+   const auto parent_cell_p1 = arena->GetCellFromCoordinates(DefaultSize::PLAYER_1_CELL_X, DefaultSize::PLAYER_1_CELL_Y);
    players[0]->SetInputDevice(input_p1);
    players[0]->SetParentCell(parent_cell_p1);
    players[0]->SetPosition(parent_cell_p1->GetPosition());
-   players[0]->SetSize({ DefaultOptions::PLAYER_WIDTH,
-                         DefaultOptions::PLAYER_HEIGHT });
+   players[0]->SetSize({ DefaultSize::PLAYER_WIDTH, DefaultSize::PLAYER_HEIGHT });
 
    const auto input_p2 = std::make_shared<KeyboardInput>(SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_LCTRL);
-   const auto parent_cell_p2 = arena->GetCellFromCoordinates(DefaultOptions::PLAYER_2_CELL_X,
-                                                             DefaultOptions::PLAYER_2_CELL_Y);
+   const auto parent_cell_p2 = arena->GetCellFromCoordinates(DefaultSize::PLAYER_2_CELL_X, DefaultSize::PLAYER_2_CELL_Y);
    players[1]->SetInputDevice(input_p2);
    players[1]->SetParentCell(parent_cell_p2);
    players[1]->SetPosition(parent_cell_p2->GetPosition());
-   players[1]->SetSize({ DefaultOptions::PLAYER_WIDTH,
-                         DefaultOptions::PLAYER_HEIGHT });
+   players[1]->SetSize({ DefaultSize::PLAYER_WIDTH, DefaultSize::PLAYER_HEIGHT });
 
    mMatch = std::make_shared<Match>(arena, players);
 }

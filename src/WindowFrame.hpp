@@ -22,7 +22,7 @@ protected:
 
    std::string mTitle;
 
-   const int mFrameTimerUpdateRate = DefaultOptions::FPS_UPDATE_RATE;
+   const int mFrameTimerUpdateRate = 1000_ms;
    SDL_TimerID mFrameTimer = nullptr;
 
    int mUpdateCount = 0; // Internal game updates (input, physics, etc.)

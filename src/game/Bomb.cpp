@@ -8,8 +8,8 @@ Bomb::Bomb(const std::string& name, const std::shared_ptr<Cell>& cell)
 {
    SetResourceId(name);
 
-   mAnimation.SetFrameCount(2);
-   mAnimation.SetLength(500);
+   mAnimation.SetFrameCount(3);
+   mAnimation.SetLength(DEFAULT_LIFETIME);
    mAnimation.SetLooping(true);
 }
 

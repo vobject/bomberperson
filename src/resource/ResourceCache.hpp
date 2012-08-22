@@ -23,12 +23,7 @@ public:
    // TODO:
    // SetTheme();
 
-//   BackgroundResource GetBackground(const std::string& id);
-//   SpriteResource GetSprite(const std::string& id);
-
    SpriteResource GetBgResource(const std::string& id) const;
-//   SpriteResource GetArenaResource(const std::string& id) const;
-   SpriteResource GetCellResource(const std::string& id) const;
    SpriteResource GetWallResource(const std::string& id) const;
    SpriteResource GetExtraResource(const std::string& id) const;
    SpriteResource GetBombResource(const std::string& id) const;
@@ -42,12 +37,7 @@ public:
 //   SDL_Surface* GetResource(const std::string& id);
 
 private:
-//   void LoadSprites(const std::string& id,
-//                   const std::vector<std::string>& files, const Size& size);
-
    void LoadBackgroundResources();
-//   void LoadArenaResources();
-   void LoadCellResources();
    void LoadWallResources();
    void LoadExtraResources();
    void LoadBombResources();
@@ -58,8 +48,6 @@ private:
 
    std::string mResDir;
    std::map<std::string, SpriteResource> mBackgroundRes;
-//   std::map<std::string, SpriteResource> mArenaRes;
-   std::map<std::string, SpriteResource> mCellRes;
    std::map<std::string, SpriteResource> mWallRes;
    std::map<std::string, SpriteResource> mExtraRes;
    std::map<std::string, SpriteResource> mBombRes;

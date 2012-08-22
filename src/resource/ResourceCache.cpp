@@ -6,11 +6,8 @@
 #include <SDL_image.h>
 #include <SDL_rotozoom.h>
 
-//#include <boost/filesystem.hpp>
-//namespace boostfs = boost::filesystem;
-
 ResourceCache::ResourceCache()
-   : mResDir(DefaultOptions::RESOURCE_DIR)
+   : mResDir("res")
 {
    if (0 == IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG)) {
        throw "Failed to initialize SDL_image";
@@ -18,8 +15,6 @@ ResourceCache::ResourceCache()
 
    // TODO: Coordinate this using XML files.
    LoadBackgroundResources();
-//   LoadArenaResources();
-   LoadCellResources();
    LoadWallResources();
    LoadExtraResources();
    LoadBombResources();
@@ -34,63 +29,10 @@ ResourceCache::~ResourceCache()
    }
 }
 
-//void ResourceCache::AddDirectory(const std::string& dir)
-//{
-//   boostfs::path path(dir);
-//
-//   try
-//   {
-//      if (!boostfs::exists(path) || !boostfs::is_directory(path)) {
-//         LOG(logDEBUG) << "Resource directory does not exist: " << path;
-//         return;
-//      }
-//
-//      boostfs::directory_iterator dir_iter(path);
-//      boostfs::directory_iterator end_iter;
-//
-//      for (; dir_iter != end_iter; dir_iter++)
-//      {
-//         if (boostfs::is_directory(*dir_iter)) {
-//            continue;
-//         }
-//
-//         Load(dir_iter->path().c_str(), dir_iter->path().filename().c_str());
-//      }
-//   }
-//   catch (const boostfs::filesystem_error& ex)
-//   {
-//      LOG(logERROR) << "File system exception while adding resource directory.";
-//   }
-//}
-
-
-//SpriteResource ResourceCache::GetSprite(const std::string& id)
-//{
-//   return mSprites[id];
-//}
-
 SpriteResource ResourceCache::GetBgResource(const std::string& id) const
 {
    const auto iter = mBackgroundRes.find(id);
    if (iter == mBackgroundRes.end()) {
-      throw "Trying to access non-existing resource";
-   }
-   return iter->second;
-}
-
-//SpriteResource ResourceCache::GetArenaResource(const std::string& id) const
-//{
-//   const auto iter = mArenaRes.find(id);
-//   if (iter == mArenaRes.end()) {
-//      throw "Trying to access non-existing resource";
-//   }
-//   return iter->second;
-//}
-
-SpriteResource ResourceCache::GetCellResource(const std::string& id) const
-{
-   const auto iter = mCellRes.find(id);
-   if (iter == mCellRes.end()) {
       throw "Trying to access non-existing resource";
    }
    return iter->second;
@@ -141,95 +83,69 @@ PlayerResource ResourceCache::GetPlayerResource(const std::string& id) const
    return iter->second;
 }
 
-//void ResourceCache::LoadSprite(
-//   const std::string& id,
-//   const std::vector<std::string>& files,
-//   const Size& size
-//)
-//{
-//   std::vector<SDL_Surface*> textures;
-//
-//   for (const auto& file : files)
-//   {
-//      textures.push_back(LoadTexture(file, size));
-//   }
-//
-//   mSprites[id] = { id, textures };
-//}
-
-
 void ResourceCache::LoadBackgroundResources()
 {
-   const auto bg_arena_1_id = DefaultOptions::ARENA_BG_ID;
-   const Size size = { DefaultOptions::ARENA_BG_WIDTH,
-                       DefaultOptions::ARENA_BG_HEIGHT };
+   const Size size = { DefaultSize::ARENA_BG_WIDTH,
+                       DefaultSize::ARENA_BG_HEIGHT };
 
-   mBackgroundRes[bg_arena_1_id] = { bg_arena_1_id, { LoadTexture("../res_nonfree/bg/arena_2.png", size) } };
-}
-
-//void ResourceCache::LoadArenaResources()
-//{
-//   const auto arena_id = DefaultOptions::ARENA_ID;
-//   const Size size = { DefaultOptions::ARENA_WIDTH,
-//                       DefaultOptions::ARENA_HEIGHT };
-//
-//   mArenaRes[arena_id] = { arena_id, { LoadTexture("../res_nonfree/sprite/arena_1.png", size) } };
-//}
-
-void ResourceCache::LoadCellResources()
-{
-   const auto cell_id = DefaultOptions::CELL_ID;
-   const Size size = { DefaultOptions::CELL_WIDTH,
-                       DefaultOptions::CELL_HEIGHT };
-
-   mCellRes[cell_id] = { cell_id, { LoadTexture("sprite/cell.png", size) } };
+   mBackgroundRes["bg_arena_1"] = {
+      "bg_arena_1",
+      { LoadTexture("sprite/bg_arena_1.png", size) }
+   };
 }
 
 void ResourceCache::LoadWallResources()
 {
-   const auto wood_id = DefaultOptions::WALL_ID_WOOD;
-   const auto bricks_id = DefaultOptions::WALL_ID_BRICKS;
-   const Size size = { DefaultOptions::WALL_WIDTH,
-                       DefaultOptions::WALL_HEIGHT };
+   const Size size = { DefaultSize::WALL_WIDTH,
+                       DefaultSize::WALL_HEIGHT };
 
-   mWallRes[wood_id] = { wood_id, { LoadTexture("../res_nonfree/sprite/wall_wood.png", size) } };
-   mWallRes[bricks_id] = { bricks_id, { LoadTexture("sprite/wall_bricks.png", size) } };
+   mWallRes["wall_destructible"] = {
+      "wall_destructible",
+      { LoadTexture("sprite/wall_destructible.png", size) }
+   };
 }
 
 void ResourceCache::LoadExtraResources()
 {
-   const auto speed_id = DefaultOptions::EXTRA_ID_SPEED;
-   const auto bombs_id = DefaultOptions::EXTRA_ID_BOMBS;
-   const auto range_id = DefaultOptions::EXTRA_ID_RANGE;
-   const Size size = { DefaultOptions::EXTRA_WIDTH,
-                       DefaultOptions::EXTRA_HEIGHT };
+   const Size size = { DefaultSize::EXTRA_WIDTH,
+                       DefaultSize::EXTRA_HEIGHT };
 
-   mExtraRes[speed_id] = { speed_id, { LoadTexture("sprite/extra_speed.png", size) } };
-   mExtraRes[bombs_id] = { bombs_id, { LoadTexture("sprite/extra_supply.png", size) } };
-   mExtraRes[range_id] = { range_id, { LoadTexture("sprite/extra_range.png", size) } };
+   mExtraRes["extra_speed"] = {
+      "extra_speed",
+      { LoadTexture("sprite/extra_speed.png", size) }
+   };
+
+   mExtraRes["extra_bombs"] = {
+      "extra_bombs",
+      { LoadTexture("sprite/extra_supply.png", size) }
+   };
+
+   mExtraRes["extra_range"] = {
+      "extra_range",
+      { LoadTexture("sprite/extra_range.png", size) }
+   };
 }
 
 void ResourceCache::LoadBombResources()
 {
-   const auto bomb_id = DefaultOptions::BOMB_ID;
-   const Size size = { DefaultOptions::BOMB_WIDTH,
-                       DefaultOptions::BOMB_HEIGHT };
+   const Size size = { DefaultSize::BOMB_WIDTH,
+                       DefaultSize::BOMB_HEIGHT };
 
-   mBombRes[bomb_id] = {
-      bomb_id,
+   mBombRes["bomb"] = {
+      "bomb",
       { LoadTexture("sprite/bomb_1.png", size),
-        LoadTexture("sprite/bomb_2.png", size) }
+        LoadTexture("sprite/bomb_2.png", size),
+        LoadTexture("sprite/bomb_3.png", size) }
    };
 }
 
 void ResourceCache::LoadExplosionResources()
 {
-   const auto explosion_id = DefaultOptions::EXPLOSION_ID;
-   const Size size = { DefaultOptions::EXPLOSION_WIDTH,
-                       DefaultOptions::EXPLOSION_HEIGHT };
+   const Size size = { DefaultSize::EXPLOSION_WIDTH,
+                       DefaultSize::EXPLOSION_HEIGHT };
 
-   mExplosionRes[explosion_id] = {
-      explosion_id,
+   mExplosionRes["explosion"] = {
+      "explosion",
       { LoadTexture("sprite/explosion_1.png", size),
         LoadTexture("sprite/explosion_2.png", size),
         LoadTexture("sprite/explosion_3.png", size),
@@ -239,10 +155,10 @@ void ResourceCache::LoadExplosionResources()
 
 void ResourceCache::LoadPlayerResources()
 {
-   const Size size = { DefaultOptions::PLAYER_WIDTH,
-                       DefaultOptions::PLAYER_HEIGHT };
+   const Size size = { DefaultSize::PLAYER_WIDTH,
+                       DefaultSize::PLAYER_HEIGHT };
 
-   PlayerResource player_1(DefaultOptions::PLAYER_ID_1);
+   PlayerResource player_1("player_1");
    player_1.SetWalkFrames(Direction::Up,
                           { LoadTexture("sprite/player_1_up_1.png", size),
                             LoadTexture("sprite/player_1_up_2.png", size) });
@@ -257,7 +173,7 @@ void ResourceCache::LoadPlayerResources()
                             LoadTexture("sprite/player_1_right_2.png", size) });
    mPlayerRes[player_1.GetId()] = player_1;
 
-   PlayerResource player_2(DefaultOptions::PLAYER_ID_2);
+   PlayerResource player_2("player_2");
    player_2.SetWalkFrames(Direction::Up,
                           { LoadTexture("sprite/player_2_up_1.png", size),
                             LoadTexture("sprite/player_2_up_2.png", size) });
@@ -271,6 +187,36 @@ void ResourceCache::LoadPlayerResources()
                           { LoadTexture("sprite/player_2_right_1.png", size),
                             LoadTexture("sprite/player_2_right_2.png", size) });
    mPlayerRes[player_2.GetId()] = player_2;
+
+   PlayerResource player_3("player_3");
+   player_3.SetWalkFrames(Direction::Up,
+                          { LoadTexture("sprite/player_3_up_1.png", size),
+                            LoadTexture("sprite/player_3_up_2.png", size) });
+   player_3.SetWalkFrames(Direction::Down,
+                          { LoadTexture("sprite/player_3_down_1.png", size),
+                            LoadTexture("sprite/player_3_down_2.png", size) });
+   player_3.SetWalkFrames(Direction::Left,
+                          { LoadTexture("sprite/player_3_left_1.png", size),
+                            LoadTexture("sprite/player_3_left_2.png", size) });
+   player_3.SetWalkFrames(Direction::Right,
+                          { LoadTexture("sprite/player_3_right_1.png", size),
+                            LoadTexture("sprite/player_3_right_2.png", size) });
+   mPlayerRes[player_3.GetId()] = player_3;
+
+   PlayerResource player_4("player_4");
+   player_4.SetWalkFrames(Direction::Up,
+                          { LoadTexture("sprite/player_4_up_1.png", size),
+                            LoadTexture("sprite/player_4_up_2.png", size) });
+   player_4.SetWalkFrames(Direction::Down,
+                          { LoadTexture("sprite/player_4_down_1.png", size),
+                            LoadTexture("sprite/player_4_down_2.png", size) });
+   player_4.SetWalkFrames(Direction::Left,
+                          { LoadTexture("sprite/player_4_left_1.png", size),
+                            LoadTexture("sprite/player_4_left_2.png", size) });
+   player_4.SetWalkFrames(Direction::Right,
+                          { LoadTexture("sprite/player_4_right_1.png", size),
+                            LoadTexture("sprite/player_4_right_2.png", size) });
+   mPlayerRes[player_4.GetId()] = player_4;
 }
 
 SDL_Surface* ResourceCache::LoadTexture(const std::string& file, const Size& size)

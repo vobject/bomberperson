@@ -14,12 +14,6 @@ public:
    Background& operator=(const Background&) = delete;
 
    void Update(int elapsed_time) override;
-
-   Size GetBorderSize() const;
-   void SetBorderSize(const Size& size);
-
-private:
-   Size mBorderSize { 0, 0 };
 };
 
 #endif // BACKGROUND_HPP
