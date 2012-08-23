@@ -25,8 +25,7 @@ SdlRenderer::SdlRenderer(const Size res)
                               32,
                               SDL_ANYFORMAT |
                                  SDL_SWSURFACE |
-                                 SDL_DOUBLEBUF |
-                                 SDL_RESIZABLE);
+                                 SDL_DOUBLEBUF);
    if (!mScreen) {
       throw "SDL_SetVideoMode() failed.";
    }

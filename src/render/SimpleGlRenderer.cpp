@@ -25,7 +25,7 @@ SimpleGlRenderer::SimpleGlRenderer(const Size res)
    const auto screen = SDL_SetVideoMode(res.Width,
                                         res.Height,
                                         32,
-                                        SDL_OPENGL | SDL_RESIZABLE);
+                                        SDL_OPENGL);
    if (!screen) {
       throw "SDL_SetVideoMode() failed.";
    }
