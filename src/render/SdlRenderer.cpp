@@ -33,12 +33,6 @@ SdlRenderer::SdlRenderer(const Size res)
    // The return value of SDL_SetVideoMode() (-> screen) should not be freed
    //  by the caller. The man page tells us to rely on SDL_Quit() to do this.
 
-   // TODO: Calculate the size for each renderable object type and
-   //  pass the sizes into ResourceCache, so it can scale the resources
-   //  at load time.
-   // ---> This idea does not work! Instead introduce some sort of
-   //  scaled-texture-cache inside the renderer class!
-
    mResCache = std::make_shared<ResourceCache>();
 }
 
@@ -82,10 +76,6 @@ void SdlRenderer::Render(const std::shared_ptr<Match>& match)
 
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
-//   const auto name = arena->GetResourceId();
-//   const auto frame = mResCache->GetArenaResource(name).GetFrame(0);
-//   Render(arena, frame);
-
    for (const auto& cell : arena->GetCells())
    {
       Render(cell);
@@ -94,18 +84,9 @@ void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 
 void SdlRenderer::Render(const std::shared_ptr<Cell>& cell)
 {
-//   const auto name = cell->GetResourceId();
-//   const auto frame = mResCache->GetCellResource(name).GetFrame(0);
-//   Render(cell, frame);
-
    if (cell->HasWall())
    {
-      const auto wall = cell->GetWall();
-      if (wall->IsDestructible())
-      {
-         // Indestructible wall are always part of the background image.
-         Render(wall);
-      }
+      Render(cell->GetWall());
       return;
    }
 

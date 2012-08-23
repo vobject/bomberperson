@@ -103,6 +103,11 @@ void ResourceCache::LoadWallResources()
       "wall_destructible",
       { LoadTexture("sprite/wall_destructible.png", size) }
    };
+
+   mWallRes["wall_indestructible"] = {
+      "wall_indestructible",
+      { LoadTexture("sprite/wall_indestructible.png", size) }
+   };
 }
 
 void ResourceCache::LoadExtraResources()
