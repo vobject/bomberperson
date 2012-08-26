@@ -38,14 +38,17 @@ void BomberPersonApp::Mainloop()
    // A game update call will update the game status by this amount of time.
    const std::chrono::milliseconds delta_time(2_ms);
 
-   auto old_time = std::chrono::high_resolution_clock::now();
+   auto old_time = std::chrono::milliseconds(SDL_GetTicks());
+//   auto old_time = std::chrono::high_resolution_clock::now();
    auto game_time = std::chrono::milliseconds::zero();
    auto accumulator = std::chrono::milliseconds::zero();
 
    while(!mQuitRequested)
    {
-      const auto new_time = std::chrono::high_resolution_clock::now();
-      auto frame_time = std::chrono::duration_cast<std::chrono::milliseconds>(new_time - old_time);
+      const auto new_time = std::chrono::milliseconds(SDL_GetTicks());
+//      const auto new_time = std::chrono::high_resolution_clock::now();
+      auto frame_time = new_time - old_time;
+//      auto frame_time = std::chrono::duration_cast<std::chrono::milliseconds>(new_time - old_time);
       old_time = new_time;
 
       // Number of ms the game lacks behind and has to be updated for.
