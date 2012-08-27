@@ -9,7 +9,7 @@ struct SDL_Surface;
 class SimpleSdlRenderer : public Renderer
 {
 public:
-   SimpleSdlRenderer(Size res);
+   explicit SimpleSdlRenderer(Size res);
    virtual ~SimpleSdlRenderer();
 
    SimpleSdlRenderer(const SimpleSdlRenderer&) = delete;
