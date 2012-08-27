@@ -17,7 +17,7 @@ public:
    void UpdateDone();
    void FrameDone();
 
-protected:
+private:
    static Uint32 DefaultFrameTimerCallback(Uint32 interval, void *param);
 
    std::string mTitle;
