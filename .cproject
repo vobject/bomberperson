@@ -55,6 +55,7 @@
 									<listOptionValue builtIn="false" value="SDL"/>
 									<listOptionValue builtIn="false" value="SDL_image"/>
 									<listOptionValue builtIn="false" value="SDL_gfx"/>
+									<listOptionValue builtIn="false" value="SDL_mixer"/>
 									<listOptionValue builtIn="false" value="SDL_ttf"/>
 									<listOptionValue builtIn="false" value="OpenNI"/>
 									<listOptionValue builtIn="false" value="GL"/>
@@ -124,12 +125,13 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.108068650" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
 								<option id="gnu.cpp.link.option.libs.427420571" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="SDL"/>
+									<listOptionValue builtIn="false" value="SDL_image"/>
+									<listOptionValue builtIn="false" value="SDL_gfx"/>
+									<listOptionValue builtIn="false" value="SDL_mixer"/>
 									<listOptionValue builtIn="false" value="SDL_ttf"/>
 									<listOptionValue builtIn="false" value="OpenNI"/>
 									<listOptionValue builtIn="false" value="GL"/>
 									<listOptionValue builtIn="false" value="X11"/>
-									<listOptionValue builtIn="false" value="SDL_image"/>
-									<listOptionValue builtIn="false" value="SDL_gfx"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.587052439" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1029392351" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">

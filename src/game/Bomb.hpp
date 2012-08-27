@@ -3,6 +3,7 @@
 
 #include "SceneObject.hpp"
 #include "Animation.hpp"
+//#include "Sound.hpp"
 #include "../utils/Utils.hpp"
 
 #include <memory>
@@ -21,6 +22,7 @@ public:
    void Update(int elapsed_time) override;
 
    int GetAnimationFrame() const;
+   bool WasPlantedSound() const;
 
    int GetRange() const;
    void SetRange(int range);
@@ -33,11 +35,13 @@ private:
    void PlantCenterExplosion() const;
    void PlantRangeExplosion(Direction dir) const;
 
-   std::shared_ptr<Cell> mParentCell;
+   const std::shared_ptr<Cell> mParentCell;
    int mLifeTime = 0;
    int mRange = 1;
 
    Animation mAnimation;
+   mutable bool mPlantedSound;
+//   Sound mPlantedSound;
 };
 
 #endif // BOMB_HPP

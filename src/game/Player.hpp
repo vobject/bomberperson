@@ -3,6 +3,7 @@
 
 #include "SceneObject.hpp"
 #include "Animation.hpp"
+#include "Sound.hpp"
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
@@ -12,6 +13,11 @@
 class InputDevice;
 class Cell;
 class Bomb;
+
+enum class PlayerSound
+{
+
+};
 
 class Player : public SceneObject
 {

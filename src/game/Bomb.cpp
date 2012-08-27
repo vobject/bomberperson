@@ -11,6 +11,7 @@ Bomb::Bomb(const std::string& name, const std::shared_ptr<Cell>& cell)
    mAnimation.SetFrameCount(3);
    mAnimation.SetLength(DEFAULT_LIFETIME);
    mAnimation.SetLooping(true);
+   mPlantedSound = true;
 }
 
 Bomb::~Bomb()
@@ -39,6 +40,15 @@ void Bomb::Update(const int elapsed_time)
 int Bomb::GetAnimationFrame() const
 {
    return mAnimation.GetCurrentFrame();
+}
+
+bool Bomb::WasPlantedSound() const
+{
+   if (mPlantedSound) {
+      mPlantedSound = false;
+      return true;
+   }
+   return false;
 }
 
 int Bomb::GetRange() const
