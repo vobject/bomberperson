@@ -20,22 +20,20 @@ inline std::string NowTime();
 class Log
 {
 public:
-   Log() { };
+   Log() { }
    ~Log();
+
+   Log(const Log&) = delete;
+   Log& operator=(const Log&) = delete;
 
    std::ostringstream& Get(LogLevel level = logINFO);
 
    static LogLevel& ReportingLevel();
    static std::string ToString(LogLevel level);
 
-protected:
-   std::ostringstream os;
-
 private:
-   Log(const Log&);
-   Log& operator =(const Log&);
+   std::ostringstream os;
 };
-
 
 inline std::ostringstream& Log::Get(LogLevel level)
 {
@@ -60,7 +58,7 @@ inline LogLevel& Log::ReportingLevel()
 
 inline std::string Log::ToString(LogLevel level)
 {
-   static const char* const buffer[] = {"ERROR", "WARNING", "INFO", "DEBUG"};
+   static const char* const buffer[] = { "ERROR", "WARNING", "INFO", "DEBUG" };
    return buffer[level];
 }
 

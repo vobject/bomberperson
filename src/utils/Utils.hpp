@@ -16,7 +16,7 @@ enum class Direction
 
 struct Point
 {
-   constexpr Point(int x, int y) : X(x), Y(y) { }
+   constexpr Point(int x, int y) : X{x}, Y{y} { }
 
    int X;
    int Y;
@@ -24,7 +24,7 @@ struct Point
 
 struct Size
 {
-   constexpr Size(int width, int height) : Width(width), Height(height) { }
+   constexpr Size(int width, int height) : Width{width}, Height{height} { }
 
    bool operator!() const
    { return !Width && !Height; }
@@ -42,32 +42,23 @@ struct Size
    int Height;
 };
 
-//static Size operator-(const Size s1, const Size s2)
-//{ return { s1.Width - s2.Width, s1.Height - s2.Height }; }
-//
-//static Size operator+(const Size s1, const Size s2)
-//{ return { s1.Width + s2.Width, s1.Height + s2.Height }; }
-//
-//static Size operator*(const Size s1, const int n)
-//{ return { s1.Width * n, s1.Height * n }; }
+//struct Rect
+//{
+//   constexpr Rect(int x, int y, int w, int h) : X(x), Y(y), Width(w), Height(h) { }
 
-struct Rect
-{
-   constexpr Rect(int x, int y, int w, int h) : X(x), Y(y), Width(w), Height(h) { }
+//   int X;
+//   int Y;
+//   int Width;
+//   int Height;
+//};
 
-   int X;
-   int Y;
-   int Width;
-   int Height;
-};
+//struct ScreenPos
+//{
+//   constexpr ScreenPos(float x, float y) : X(x), Y(y) { }
 
-struct ScreenPos
-{
-   constexpr ScreenPos(float x, float y) : X(x), Y(y) { }
-
-   float X;
-   float Y;
-};
+//   float X;
+//   float Y;
+//};
 
 constexpr int operator"" _pt(unsigned long long point_size)
 {
@@ -84,13 +75,9 @@ constexpr int operator"" _ms(unsigned long long milliseconds)
    return milliseconds;
 }
 
-constexpr int operator"" _mm(unsigned long long millimeters)
-{
-   return millimeters;
-}
-
-// http://herbsutter.com/gotw/_102/
-// http://stackoverflow.com/questions/10149840/c-arrays-and-make-unique
+// Source:
+//  http://herbsutter.com/gotw/_102/
+//  http://stackoverflow.com/questions/10149840/c-arrays-and-make-unique
 template<typename T, typename ...Args>
 typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T>>::type
 make_unique(Args&& ...args)
@@ -105,5 +92,13 @@ make_unique(std::size_t n)
    typedef typename std::remove_extent<T>::type RT;
    return std::unique_ptr<T>(new RT[n]);
 }
+
+// Source:
+// http://channel9.msdn.com/Events/GoingNative/GoingNative-2012/C-11-VC-11-and-Beyond
+template<class T>
+auto cbegin(const T& t) -> decltype(t.cbegin()) { return t.cbegin(); }
+
+template<class T>
+auto cend(const T& t) -> decltype(t.cend()) { return t.cend(); }
 
 #endif // UTILS_HPP
