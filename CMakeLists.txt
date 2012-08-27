@@ -12,6 +12,7 @@ ENDIF()
 # TODO: Check compiler version to be at least g++4.7 or clang++3.1.
 
 FIND_PACKAGE(SDL REQUIRED)
+FIND_PACKAGE(SDL_image REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED) # TODO: Make this optional
 FIND_PACKAGE(X11 REQUIRED) # OpenGL should already have taken care of this...
 # TODO: Check for OpenNI
@@ -42,8 +43,8 @@ ADD_EXECUTABLE(BomberPerson ${BOMBERPERSON_HEADERS} ${BOMBERPERSON_SOURCES})
 TARGET_LINK_LIBRARIES(
    ${PROJECT_NAME}
    ${SDL_LIBRARY}
+   ${SDLIMAGE_LIBRARY}
    ${OPENGL_LIBRARIES}
    ${X11_LIBRARIES}
-   SDL_image
    SDL_gfx
 )
