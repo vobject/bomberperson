@@ -103,11 +103,12 @@ void Player::UpdateMovement(const int elapsed_time)
    int down = 0;
    int left = 0;
    int right = 0;
+   bool update_anim = false;
 
    if (mInput->TestUp())
    {
       mDirection = Direction::Up;
-      UpdateAnimation(elapsed_time);
+      update_anim = true;
 
       if (CanMove(mDirection, distance)) {
          up++;
@@ -116,7 +117,7 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInput->TestDown())
    {
       mDirection = Direction::Down;
-      UpdateAnimation(elapsed_time);
+      update_anim = true;
 
       if (CanMove(mDirection, distance)) {
          down++;
@@ -125,7 +126,7 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInput->TestLeft())
    {
       mDirection = Direction::Left;
-      UpdateAnimation(elapsed_time);
+      update_anim = true;
 
       if (CanMove(mDirection, distance)) {
          left++;
@@ -134,7 +135,7 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInput->TestRight())
    {
       mDirection = Direction::Right;
-      UpdateAnimation(elapsed_time);
+      update_anim = true;
 
       if (CanMove(mDirection, distance)) {
          right++;
@@ -142,6 +143,12 @@ void Player::UpdateMovement(const int elapsed_time)
    }
 
    SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
+
+   if (update_anim)
+   {
+      UpdateAnimation(elapsed_time);
+   }
+
    mMoveIdleTime = 0;
 }
 
