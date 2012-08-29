@@ -14,7 +14,7 @@ class Match;
 class Logic
 {
 public:
-   Logic(const std::shared_ptr<Renderer>& renderer);
+   Logic();
    virtual ~Logic();
 
    Logic(const Logic&) = delete;
@@ -24,10 +24,9 @@ public:
 //   virtual void ProcessInput(const kinex::Nui& kinect);
 
    virtual void Update(int app_time, int elapsed_time);
-   virtual void Render();
+   virtual void Render(const std::shared_ptr<Renderer>& renderer);
 
 private:
-   std::shared_ptr<Renderer> mRenderer;
    std::shared_ptr<Background> mBackground;
    std::shared_ptr<ArenaGenerator> mFieldGen;
    std::shared_ptr<Match> mMatch;

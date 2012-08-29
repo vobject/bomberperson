@@ -72,10 +72,11 @@ void BomberPersonApp::Initialize()
 
    InitNui();
 
-   const Size screen_size = { DefaultSize::SCREEN_WIDTH, DefaultSize::SCREEN_HEIGHT };
+   const Size screen_size = { DefaultSize::SCREEN_WIDTH,
+                              DefaultSize::SCREEN_HEIGHT };
    mRenderer = std::make_shared<SdlRenderer>(screen_size);
    mWndFrame = std::make_shared<WindowFrame>("BomberPerson");
-   mLogic = std::make_shared<Logic>(mRenderer);
+   mLogic = std::make_shared<Logic>();
 }
 
 void BomberPersonApp::ProcessInput()
@@ -92,24 +93,29 @@ void BomberPersonApp::ProcessInput()
       return;
    }
 
+   // Handle application-level requests, e.g. change of the renderer.
+   if (SDL_KEYDOWN == event.type && (event.key.keysym.mod & KMOD_LALT))
+   {
+      const Size screen_size = { DefaultSize::SCREEN_WIDTH,
+                                 DefaultSize::SCREEN_HEIGHT };
+
+      if (SDLK_F1 == event.key.keysym.sym) {
+         mRenderer = std::make_shared<SimpleSdlRenderer>(screen_size);
+      }
+      else if (SDLK_F2 == event.key.keysym.sym) {
+         mRenderer = std::make_shared<SdlRenderer>(screen_size);
+      }
+      else if (SDLK_F3 == event.key.keysym.sym) {
+         mRenderer = std::make_shared<SimpleGlRenderer>(screen_size);
+      }
+      return;
+   }
+
    switch (event.type)
    {
       case SDL_KEYDOWN:
       case SDL_KEYUP:
          {
-            // TODO: Enable switching renderers with Strg-ANYKEY keys.
-
-//            if (SDLK_s == event.key.keysym.sym) {
-//               mCurrentVideoMode = VideoMode::Software;
-//               InitVideo();
-//               SelectRenderer();
-//            }
-//            else if (SDLK_o == event.key.keysym.sym) {
-//               mCurrentVideoMode = VideoMode::OpenGL;
-//               InitVideo();
-//               SelectRenderer();
-//            }
-
             mLogic->ProcessInput(event.key);
          }
          break;
@@ -129,7 +135,7 @@ void BomberPersonApp::UpdateScene(const int app_time, const int elapsed_time)
 
 void BomberPersonApp::RenderScene()
 {
-   mLogic->Render();
+   mLogic->Render(mRenderer);
    mWndFrame->FrameDone();
 }
 

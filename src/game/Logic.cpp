@@ -12,8 +12,7 @@
 
 #include <SDL_events.h>
 
-Logic::Logic(const std::shared_ptr<Renderer>& renderer)
-   : mRenderer(renderer)
+Logic::Logic()
 {
    // Create a new game and start it.
    // This should usually just be done when the app cahnges from mainmenu-state
@@ -89,10 +88,12 @@ void Logic::Update(const int app_time, const int elapsed_time)
    mMatch->Update(elapsed_time);
 }
 
-void Logic::Render()
+void Logic::Render(const std::shared_ptr<Renderer>& renderer)
 {
-   mRenderer->PreRender();
-   mRenderer->Render(mBackground);
-   mRenderer->Render(mMatch);
-   mRenderer->PostRender();
+   // TODO: Should the logic orchestrate rendering fine-graned?
+
+   renderer->PreRender();
+   renderer->Render(mBackground);
+   renderer->Render(mMatch);
+   renderer->PostRender();
 }
