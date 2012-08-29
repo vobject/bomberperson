@@ -78,6 +78,9 @@ std::shared_ptr<Cell> Arena::GetCellLeftOf(const int cell_x, const int cell_y) c
 
 std::shared_ptr<Cell> Arena::GetCellRightOf(const int cell_x, const int cell_y) const
 {
+   if (cell_x == (mXCells - 1)) {
+      return nullptr;
+   }
    return GetCellFromCoordinates(cell_x + 1, cell_y);
 }
 
