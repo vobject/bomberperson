@@ -99,15 +99,18 @@ void BomberPersonApp::ProcessInput()
       const Size screen_size = { DefaultSize::SCREEN_WIDTH,
                                  DefaultSize::SCREEN_HEIGHT };
 
-      if (SDLK_F1 == event.key.keysym.sym) {
+      if (SDLK_1 == event.key.keysym.sym) {
          mRenderer = std::make_shared<SimpleSdlRenderer>(screen_size);
       }
-      else if (SDLK_F2 == event.key.keysym.sym) {
+      else if (SDLK_2 == event.key.keysym.sym) {
          mRenderer = std::make_shared<SdlRenderer>(screen_size);
       }
-      else if (SDLK_F3 == event.key.keysym.sym) {
+      else if (SDLK_3 == event.key.keysym.sym) {
          mRenderer = std::make_shared<SimpleGlRenderer>(screen_size);
       }
+
+      // TODO: KMOD_LALT + SDLK_K -> try connecting to kinect device.
+
       return;
    }
 
