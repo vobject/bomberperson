@@ -24,3 +24,9 @@
 - Network support
 - AI
 - Make player walk speed dependent on the arena size, not on ms/pixel.
+- Make the game not dependent on sprites -> let the renderer choose
+   the right sprite/animation-frame based on the current animation-time.
+   -> maybe the ResCache/PlayerResource should be responsible to return
+   the right resource based on the Player-object's information.
+   -> pres.GetFrame(p.State/Direction(), p.AnimTime());
+   -> p.GetState() => Walkingnorth/south/west/east,Standing/...,Dieing,Winning

@@ -1,5 +1,4 @@
 #include "PlayerResource.hpp"
-#include "../utils/Utils.hpp"
 
 #include <SDL.h>
 
@@ -24,12 +23,20 @@ std::string PlayerResource::GetId() const
    return mId;
 }
 
-void PlayerResource::SetWalkFrames(
-   const Direction dir,
+//void PlayerResource::SetWalkFrames(
+//   const Direction dir,
+//   const std::vector<SDL_Surface*>& textures
+//)
+//{
+//   mWalkFrames[dir] = textures;
+//}
+
+void PlayerResource::SetFrames(
+   const PlayerState state,
    const std::vector<SDL_Surface*>& textures
 )
 {
-   mWalkFrames[dir] = textures;
+   mFrames[state] = textures;
 }
 
 //void PlayerResource::SetWalkDownFrames(const std::vector<SDL_Surface*>& textures_down)
@@ -63,25 +70,49 @@ void PlayerResource::SetWalkFrames(
 //   return 0;
 //}
 
-SDL_Surface* PlayerResource::GetWalkFrame(const Direction dir, const int n) const
+//SDL_Surface* PlayerResource::GetWalkFrame(const Direction dir, const int n) const
+//{
+//   const auto iter = mWalkFrames.find(dir);
+//   if (iter == mWalkFrames.end()) {
+//      throw "Trying to access non-existing frame";
+//   }
+//   return iter->second.at(n);
+
+////   switch (dir)
+////   {
+////      case Direction::Up:
+////      case Direction::Down:
+////         return mWalkFrames[dir].at(n);
+////      case Direction::Left:
+////         return mWalkFrames[dir].at(n);
+////      case Direction::Right:
+////         return mWalkFrames[dir].at(n);
+////   }
+////   return nullptr;
+//}
+
+SDL_Surface* PlayerResource::GetFrame(
+   const PlayerState state,
+   const int state_time,
+   const int speed) const
 {
-   const auto iter = mWalkFrames.find(dir);
-   if (iter == mWalkFrames.end()) {
+   const auto iter = mFrames.find(state);
+   if (iter == mFrames.end()) {
       throw "Trying to access non-existing frame";
    }
-   return iter->second.at(n);
 
-//   switch (dir)
-//   {
-//      case Direction::Up:
-//      case Direction::Down:
-//         return mWalkFrames[dir].at(n);
-//      case Direction::Left:
-//         return mWalkFrames[dir].at(n);
-//      case Direction::Right:
-//         return mWalkFrames[dir].at(n);
-//   }
-//   return nullptr;
+   // An animation must always consist of one frame or more.
+   // An animations length must always be > 0.
+
+   const auto anim_len = mAnimationLength - (speed * mAnimationLength * .05);
+   const auto ms_per_frame = anim_len / iter->second.size();
+   const int current_frame_index = state_time / ms_per_frame;
+   return iter->second.at(current_frame_index % iter->second.size());
+}
+
+void PlayerResource::SetAnimationLength(const int ms)
+{
+   mAnimationLength = ms;
 }
 
 //Size DirectedSpriteResource::GetSize(const Direction dir) const

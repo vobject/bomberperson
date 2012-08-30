@@ -139,11 +139,12 @@ void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 {
    const auto name = player->GetResourceId();
-   const auto dir = player->GetDirection();
-   const auto index = player->GetAnimationFrame();
+   const auto state = player->GetState();
+   const auto state_time = player->GetStateTime();
+   const auto speed = player->GetSpeed();
 
    const auto res = mResCache->GetPlayerResource(name);
-   const auto frame = res.GetWalkFrame(dir, index);
+   const auto frame = res.GetFrame(state, state_time, speed);
    Render(player, frame);
 }
 

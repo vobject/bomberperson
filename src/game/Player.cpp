@@ -9,21 +9,21 @@ Player::Player(const std::string& res_name)
 {
    SetResourceId(res_name);
 
-   mWalkUpAnimation.SetFrameCount(mWalkAnimationFrames);
-   mWalkUpAnimation.SetLength(mWalkAnimationLength);
-   mWalkUpAnimation.SetLooping(true);
+//   mWalkUpAnimation.SetFrameCount(mWalkAnimationFrames);
+//   mWalkUpAnimation.SetLength(mWalkAnimationLength);
+//   mWalkUpAnimation.SetLooping(true);
 
-   mWalkDownAnimation.SetFrameCount(mWalkAnimationFrames);
-   mWalkDownAnimation.SetLength(mWalkAnimationLength);
-   mWalkDownAnimation.SetLooping(true);
+//   mWalkDownAnimation.SetFrameCount(mWalkAnimationFrames);
+//   mWalkDownAnimation.SetLength(mWalkAnimationLength);
+//   mWalkDownAnimation.SetLooping(true);
 
-   mWalkLeftAnimation.SetFrameCount(mWalkAnimationFrames);
-   mWalkLeftAnimation.SetLength(mWalkAnimationLength);
-   mWalkLeftAnimation.SetLooping(true);
+//   mWalkLeftAnimation.SetFrameCount(mWalkAnimationFrames);
+//   mWalkLeftAnimation.SetLength(mWalkAnimationLength);
+//   mWalkLeftAnimation.SetLooping(true);
 
-   mWalkRightAnimation.SetFrameCount(mWalkAnimationFrames);
-   mWalkRightAnimation.SetLength(mWalkAnimationLength);
-   mWalkRightAnimation.SetLooping(true);
+//   mWalkRightAnimation.SetFrameCount(mWalkAnimationFrames);
+//   mWalkRightAnimation.SetLength(mWalkAnimationLength);
+//   mWalkRightAnimation.SetLooping(true);
 }
 
 Player::~Player()
@@ -33,6 +33,8 @@ Player::~Player()
 
 void Player::Update(const int elapsed_time)
 {
+   const auto old_state = mState;
+
    mMoveIdleTime += elapsed_time;
    if (mMoveIdleTime > mMovementSpeed)
    {
@@ -43,6 +45,13 @@ void Player::Update(const int elapsed_time)
    if (mBombIdleTime > mPlantingSpeed)
    {
       UpdateBombing(mBombIdleTime);
+   }
+
+   if (old_state == mState) {
+      mStateTime += elapsed_time;
+   }
+   else {
+      mStateTime = 0; // Start new state.
    }
 }
 
@@ -86,67 +95,83 @@ void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
    }
 }
 
-Direction Player::GetDirection() const
+//Direction Player::GetDirection() const
+//{
+//   return mDirection;
+//}
+
+//int Player::GetAnimationFrame() const
+//{
+//   return GetCurrentDirectionAnimation().GetCurrentFrame();
+//}
+
+PlayerState Player::GetState() const
 {
-   return mDirection;
+   return mState;
 }
 
-int Player::GetAnimationFrame() const
+int Player::GetStateTime() const
 {
-   return GetCurrentDirectionAnimation().GetCurrentFrame();
+   return mStateTime;
+}
+
+int Player::GetSpeed() const
+{
+   // FIXME
+   return mMovementSpeed;
 }
 
 void Player::UpdateMovement(const int elapsed_time)
 {
-   const int distance = 1;
-   int up = 0;
-   int down = 0;
-   int left = 0;
-   int right = 0;
-   bool update_anim = false;
+   const auto distance = 1;
+   auto up = 0;
+   auto down = 0;
+   auto left = 0;
+   auto right = 0;
+   auto update_anim = false;
 
    if (mInput->TestUp())
    {
-      mDirection = Direction::Up;
       update_anim = true;
+      mState = PlayerState::WalkUp;
 
-      if (CanMove(mDirection, distance)) {
+      if (CanMove(Direction::Up, distance)) {
          up++;
       }
    }
    if (mInput->TestDown())
    {
-      mDirection = Direction::Down;
       update_anim = true;
+      mState = PlayerState::WalkDown;
 
-      if (CanMove(mDirection, distance)) {
+      if (CanMove(Direction::Down, distance)) {
          down++;
       }
    }
    if (mInput->TestLeft())
    {
-      mDirection = Direction::Left;
       update_anim = true;
+      mState = PlayerState::WalkLeft;
 
-      if (CanMove(mDirection, distance)) {
+      if (CanMove(Direction::Left, distance)) {
          left++;
       }
    }
    if (mInput->TestRight())
    {
-      mDirection = Direction::Right;
       update_anim = true;
+      mState = PlayerState::WalkRight;
 
-      if (CanMove(mDirection, distance)) {
+      if (CanMove(Direction::Right, distance)) {
          right++;
       }
    }
 
    SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
 
-   if (update_anim)
+   if (!update_anim)
    {
-      UpdateAnimation(elapsed_time);
+      mState = GetStopWalkingState(mState);
    }
 
    mMoveIdleTime = 0;
@@ -180,36 +205,36 @@ void Player::UpdateBombing(const int elapsed_time)
    mBombIdleTime = 0;
 }
 
-void Player::UpdateAnimation(const int elapsed_time)
-{
-   switch (mDirection)
-   {
-      case Direction::Up:
-         mWalkUpAnimation.Update(elapsed_time);
-         mWalkDownAnimation.Reset();
-         mWalkLeftAnimation.Reset();
-         mWalkRightAnimation.Reset();
-         break;
-      case Direction::Down:
-         mWalkUpAnimation.Reset();
-         mWalkDownAnimation.Update(elapsed_time);
-         mWalkLeftAnimation.Reset();
-         mWalkRightAnimation.Reset();
-         break;
-      case Direction::Left:
-         mWalkUpAnimation.Reset();
-         mWalkDownAnimation.Reset();
-         mWalkLeftAnimation.Update(elapsed_time);
-         mWalkRightAnimation.Reset();
-         break;
-      case Direction::Right:
-         mWalkUpAnimation.Reset();
-         mWalkDownAnimation.Reset();
-         mWalkLeftAnimation.Reset();
-         mWalkRightAnimation.Update(elapsed_time);
-         break;
-   }
-}
+//void Player::UpdateAnimation(const int elapsed_time)
+//{
+//   switch (mDirection)
+//   {
+//      case Direction::Up:
+//         mWalkUpAnimation.Update(elapsed_time);
+//         mWalkDownAnimation.Reset();
+//         mWalkLeftAnimation.Reset();
+//         mWalkRightAnimation.Reset();
+//         break;
+//      case Direction::Down:
+//         mWalkUpAnimation.Reset();
+//         mWalkDownAnimation.Update(elapsed_time);
+//         mWalkLeftAnimation.Reset();
+//         mWalkRightAnimation.Reset();
+//         break;
+//      case Direction::Left:
+//         mWalkUpAnimation.Reset();
+//         mWalkDownAnimation.Reset();
+//         mWalkLeftAnimation.Update(elapsed_time);
+//         mWalkRightAnimation.Reset();
+//         break;
+//      case Direction::Right:
+//         mWalkUpAnimation.Reset();
+//         mWalkDownAnimation.Reset();
+//         mWalkLeftAnimation.Reset();
+//         mWalkRightAnimation.Update(elapsed_time);
+//         break;
+//   }
+//}
 
 bool Player::CanMove(const Direction dir, const int distance) const
 {
@@ -275,27 +300,28 @@ void Player::IncreaseSpeed()
    if (mMovementSpeed > 2) {
       mMovementSpeed -= 2;
 
-      mWalkAnimationLength -= 60;
-      mWalkUpAnimation.SetLength(mWalkAnimationLength);
-      mWalkDownAnimation.SetLength(mWalkAnimationLength);
-      mWalkLeftAnimation.SetLength(mWalkAnimationLength);
-      mWalkRightAnimation.SetLength(mWalkAnimationLength);
+//      mWalkAnimationLength -= 60;
+//      mWalkUpAnimation.SetLength(mWalkAnimationLength);
+//      mWalkDownAnimation.SetLength(mWalkAnimationLength);
+//      mWalkLeftAnimation.SetLength(mWalkAnimationLength);
+//      mWalkRightAnimation.SetLength(mWalkAnimationLength);
    }
    // The player is already at maximum speed.
 }
 
-const Animation& Player::GetCurrentDirectionAnimation() const
+PlayerState Player::GetStopWalkingState(const PlayerState state) const
 {
-   switch (mDirection)
+   switch (state)
    {
-      case Direction::Up:
-         return mWalkUpAnimation;
-      case Direction::Down:
-         return mWalkDownAnimation;
-      case Direction::Left:
-         return mWalkLeftAnimation;
-      case Direction::Right:
-         return mWalkRightAnimation;
+      case PlayerState::WalkUp:
+         return PlayerState::StandUp;
+      case PlayerState::WalkDown:
+         return PlayerState::StandDown;
+      case PlayerState::WalkLeft:
+         return PlayerState::StandLeft;
+      case PlayerState::WalkRight:
+         return PlayerState::StandRight;
+      default:
+         return state;
    }
-   return mWalkDownAnimation;
 }

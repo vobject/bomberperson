@@ -2,7 +2,7 @@
 #define PLAYER_HPP
 
 #include "SceneObject.hpp"
-#include "Animation.hpp"
+//#include "Animation.hpp"
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
@@ -12,6 +12,49 @@
 class InputDevice;
 class Cell;
 class Bomb;
+
+//enum class PlayerState
+//{
+//   Stand,
+//   Walk,
+////   Idle,
+////   Lockedin,
+////   Die,
+////   Win
+//};
+
+enum class PlayerState
+{
+   StandUp,
+   StandDown,
+   StandLeft,
+   StandRight,
+   WalkUp,
+   WalkDown,
+   WalkLeft,
+   WalkRight,
+//   Idle,
+//   Lockedin,
+//   Die,
+//   Win
+};
+
+//class PlayerAnimation
+//{
+//public:
+//   PlayerAnimation() {}
+//   ~PlayerAnimation() {}
+
+//   PlayerState GetState() const { return mState; }
+//   void SetState(PlayerState state) { mState = state; }
+
+//   Direction GetDirection() const { return mDirection; }
+//   void SetDirection(Direction dir) { mDirection = dir; }
+
+//private:
+//   PlayerState mState = PlayerState::Stand;
+//   Direction mDirection = Direction::Down;
+//};
 
 class Player : public SceneObject
 {
@@ -32,7 +75,14 @@ public:
    Direction GetDirection() const;
    int GetAnimationFrame() const;
 
+   PlayerState GetState() const;
+   int GetStateTime() const;
+   int GetSpeed() const;
+
 private:
+   static const int SPEED_MIN = 1;
+   static const int SPEED_MAX = 20;
+
    void UpdateMovement(int elapsed_time);
    void UpdateBombing(int elapsed_time);
    void UpdateAnimation(int elapsed_time);
@@ -41,8 +91,9 @@ private:
    bool CanPlantBomb();
 
    void IncreaseSpeed();
+   PlayerState GetStopWalkingState(PlayerState state) const;
 
-   const Animation& GetCurrentDirectionAnimation() const;
+//   const Animation& GetCurrentDirectionAnimation() const;
 
    std::shared_ptr<InputDevice> mInput;
    std::shared_ptr<Cell> mParentCell;
@@ -61,13 +112,16 @@ private:
    int mBombSupply = 1;
    std::vector<std::shared_ptr<Bomb>> mPlantedBombs;
 
-   Direction mDirection = Direction::Down;
-   Animation mWalkUpAnimation;
-   Animation mWalkDownAnimation;
-   Animation mWalkLeftAnimation;
-   Animation mWalkRightAnimation;
+//   Direction mDirection = Direction::Down;
+//   Animation mWalkUpAnimation;
+//   Animation mWalkDownAnimation;
+//   Animation mWalkLeftAnimation;
+//   Animation mWalkRightAnimation;
 //   Animation mDeathAnimation;
 //   Animation mWinAnimation;
+
+   PlayerState mState = PlayerState::StandDown;
+   int mStateTime = 0;
 };
 
 #endif // PLAYER_HPP
