@@ -1,4 +1,5 @@
 #include "SimpleGlRenderer.hpp"
+#include "../game/MainMenu.hpp"
 #include "../game/Match.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Cell.hpp"
@@ -60,6 +61,11 @@ void SimpleGlRenderer::PreRender()
 void SimpleGlRenderer::PostRender()
 {
    SDL_GL_SwapBuffers();
+}
+
+void SimpleGlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
+{
+
 }
 
 void SimpleGlRenderer::Render(const std::shared_ptr<Background>& bg)

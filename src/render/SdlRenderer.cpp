@@ -1,4 +1,5 @@
 #include "SdlRenderer.hpp"
+#include "../game/MainMenu.hpp"
 #include "../game/Background.hpp"
 #include "../game/Match.hpp"
 #include "../game/Arena.hpp"
@@ -49,6 +50,38 @@ void SdlRenderer::PreRender()
 void SdlRenderer::PostRender()
 {
    SDL_Flip(mScreen);
+}
+
+void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
+{
+   const auto pos = mainmenu->GetPosition();
+   const auto size = mainmenu->GetSize();
+   const auto selection = mainmenu->GetSelection();
+
+   const int border_x = .1f * size.Width;
+   const int border_y = .1f * size.Height;
+
+   SDL_Rect rect = { static_cast<Sint16>(pos.X + border_x),
+                     static_cast<Sint16>(pos.Y + border_y),
+                     static_cast<Uint16>(size.Width - (2 * border_x)),
+                     static_cast<Uint16>(size.Height - (2 * border_y)) };
+   SDL_FillRect(mScreen, &rect, 0x9f9f7f);
+
+   const auto menu_item_cnt = static_cast<int>(MainMenuItem::Exit) + 1;
+   const auto selected_item = static_cast<int>(selection);
+   for (int i = 0; i < menu_item_cnt; i++)
+   {
+      int item_color = 0x000000;
+      if (selected_item == i) {
+         item_color = 0xffffff;
+      }
+
+      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + (2 * border_x)),
+                             static_cast<Sint16>(pos.Y + (2 * border_y) + (border_y * i)),
+                             static_cast<Uint16>(10),
+                             static_cast<Uint16>(10) };
+      SDL_FillRect(mScreen, &item_rect, item_color);
+   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Background>& bg)
