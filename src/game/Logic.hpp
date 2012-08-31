@@ -40,6 +40,12 @@ public:
    bool Done() const;
 
 private:
+   void ProcessInputMainMenuState(const SDL_KeyboardEvent& ev);
+   void ProcessInputRunningState(const SDL_KeyboardEvent& ev);
+
+   void UpdateMainMenuState(int elapsed_time);
+   void UpdateRunningState(int elapsed_time);
+
    void ShowMainMenu();
    void ShowGame();
 

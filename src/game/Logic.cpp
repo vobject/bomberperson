@@ -29,60 +29,13 @@ void Logic::ProcessInput(const SDL_KeyboardEvent& ev)
    switch (mCurrentState)
    {
       case GameState::MainMenu:
-      {
-         if (SDL_KEYDOWN != ev.type) {
-            return;
-         }
-
-         if (SDLK_UP == ev.keysym.sym)
-         {
-            mMainMenu->SelectionUp();
-         }
-         else if (SDLK_DOWN == ev.keysym.sym)
-         {
-            mMainMenu->SelectionDown();
-         }
-         else if (SDLK_RETURN == ev.keysym.sym)
-         {
-            mMainMenu->Choose();
-         }
-         else if(SDLK_ESCAPE == ev.keysym.sym)
-         {
-            mCurrentState = GameState::Exit;
-         }
+         ProcessInputMainMenuState(ev);
          break;
-      }
       case GameState::Running:
-      {
-         const auto players = mMatch->GetPlayers();
-
-         if (SDL_KEYDOWN == ev.type)
-         {
-            if (SDLK_ESCAPE == ev.keysym.sym)
-            {
-               ShowMainMenu();
-               return;
-            }
-
-            for (auto& player : players)
-            {
-               player->GetInputDevice()->Press(ev.keysym.sym);
-            }
-         }
-         else if (SDL_KEYUP == ev.type)
-         {
-            for (auto& player : players)
-            {
-               player->GetInputDevice()->Release(ev.keysym.sym);
-            }
-         }
+         ProcessInputRunningState(ev);
          break;
-      }
       case GameState::Exit:
-         LOG(logERROR) << "Logic: GameState is Exit.";
-         break;
-      default:
-         LOG(logERROR) << "Logic: Unknown GameState value.";
+         LOG(logERROR) << "ProcessInput: GameState is Exit.";
          break;
    }
 }
@@ -95,30 +48,15 @@ void Logic::ProcessInput(const SDL_KeyboardEvent& ev)
 
 void Logic::Update(const int app_time, const int elapsed_time)
 {
+   (void) app_time;
+
    switch (mCurrentState)
    {
       case GameState::MainMenu:
-      {
-         if (mMainMenu->HasChosen())
-         {
-            switch (mMainMenu->GetSelection())
-            {
-               case MainMenuItem::StartGame:
-                  ShowGame();
-                  break;
-               case MainMenuItem::Exit:
-                  mCurrentState = GameState::Exit;
-                  break;
-            }
-         }
-         else
-         {
-            mMainMenu->Update(elapsed_time);
-         }
+         UpdateMainMenuState(elapsed_time);
          break;
-      }
       case GameState::Running:
-         mMatch->Update(elapsed_time);
+         UpdateRunningState(elapsed_time);
          break;
       case GameState::Exit:
          break;
@@ -127,27 +65,103 @@ void Logic::Update(const int app_time, const int elapsed_time)
 
 void Logic::Render()
 {
-   mRenderer->PreRender();
-
    switch (mCurrentState)
    {
       case GameState::MainMenu:
+         mRenderer->PreRender();
          mRenderer->Render(mMainMenu);
+         mRenderer->PostRender();
          break;
       case GameState::Running:
+         mRenderer->PreRender();
          mRenderer->Render(mBackground);
          mRenderer->Render(mMatch);
+         mRenderer->PostRender();
          break;
       case GameState::Exit:
          break;
    }
-
-   mRenderer->PostRender();
 }
 
 bool Logic::Done() const
 {
    return (mCurrentState == GameState::Exit);
+}
+
+void Logic::ProcessInputMainMenuState(const SDL_KeyboardEvent& ev)
+{
+   if (SDL_KEYDOWN != ev.type) {
+      return;
+   }
+
+   switch (ev.keysym.sym)
+   {
+      case SDLK_UP:
+         mMainMenu->SelectionUp();
+         break;
+      case SDLK_DOWN:
+         mMainMenu->SelectionDown();
+         break;
+      case SDLK_RETURN:
+         mMainMenu->Choose();
+         break;
+      case SDLK_ESCAPE:
+         mCurrentState = GameState::Exit;
+         break;
+      default:
+         break;
+   }
+}
+
+void Logic::ProcessInputRunningState(const SDL_KeyboardEvent& ev)
+{
+   const auto players = mMatch->GetPlayers();
+
+   if (SDL_KEYDOWN == ev.type)
+   {
+      if (SDLK_ESCAPE == ev.keysym.sym)
+      {
+         // User pressed the ESC key while playing.
+         ShowMainMenu();
+         return;
+      }
+
+      for (auto& player : players)
+      {
+         player->GetInputDevice()->Press(ev.keysym.sym);
+      }
+   }
+   else if (SDL_KEYUP == ev.type)
+   {
+      for (auto& player : players)
+      {
+         player->GetInputDevice()->Release(ev.keysym.sym);
+      }
+   }
+}
+
+void Logic::UpdateMainMenuState(const int elapsed_time)
+{
+   if (!mMainMenu->HasChosen())
+   {
+      mMainMenu->Update(elapsed_time);
+      return;
+   }
+
+   switch (mMainMenu->GetSelection())
+   {
+      case MainMenuItem::StartGame:
+         ShowGame();
+         break;
+      case MainMenuItem::Exit:
+         mCurrentState = GameState::Exit;
+         break;
+   }
+}
+
+void Logic::UpdateRunningState(const int elapsed_time)
+{
+   mMatch->Update(elapsed_time);
 }
 
 void Logic::ShowMainMenu()
