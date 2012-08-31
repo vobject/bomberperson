@@ -7,6 +7,7 @@
 #include "Cell.hpp"
 #include "Player.hpp"
 #include "../input/KeyboardInput.hpp"
+#include "../input/MouseInput.hpp"
 #include "../render/Renderer.hpp"
 #include "../utils/Utils.hpp"
 #include "../Options.hpp"
@@ -24,19 +25,46 @@ Logic::~Logic()
 
 }
 
-void Logic::ProcessInput(const SDL_KeyboardEvent& ev)
+void Logic::ProcessInput(const SDL_KeyboardEvent& key)
 {
    switch (mCurrentState)
    {
       case GameState::MainMenu:
-         ProcessInputMainMenuState(ev);
+         ProcessInputMainMenuState(key);
          break;
       case GameState::Running:
-         ProcessInputRunningState(ev);
+         ProcessInputRunningState(key);
          break;
       case GameState::Exit:
          LOG(logERROR) << "ProcessInput: GameState is Exit.";
          break;
+   }
+}
+
+void Logic::ProcessInput(const SDL_MouseMotionEvent& motion)
+{
+   if (GameState::Running != mCurrentState) {
+      // Mouse input is currently only for moving players.
+      return;
+   }
+
+   mMouse_1->Move({ motion.x, motion.y });
+}
+
+void Logic::ProcessInput(const SDL_MouseButtonEvent& button)
+{
+   if (GameState::Running != mCurrentState) {
+      // Mouse input is currently only for moving players.
+      return;
+   }
+
+   if (SDL_MOUSEBUTTONDOWN == button.type)
+   {
+      mMouse_1->Press(button.button);
+   }
+   else if (SDL_MOUSEBUTTONUP == button.type)
+   {
+      mMouse_1->Release(button.button);
    }
 }
 
@@ -88,13 +116,13 @@ bool Logic::Done() const
    return (mCurrentState == GameState::Exit);
 }
 
-void Logic::ProcessInputMainMenuState(const SDL_KeyboardEvent& ev)
+void Logic::ProcessInputMainMenuState(const SDL_KeyboardEvent& key)
 {
-   if (SDL_KEYDOWN != ev.type) {
+   if (SDL_KEYDOWN != key.type) {
       return;
    }
 
-   switch (ev.keysym.sym)
+   switch (key.keysym.sym)
    {
       case SDLK_UP:
          mMainMenu->SelectionUp();
@@ -113,30 +141,24 @@ void Logic::ProcessInputMainMenuState(const SDL_KeyboardEvent& ev)
    }
 }
 
-void Logic::ProcessInputRunningState(const SDL_KeyboardEvent& ev)
+void Logic::ProcessInputRunningState(const SDL_KeyboardEvent& key)
 {
-   const auto players = mMatch->GetPlayers();
-
-   if (SDL_KEYDOWN == ev.type)
+   if (SDL_KEYDOWN == key.type)
    {
-      if (SDLK_ESCAPE == ev.keysym.sym)
+      if (SDLK_ESCAPE == key.keysym.sym)
       {
          // User pressed the ESC key while playing.
          ShowMainMenu();
          return;
       }
 
-      for (auto& player : players)
-      {
-         player->GetInputDevice()->Press(ev.keysym.sym);
-      }
+      mKeyboard_1->Press(key.keysym.sym);
+      mKeyboard_2->Press(key.keysym.sym);
    }
-   else if (SDL_KEYUP == ev.type)
+   else if (SDL_KEYUP == key.type)
    {
-      for (auto& player : players)
-      {
-         player->GetInputDevice()->Release(ev.keysym.sym);
-      }
+      mKeyboard_1->Release(key.keysym.sym);
+      mKeyboard_2->Release(key.keysym.sym);
    }
 }
 
@@ -169,6 +191,9 @@ void Logic::ShowMainMenu()
    mMatch = nullptr;
    mFieldGen = nullptr;
    mBackground = nullptr;
+   mMouse_1 = nullptr;
+   mKeyboard_2 = nullptr;
+   mKeyboard_1 = nullptr;
 
    mMainMenu = make_unique<MainMenu>("mainmenu");
    mMainMenu->SetSize({ DefaultSize::SCREEN_WIDTH, DefaultSize::SCREEN_HEIGHT });
@@ -180,12 +205,18 @@ void Logic::ShowGame()
 {
    mMainMenu = nullptr;
 
+   mKeyboard_1 = std::make_shared<KeyboardInput>(SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE);
+   mKeyboard_2 = std::make_shared<KeyboardInput>(SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_LCTRL);
+
+   Point mouse_center(DefaultSize::SCREEN_WIDTH / 2, DefaultSize::SCREEN_HEIGHT / 2);
+   mMouse_1 = std::make_shared<MouseInput>(mouse_center, SDL_BUTTON_LEFT);
+
    mBackground = std::make_shared<Background>("bg_arena_1");
    mBackground->SetSize({ DefaultSize::ARENA_BG_WIDTH, DefaultSize::ARENA_BG_HEIGHT });
 
    const std::vector<std::shared_ptr<Player>> players = {
-      std::make_shared<Player>("player_1")
-    , std::make_shared<Player>("player_2")
+      std::make_shared<Player>("player_1", mKeyboard_1)
+    , std::make_shared<Player>("player_2", mMouse_1)
 //    , std::make_shared<Player>("player_3")
 //    , std::make_shared<Player>("player_4")
    };
@@ -195,16 +226,12 @@ void Logic::ShowGame()
    mFieldGen->SetArenaSize({ DefaultSize::ARENA_WIDTH, DefaultSize::ARENA_HEIGHT });
    auto arena = mFieldGen->GetDefaultArena(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, players.size());
 
-   const auto input_p1 = std::make_shared<KeyboardInput>(SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE);
    const auto parent_cell_p1 = arena->GetCellFromCoordinates(DefaultSize::PLAYER_1_CELL_X, DefaultSize::PLAYER_1_CELL_Y);
-   players[0]->SetInputDevice(input_p1);
    players[0]->SetParentCell(parent_cell_p1);
    players[0]->SetPosition(parent_cell_p1->GetPosition());
    players[0]->SetSize({ DefaultSize::PLAYER_WIDTH, DefaultSize::PLAYER_HEIGHT });
 
-   const auto input_p2 = std::make_shared<KeyboardInput>(SDLK_w, SDLK_s, SDLK_a, SDLK_d, SDLK_LCTRL);
    const auto parent_cell_p2 = arena->GetCellFromCoordinates(DefaultSize::PLAYER_2_CELL_X, DefaultSize::PLAYER_2_CELL_Y);
-   players[1]->SetInputDevice(input_p2);
    players[1]->SetParentCell(parent_cell_p2);
    players[1]->SetPosition(parent_cell_p2->GetPosition());
    players[1]->SetSize({ DefaultSize::PLAYER_WIDTH, DefaultSize::PLAYER_HEIGHT });

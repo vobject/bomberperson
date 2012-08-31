@@ -5,11 +5,15 @@
 #include <list>
 
 struct SDL_KeyboardEvent;
+struct SDL_MouseMotionEvent;
+struct SDL_MouseButtonEvent;
 
 class MainMenu;
 class Renderer;
 class Background;
 class ArenaGenerator;
+class KeyboardInput;
+class MouseInput;
 class Match;
 
 enum class GameState
@@ -31,7 +35,9 @@ public:
    Logic(const Logic&) = delete;
    Logic& operator=(const Logic&) = delete;
 
-   void ProcessInput(const SDL_KeyboardEvent& ev);
+   void ProcessInput(const SDL_KeyboardEvent& key);
+   void ProcessInput(const SDL_MouseMotionEvent& motion);
+   void ProcessInput(const SDL_MouseButtonEvent& button);
 //   void ProcessInput(const kinex::Nui& kinect);
 
    void Update(int app_time, int elapsed_time);
@@ -55,6 +61,9 @@ private:
    std::shared_ptr<Renderer> mRenderer;
    std::shared_ptr<Background> mBackground;
    std::shared_ptr<ArenaGenerator> mFieldGen;
+   std::shared_ptr<KeyboardInput> mKeyboard_1;
+   std::shared_ptr<KeyboardInput> mKeyboard_2;
+   std::shared_ptr<MouseInput> mMouse_1;
    std::shared_ptr<Match> mMatch;
 };
 

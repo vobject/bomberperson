@@ -1,5 +1,5 @@
-#ifndef MAINMENU_HPP
-#define MAINMENU_HPP
+#ifndef MAIN_MENU_HPP
+#define MAIN_MENU_HPP
 
 #include "SceneObject.hpp"
 #include "../utils/Utils.hpp"
@@ -42,4 +42,4 @@ private:
     bool mHasChosen = false;
 };
 
-#endif // MAINMENU_HPP
+#endif // MAIN_MENU_HPP

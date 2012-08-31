@@ -8,21 +8,21 @@
 class KeyboardInput : public InputDevice
 {
 public:
-   KeyboardInput(int up_keycode,
-                 int down_keycode,
-                 int left_keycode,
-                 int right_keycode,
-                 int bomb_keycode);
+   KeyboardInput(SDLKey up_keycode,
+                 SDLKey down_keycode,
+                 SDLKey left_keycode,
+                 SDLKey right_keycode,
+                 SDLKey bomb_keycode);
    virtual ~KeyboardInput();
-
-   void Press(SDLKey key) override;
-   void Release(SDLKey key) override;
 
    bool TestUp() const override;
    bool TestDown() const override;
    bool TestLeft() const override;
    bool TestRight() const override;
    bool TestPlantBomb() const override;
+
+   void Press(SDLKey key);
+   void Release(SDLKey key);
 
 private:
    const int mUpKey;

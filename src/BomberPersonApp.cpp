@@ -96,22 +96,14 @@ void BomberPersonApp::ProcessInput()
    {
       case SDL_KEYDOWN:
       case SDL_KEYUP:
-         {
-            // TODO: Enable switching renderers with Strg-ANYKEY keys.
-
-//            if (SDLK_s == event.key.keysym.sym) {
-//               mCurrentVideoMode = VideoMode::Software;
-//               InitVideo();
-//               SelectRenderer();
-//            }
-//            else if (SDLK_o == event.key.keysym.sym) {
-//               mCurrentVideoMode = VideoMode::OpenGL;
-//               InitVideo();
-//               SelectRenderer();
-//            }
-
-            mLogic->ProcessInput(event.key);
-         }
+         mLogic->ProcessInput(event.key);
+         break;
+      case SDL_MOUSEMOTION:
+         mLogic->ProcessInput(event.motion);
+         break;
+      case SDL_MOUSEBUTTONDOWN:
+      case SDL_MOUSEBUTTONUP:
+         mLogic->ProcessInput(event.button);
          break;
       default:
          break;

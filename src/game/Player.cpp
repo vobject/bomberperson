@@ -5,7 +5,11 @@
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
-Player::Player(const std::string& res_name)
+Player::Player(
+   const std::string& res_name,
+   const std::shared_ptr<InputDevice>& input
+)
+   : mInput(input)
 {
    SetResourceId(res_name);
 
@@ -46,15 +50,15 @@ void Player::Update(const int elapsed_time)
    }
 }
 
-std::shared_ptr<InputDevice> Player::GetInputDevice() const
-{
-   return mInput;
-}
+//std::shared_ptr<InputDevice> Player::GetInputDevice() const
+//{
+//   return mInput;
+//}
 
-void Player::SetInputDevice(const std::shared_ptr<InputDevice>& input)
-{
-   mInput = input;
-}
+//void Player::SetInputDevice(const std::shared_ptr<InputDevice>& input)
+//{
+//   mInput = input;
+//}
 
 void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
 {
