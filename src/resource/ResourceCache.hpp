@@ -24,6 +24,7 @@ public:
    // TODO:
    // SetTheme();
 
+   SpriteResource GetMenuResource(EntityId id) const;
    SpriteResource GetArenaResource(EntityId id) const;
    SpriteResource GetWallResource(EntityId id) const;
    SpriteResource GetExtraResource(EntityId id) const;
@@ -38,6 +39,7 @@ public:
 //   SDL_Surface* GetResource(const std::string& id);
 
 private:
+   void LoadMenuResources();
    void LoadArenaResources();
    void LoadWallResources();
    void LoadExtraResources();
@@ -48,6 +50,7 @@ private:
    SDL_Surface* LoadTexture(const std::string& file, const Size& size);
 
    std::string mResDir;
+   std::map<EntityId, SpriteResource> mMenuRes;
    std::map<EntityId, SpriteResource> mArenaRes;
    std::map<EntityId, SpriteResource> mWallRes;
    std::map<EntityId, SpriteResource> mExtraRes;

@@ -8,13 +8,14 @@
 #include <SDL_rotozoom.h>
 
 ResourceCache::ResourceCache()
-   : mResDir("res")
+   : mResDir("res_nonfree")
 {
    if (0 == IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG)) {
        throw "Failed to initialize SDL_image";
    }
 
    // TODO: Coordinate this using XML files.
+   LoadMenuResources();
    LoadArenaResources();
    LoadWallResources();
    LoadExtraResources();
@@ -28,6 +29,15 @@ ResourceCache::~ResourceCache()
    for (auto& surface : mSurfaceCache) {
       SDL_FreeSurface(surface);
    }
+}
+
+SpriteResource ResourceCache::GetMenuResource(const EntityId id) const
+{
+   const auto iter = mMenuRes.find(id);
+   if (iter == mMenuRes.end()) {
+      throw "Trying to access non-existing resource";
+   }
+   return iter->second;
 }
 
 SpriteResource ResourceCache::GetArenaResource(const EntityId id) const
@@ -82,6 +92,17 @@ PlayerResource ResourceCache::GetPlayerResource(const EntityId id) const
       throw "Trying to access non-existing resource";
    }
    return iter->second;
+}
+
+void ResourceCache::LoadMenuResources()
+{
+   const Size size = { DefaultSize::SCREEN_WIDTH,
+                       DefaultSize::SCREEN_HEIGHT };
+
+   mMenuRes[EntityId::MainMenu] = {
+      EntityId::MainMenu,
+      { LoadTexture("sprite/mainmenu.png", size) }
+   };
 }
 
 void ResourceCache::LoadArenaResources()

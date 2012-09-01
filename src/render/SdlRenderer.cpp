@@ -53,32 +53,26 @@ void SdlRenderer::PostRender()
 
 void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
 {
+   const auto id = mainmenu->GetId();
+   const auto frame = mResCache->GetMenuResource(id).GetFrame(0);
+   Render(mainmenu, frame);
+
    const auto pos = mainmenu->GetPosition();
-   const auto size = mainmenu->GetSize();
    const auto selection = mainmenu->GetSelection();
-
-   const int border_x = .1f * size.Width;
-   const int border_y = .1f * size.Height;
-
-   SDL_Rect rect = { static_cast<Sint16>(pos.X + border_x),
-                     static_cast<Sint16>(pos.Y + border_y),
-                     static_cast<Uint16>(size.Width - (2 * border_x)),
-                     static_cast<Uint16>(size.Height - (2 * border_y)) };
-   SDL_FillRect(mScreen, &rect, 0x9f9f7f);
 
    const auto menu_item_cnt = static_cast<int>(MainMenuItem::Exit) + 1;
    const auto selected_item = static_cast<int>(selection);
    for (int i = 0; i < menu_item_cnt; i++)
    {
-      int item_color = 0x000000;
+      int item_color = 0xc0c0c0;
       if (selected_item == i) {
-         item_color = 0xffffff;
+         item_color = 0x804000;
       }
 
-      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + (2 * border_x)),
-                             static_cast<Sint16>(pos.Y + (2 * border_y) + (border_y * i)),
-                             static_cast<Uint16>(10),
-                             static_cast<Uint16>(10) };
+      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + 70),
+                             static_cast<Sint16>(pos.Y + 55 + (55 * i)),
+                             static_cast<Uint16>(20),
+                             static_cast<Uint16>(20) };
       SDL_FillRect(mScreen, &item_rect, item_color);
    }
 }
