@@ -108,6 +108,11 @@ std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
             break;
       }
 
+      if (!(rand() % (cells_x * cells_y / 3)))
+      {
+         extra = std::make_shared<Extra>(EntityId::GoldRangeExtra);
+      }
+
       extra->SetPosition(cell->GetPosition());
       extra->SetSize(cell->GetSize());
       cell->SetExtra(extra);

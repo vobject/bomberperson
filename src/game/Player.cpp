@@ -68,10 +68,13 @@ void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
             IncreaseSpeed();
             break;
          case EntityId::BombsExtra:
-            mBombRange++;
+            mBombSupply++;
             break;
          case EntityId::RangeExtra:
-            mBombSupply++;
+            mBombRange++;
+            break;
+         case EntityId::GoldRangeExtra:
+            mBombRange = 999;
             break;
          default:
             break;

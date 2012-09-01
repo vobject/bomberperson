@@ -20,6 +20,7 @@ enum class EntityId
    SpeedExtra,
    BombsExtra,
    RangeExtra,
+   GoldRangeExtra,
 
    Bomb,
 

@@ -130,6 +130,11 @@ void ResourceCache::LoadExtraResources()
       EntityId::RangeExtra,
       { LoadTexture("sprite/extra_range.png", size) }
    };
+
+   mExtraRes[EntityId::GoldRangeExtra] = {
+      EntityId::GoldRangeExtra,
+      { LoadTexture("sprite/extra_range_gold.png", size) }
+   };
 }
 
 void ResourceCache::LoadBombResources()
