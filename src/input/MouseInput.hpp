@@ -7,14 +7,15 @@
 class MouseInput : public InputDevice
 {
 public:
-   MouseInput(Point center, int bomb_keycode);
+   MouseInput(Point center, int action1_keycode, int action2_keycode);
    virtual ~MouseInput();
 
    bool TestUp() const override;
    bool TestDown() const override;
    bool TestLeft() const override;
    bool TestRight() const override;
-   bool TestPlantBomb() const override;
+   bool TestAction1() const override;
+   bool TestAction2() const override;
 
    void Press(int button);
    void Release(int button);
@@ -22,13 +23,15 @@ public:
 
 private:
    const Point mCenter;
-   const int mBombKey;
+   const int mAction1Button;
+   const int mAction2Button;
 
    bool mMoveUp = false;
    bool mMoveDown = false;
    bool mMoveLeft = false;
    bool mMoveRight = false;
-   bool mBombKeyPressed = false;
+   bool mAction1ButtonPressed = false;
+   bool mAction2ButtonPressed = false;
 };
 
 #endif // MOUSE_INPUT_HPP

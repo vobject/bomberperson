@@ -143,11 +143,13 @@ void Player::UpdateMovement(const int elapsed_time)
 
 void Player::UpdateBombing(const int elapsed_time)
 {
-   if (!mInput->TestPlantBomb())
+   if (!mInput->TestAction1() && !mInput->TestAction2())
    {
       // The user did not request to plant a bomb.
       return;
    }
+
+   // TODO: Use Action2 input to detonate remote controlled bombs etc.
 
    if (mParentCell->HasBomb()) {
       // Only one bomb per cell.

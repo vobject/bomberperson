@@ -1,8 +1,13 @@
 #include "MouseInput.hpp"
 
-MouseInput::MouseInput(const Point center, int bomb_keycode)
+MouseInput::MouseInput(
+   const Point center,
+   const int action1_keycode,
+   const int action2_keycode
+)
    : mCenter(center)
-   , mBombKey(bomb_keycode)
+   , mAction1Button(action1_keycode)
+   , mAction2Button(action2_keycode)
 {
 }
 
@@ -31,24 +36,37 @@ bool MouseInput::TestRight() const
    return mMoveRight;
 }
 
-bool MouseInput::TestPlantBomb() const
+bool MouseInput::TestAction1() const
 {
-   return mBombKeyPressed;
+   return mAction1ButtonPressed;
 }
 
-void MouseInput::Press(const int key)
+bool MouseInput::TestAction2() const
 {
-   if (key == mBombKey)
+   return mAction2ButtonPressed;
+}
+
+void MouseInput::Press(const int button)
+{
+   if (button == mAction1Button)
    {
-      mBombKeyPressed = true;
+      mAction1ButtonPressed = true;
+   }
+   else if (button == mAction2Button)
+   {
+      mAction2ButtonPressed = true;
    }
 }
 
-void MouseInput::Release(const int key)
+void MouseInput::Release(const int button)
 {
-   if (key == mBombKey)
+   if (button == mAction1Button)
    {
-      mBombKeyPressed = false;
+      mAction1ButtonPressed = false;
+   }
+   else if (button == mAction2Button)
+   {
+      mAction2ButtonPressed = false;
    }
 }
 

@@ -6,13 +6,15 @@ KeyboardInput::KeyboardInput(
    const SDLKey down_keycode,
    const SDLKey left_keycode,
    const SDLKey right_keycode,
-   const SDLKey bomb_keycode
+   const SDLKey action1_keycode,
+   const SDLKey action2_keycode
 )
    : mUpKey(up_keycode)
    , mDownKey(down_keycode)
    , mLeftKey(left_keycode)
    , mRightKey(right_keycode)
-   , mBombKey(bomb_keycode)
+   , mAction1Key(action1_keycode)
+   , mAction2Key(action2_keycode)
 {
 
 }
@@ -42,9 +44,14 @@ bool KeyboardInput::TestRight() const
    return mRightKeyPressed;
 }
 
-bool KeyboardInput::TestPlantBomb() const
+bool KeyboardInput::TestAction1() const
 {
-   return mBombKeyPressed;
+   return mAction1KeyPressed;
+}
+
+bool KeyboardInput::TestAction2() const
+{
+   return mAction2KeyPressed;
 }
 
 void KeyboardInput::Press(const SDLKey key)
@@ -65,9 +72,13 @@ void KeyboardInput::Press(const SDLKey key)
    {
       mRightKeyPressed = true;
    }
-   else if (key == mBombKey)
+   else if (key == mAction1Key)
    {
-      mBombKeyPressed = true;
+      mAction1KeyPressed = true;
+   }
+   else if (key == mAction2Key)
+   {
+      mAction2KeyPressed = true;
    }
 }
 
@@ -89,8 +100,12 @@ void KeyboardInput::Release(const SDLKey key)
    {
       mRightKeyPressed = false;
    }
-   else if (key == mBombKey)
+   else if (key == mAction1Key)
    {
-      mBombKeyPressed = false;
+      mAction1KeyPressed = false;
+   }
+   else if (key == mAction2Key)
+   {
+      mAction2KeyPressed = false;
    }
 }

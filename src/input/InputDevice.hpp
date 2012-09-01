@@ -11,7 +11,8 @@ public:
    virtual bool TestDown() const = 0;
    virtual bool TestLeft() const = 0;
    virtual bool TestRight() const = 0;
-   virtual bool TestPlantBomb() const = 0;
+   virtual bool TestAction1() const = 0;
+   virtual bool TestAction2() const = 0;
 };
 
 #endif // INPUT_DEVICE_HPP

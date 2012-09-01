@@ -12,14 +12,16 @@ public:
                  SDLKey down_keycode,
                  SDLKey left_keycode,
                  SDLKey right_keycode,
-                 SDLKey bomb_keycode);
+                 SDLKey action1_keycode,
+                 SDLKey action2_keycode);
    virtual ~KeyboardInput();
 
    bool TestUp() const override;
    bool TestDown() const override;
    bool TestLeft() const override;
    bool TestRight() const override;
-   bool TestPlantBomb() const override;
+   bool TestAction1() const override;
+   bool TestAction2() const override;
 
    void Press(SDLKey key);
    void Release(SDLKey key);
@@ -29,13 +31,15 @@ private:
    const int mDownKey;
    const int mLeftKey;
    const int mRightKey;
-   const int mBombKey;
+   const int mAction1Key;
+   const int mAction2Key;
 
    bool mUpKeyPressed = false;
    bool mDownKeyPressed = false;
    bool mLeftKeyPressed = false;
    bool mRightKeyPressed = false;
-   bool mBombKeyPressed = false;
+   bool mAction1KeyPressed = false;
+   bool mAction2KeyPressed = false;
 };
 
 #endif // KEYBOARD_INPUT_HPP
