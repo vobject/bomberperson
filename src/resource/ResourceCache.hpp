@@ -10,6 +10,7 @@
 #include <map>
 
 struct SDL_Surface;
+enum class EntityId;
 
 class ResourceCache
 {
@@ -23,12 +24,12 @@ public:
    // TODO:
    // SetTheme();
 
-   SpriteResource GetBgResource(const std::string& id) const;
-   SpriteResource GetWallResource(const std::string& id) const;
-   SpriteResource GetExtraResource(const std::string& id) const;
-   SpriteResource GetBombResource(const std::string& id) const;
-   SpriteResource GetExplosionResource(const std::string& id) const;
-   PlayerResource GetPlayerResource(const std::string& id) const;
+   SpriteResource GetArenaResource(EntityId id) const;
+   SpriteResource GetWallResource(EntityId id) const;
+   SpriteResource GetExtraResource(EntityId id) const;
+   SpriteResource GetBombResource(EntityId id) const;
+   SpriteResource GetExplosionResource(EntityId id) const;
+   PlayerResource GetPlayerResource(EntityId id) const;
 
 //   Texture GetPlayer(const Kinect& kinect);
    // std::shared_ptr<...> GetAudioSample(const std::string& id);
@@ -37,7 +38,7 @@ public:
 //   SDL_Surface* GetResource(const std::string& id);
 
 private:
-   void LoadBackgroundResources();
+   void LoadArenaResources();
    void LoadWallResources();
    void LoadExtraResources();
    void LoadBombResources();
@@ -47,12 +48,12 @@ private:
    SDL_Surface* LoadTexture(const std::string& file, const Size& size);
 
    std::string mResDir;
-   std::map<std::string, SpriteResource> mBackgroundRes;
-   std::map<std::string, SpriteResource> mWallRes;
-   std::map<std::string, SpriteResource> mExtraRes;
-   std::map<std::string, SpriteResource> mBombRes;
-   std::map<std::string, SpriteResource> mExplosionRes;
-   std::map<std::string, PlayerResource> mPlayerRes;
+   std::map<EntityId, SpriteResource> mArenaRes;
+   std::map<EntityId, SpriteResource> mWallRes;
+   std::map<EntityId, SpriteResource> mExtraRes;
+   std::map<EntityId, SpriteResource> mBombRes;
+   std::map<EntityId, SpriteResource> mExplosionRes;
+   std::map<EntityId, PlayerResource> mPlayerRes;
    std::vector<SDL_Surface*> mSurfaceCache;
 };
 

@@ -52,8 +52,7 @@ class Explosion;
 class Cell : public SceneObject
 {
 public:
-   Cell(const std::string& name,
-        int field_pos_x,
+   Cell(int field_pos_x,
         int field_pos_y,
         const std::shared_ptr<Arena>& field);
    virtual ~Cell();

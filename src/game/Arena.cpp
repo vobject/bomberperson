@@ -2,9 +2,10 @@
 #include "Cell.hpp"
 #include "../utils/Utils.hpp"
 
-Arena::Arena(const std::string& name)
+Arena::Arena()
+   : SceneObject(EntityId::Arena)
 {
-   SetResourceId(name);
+
 }
 
 Arena::~Arena()
@@ -22,11 +23,15 @@ void Arena::Update(const int elapsed_time)
    }
 }
 
+void Arena::SetBorderSize(const Size& borders)
+{
+   mBorders = borders;
+}
+
 void Arena::SetDimensions(const int cells_x, const int cells_y)
 {
    mXCells = cells_x;
    mYCells = cells_y;
-   mCellSize = { GetSize().Width / mXCells, GetSize().Height / mYCells };
 }
 
 void Arena::SetCells(const std::vector<std::shared_ptr<Cell>>& cells)
@@ -41,8 +46,11 @@ std::vector<std::shared_ptr<Cell>> Arena::GetCells() const
 
 std::shared_ptr<Cell> Arena::GetCellFromPosition(const Point& pos) const
 {
-   const auto cell_x = (pos.X - GetPosition().X) / mCellSize.Width;
-   const auto cell_y = (pos.Y - GetPosition().Y) / mCellSize.Height;
+   const Size cell_size((GetSize().Width - (mBorders.Width * 2)) / mXCells,
+                        (GetSize().Height - (mBorders.Height * 2)) / mYCells);
+
+   const auto cell_x = (pos.X - GetPosition().X - mBorders.Width) / cell_size.Width;
+   const auto cell_y = (pos.Y - GetPosition().Y - mBorders.Height) / cell_size.Height;
    return GetCellFromCoordinates(cell_x, cell_y);
 }
 

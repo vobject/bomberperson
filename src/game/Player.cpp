@@ -6,13 +6,12 @@
 #include "../utils/Utils.hpp"
 
 Player::Player(
-   const std::string& res_name,
+   const EntityId player_id,
    const std::shared_ptr<InputDevice>& input
 )
-   : mInput(input)
+   : SceneObject(player_id)
+   , mInput(input)
 {
-   SetResourceId(res_name);
-
    mWalkUpAnimation.SetFrameCount(mWalkAnimationFrames);
    mWalkUpAnimation.SetLength(mWalkAnimationLength);
    mWalkUpAnimation.SetLooping(true);
@@ -73,15 +72,15 @@ void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
 
    if (mParentCell->HasExtra())
    {
-      switch (mParentCell->CollectExtra()->GetType())
+      switch (mParentCell->CollectExtra()->GetId())
       {
-         case ExtraType::Speed:
+         case EntityId::SpeedExtra:
             IncreaseSpeed();
             break;
-         case ExtraType::BombRange:
+         case EntityId::BombsExtra:
             mBombRange++;
             break;
-         case ExtraType::BombSupply:
+         case EntityId::RangeExtra:
             mBombSupply++;
             break;
          default:
@@ -167,7 +166,7 @@ void Player::UpdateBombing(const int elapsed_time)
       return;
    }
 
-   auto bomb = std::make_shared<Bomb>("bomb", mParentCell);
+   auto bomb = std::make_shared<Bomb>(mParentCell);
    bomb->SetRange(mBombRange);
    bomb->SetSize(mParentCell->GetSize());
    bomb->SetPosition(mParentCell->GetPosition());

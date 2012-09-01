@@ -7,7 +7,7 @@
 class Background : public SceneObject
 {
 public:
-   Background(const std::string& name);
+   Background();
    virtual ~Background();
 
    Background(const Background&) = delete;

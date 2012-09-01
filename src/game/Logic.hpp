@@ -10,7 +10,6 @@ struct SDL_MouseButtonEvent;
 
 class MainMenu;
 class Renderer;
-class Background;
 class ArenaGenerator;
 class KeyboardInput;
 class MouseInput;
@@ -59,8 +58,7 @@ private:
 
    std::shared_ptr<MainMenu> mMainMenu;
    std::shared_ptr<Renderer> mRenderer;
-   std::shared_ptr<Background> mBackground;
-   std::shared_ptr<ArenaGenerator> mFieldGen;
+   std::shared_ptr<ArenaGenerator> mArenaGen;
    std::shared_ptr<KeyboardInput> mKeyboard_1;
    std::shared_ptr<KeyboardInput> mKeyboard_2;
    std::shared_ptr<MouseInput> mMouse_1;

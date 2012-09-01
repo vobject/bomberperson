@@ -1,9 +1,9 @@
 #include "Wall.hpp"
 
-Wall::Wall(const std::string& name, const WallType type)
-   : mType(type)
+Wall::Wall(const EntityId wall_id)
+   : SceneObject(wall_id)
 {
-   SetResourceId(name);
+
 }
 
 Wall::~Wall()
@@ -16,19 +16,20 @@ void Wall::Update(const int elapsed_time)
 
 }
 
-WallType Wall::GetType() const
-{
-   return mType;
-}
+//WallType Wall::GetType() const
+//{
+//   return mType;
+//}
 
 bool Wall::IsDestructible() const
 {
-   switch (mType)
+   switch (GetId())
    {
-      case WallType::Indestructible:
+      case EntityId::IndestructibleWall:
          return false;
-      case WallType::Destructible:
+      case EntityId::DestructibleWall:
          return true;
+      default:
+         return false;
    }
-   return false;
 }

@@ -1,7 +1,8 @@
 #include "SceneObject.hpp"
 
-SceneObject::SceneObject()
-   : mPos(0, 0)
+SceneObject::SceneObject(const EntityId id)
+   : mId(id)
+   , mPos(0, 0)
    , mSize(0, 0)
 //   , mZOrder(ZOrder::zo_Layer_1)
 //   , mIsVisible(true)
@@ -20,15 +21,15 @@ SceneObject::~SceneObject()
 //   return GetZOrder() < other.GetZOrder();
 //}
 
-std::string SceneObject::GetResourceId() const
+EntityId SceneObject::GetId() const
 {
-   return mResource;
+   return mId;
 }
 
-void SceneObject::SetResourceId(const std::string& resource)
-{
-   mResource = resource;
-}
+//void SceneObject::SetResourceId(const EntityId id)
+//{
+//   mId = id;
+//}
 
 Point SceneObject::GetPosition() const
 {

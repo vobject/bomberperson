@@ -1,8 +1,9 @@
 #include "Background.hpp"
 
-Background::Background(const std::string& name)
+Background::Background()
+   : SceneObject(EntityId::MainMenu)
 {
-   SetResourceId(name);
+
 }
 
 Background::~Background()

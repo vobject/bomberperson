@@ -16,7 +16,7 @@ class Bomb;
 class Player : public SceneObject
 {
 public:
-   Player(const std::string& res_name, const std::shared_ptr<InputDevice>& input);
+   Player(const EntityId player_id, const std::shared_ptr<InputDevice>& input);
    virtual ~Player();
 
    Player(const Player&) = delete;

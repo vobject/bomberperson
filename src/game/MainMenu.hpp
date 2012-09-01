@@ -19,7 +19,7 @@ enum class MainMenuItem
 class MainMenu : public SceneObject
 {
 public:
-    MainMenu(const std::string& name);
+    MainMenu();
     virtual ~MainMenu();
 
     MainMenu(const MainMenu&) = delete;

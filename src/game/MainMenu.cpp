@@ -1,8 +1,9 @@
 #include "MainMenu.hpp"
 
-MainMenu::MainMenu(const std::string &name)
+MainMenu::MainMenu()
+   : SceneObject(EntityId::MainMenu)
 {
-   SetResourceId(name);
+
 }
 
 MainMenu::~MainMenu()

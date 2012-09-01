@@ -21,6 +21,8 @@ Match::~Match()
 
 void Match::Update(const int elapsed_time)
 {
+   // TODO: End game if all but one players are dead.
+
    mArena->Update(elapsed_time);
 
    auto player = std::begin(mPlayers);

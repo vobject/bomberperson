@@ -84,11 +84,6 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
    }
 }
 
-void SimpleSdlRenderer::Render(const std::shared_ptr<Background>& bg)
-{
-
-}
-
 void SimpleSdlRenderer::Render(const std::shared_ptr<Match>& match)
 {
    Render(match->GetArena());
@@ -172,15 +167,15 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<Extra>& extra)
 
    int color = 0;
 
-   switch (extra->GetType())
+   switch (extra->GetId())
    {
-      case ExtraType::Speed:
+      case EntityId::SpeedExtra:
          color = 0xff0000;
          break;
-      case ExtraType::BombRange:
+      case EntityId::RangeExtra:
          color = 0x00ff00;
          break;
-      case ExtraType::BombSupply:
+      case EntityId::BombsExtra:
          color = 0x0000ff;
          break;
       default:

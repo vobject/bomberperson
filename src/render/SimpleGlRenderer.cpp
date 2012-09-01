@@ -68,11 +68,6 @@ void SimpleGlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
 
 }
 
-void SimpleGlRenderer::Render(const std::shared_ptr<Background>& bg)
-{
-
-}
-
 void SimpleGlRenderer::Render(const std::shared_ptr<Match>& match)
 {
    // TODO: Implement Me!

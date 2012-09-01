@@ -1,10 +1,8 @@
 #include "Explosion.hpp"
 
-Explosion::Explosion(const std::string& name, const ExplosionType type)
-   : mType(type)
+Explosion::Explosion()
+   : SceneObject(EntityId::Explosion)
 {
-   SetResourceId(name);
-
    mAnimation.SetFrameCount(4);
    mAnimation.SetLength(DEFAULT_LIFETIME);
    mAnimation.SetLooping(false);
@@ -25,11 +23,6 @@ void Explosion::Update(const int elapsed_time)
    }
 
    mAnimation.Update(elapsed_time);
-}
-
-ExplosionType Explosion::GetType() const
-{
-   return mType;
 }
 
 int Explosion::GetAnimationFrame() const

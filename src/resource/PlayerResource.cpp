@@ -8,7 +8,7 @@ PlayerResource::PlayerResource()
 
 }
 
-PlayerResource::PlayerResource(const std::string& id)
+PlayerResource::PlayerResource(const EntityId id)
    : mId(id)
 {
 
@@ -19,7 +19,7 @@ PlayerResource::~PlayerResource()
 
 }
 
-std::string PlayerResource::GetId() const
+EntityId PlayerResource::GetId() const
 {
    return mId;
 }

@@ -4,7 +4,6 @@
 #include <memory>
 
 class MainMenu;
-class Background;
 class Match;
 class Arena;
 class Cell;
@@ -24,7 +23,6 @@ public:
    virtual void PreRender() { }
    virtual void PostRender() { }
    virtual void Render(const std::shared_ptr<MainMenu>& mainmenu) = 0;
-   virtual void Render(const std::shared_ptr<Background>& bg) = 0;
    virtual void Render(const std::shared_ptr<Match>& match) = 0;
    virtual void Render(const std::shared_ptr<Arena>& field) = 0;
    virtual void Render(const std::shared_ptr<Cell>& cell) = 0;

@@ -1,6 +1,5 @@
 #include "SdlRenderer.hpp"
 #include "../game/MainMenu.hpp"
-#include "../game/Background.hpp"
 #include "../game/Match.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Cell.hpp"
@@ -84,13 +83,6 @@ void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
    }
 }
 
-void SdlRenderer::Render(const std::shared_ptr<Background>& bg)
-{
-   const auto name = bg->GetResourceId();
-   const auto frame = mResCache->GetBgResource(name).GetFrame(0);
-   Render(bg, frame);
-}
-
 void SdlRenderer::Render(const std::shared_ptr<Match>& match)
 {
    // FIXME: Match is not a SceneObject! Is that a design problem?
@@ -109,6 +101,10 @@ void SdlRenderer::Render(const std::shared_ptr<Match>& match)
 
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
+   const auto name = arena->GetId();
+   const auto frame = mResCache->GetArenaResource(name).GetFrame(0);
+   Render(arena, frame);
+
    for (const auto& cell : arena->GetCells())
    {
       Render(cell);
@@ -141,21 +137,21 @@ void SdlRenderer::Render(const std::shared_ptr<Cell>& cell)
 
 void SdlRenderer::Render(const std::shared_ptr<Wall>& wall)
 {
-   const auto name = wall->GetResourceId();
+   const auto name = wall->GetId();
    const auto frame = mResCache->GetWallResource(name).GetFrame(0);
    Render(wall, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Extra>& extra)
 {
-   const auto name = extra->GetResourceId();
+   const auto name = extra->GetId();
    const auto frame = mResCache->GetExtraResource(name).GetFrame(0);
    Render(extra, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Bomb>& bomb)
 {
-   const auto name = bomb->GetResourceId();
+   const auto name = bomb->GetId();
    const auto index = bomb->GetAnimationFrame();
    const auto frame = mResCache->GetBombResource(name).GetFrame(index);
    Render(bomb, frame);
@@ -163,7 +159,7 @@ void SdlRenderer::Render(const std::shared_ptr<Bomb>& bomb)
 
 void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 {
-   const auto name = explosion->GetResourceId();
+   const auto name = explosion->GetId();
    const auto index = explosion->GetAnimationFrame();
    const auto frame = mResCache->GetExplosionResource(name).GetFrame(index);
    Render(explosion, frame);
@@ -171,7 +167,7 @@ void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 
 void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 {
-   const auto name = player->GetResourceId();
+   const auto name = player->GetId();
    const auto dir = player->GetDirection();
    const auto index = player->GetAnimationFrame();
 

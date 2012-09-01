@@ -1,7 +1,7 @@
 #include "Logic.hpp"
+#include "EntityId.hpp"
 #include "MainMenu.hpp"
 #include "Match.hpp"
-#include "Background.hpp"
 #include "ArenaGenerator.hpp"
 #include "Arena.hpp"
 #include "Cell.hpp"
@@ -102,7 +102,6 @@ void Logic::Render()
          break;
       case GameState::Running:
          mRenderer->PreRender();
-         mRenderer->Render(mBackground);
          mRenderer->Render(mMatch);
          mRenderer->PostRender();
          break;
@@ -189,13 +188,12 @@ void Logic::UpdateRunningState(const int elapsed_time)
 void Logic::ShowMainMenu()
 {
    mMatch = nullptr;
-   mFieldGen = nullptr;
-   mBackground = nullptr;
+   mArenaGen = nullptr;
    mMouse_1 = nullptr;
    mKeyboard_2 = nullptr;
    mKeyboard_1 = nullptr;
 
-   mMainMenu = make_unique<MainMenu>("mainmenu");
+   mMainMenu = make_unique<MainMenu>();
    mMainMenu->SetSize({ DefaultSize::SCREEN_WIDTH, DefaultSize::SCREEN_HEIGHT });
 
    mCurrentState = GameState::MainMenu;
@@ -211,20 +209,18 @@ void Logic::ShowGame()
    Point mouse_center(DefaultSize::SCREEN_WIDTH / 2, DefaultSize::SCREEN_HEIGHT / 2);
    mMouse_1 = std::make_shared<MouseInput>(mouse_center, SDL_BUTTON_LEFT);
 
-   mBackground = std::make_shared<Background>("bg_arena_1");
-   mBackground->SetSize({ DefaultSize::ARENA_BG_WIDTH, DefaultSize::ARENA_BG_HEIGHT });
-
    const std::vector<std::shared_ptr<Player>> players = {
-      std::make_shared<Player>("player_1", mKeyboard_1)
-    , std::make_shared<Player>("player_2", mMouse_1)
-//    , std::make_shared<Player>("player_3")
+      std::make_shared<Player>(EntityId::Player_1, mKeyboard_1)
+    , std::make_shared<Player>(EntityId::Player_2, mKeyboard_2)
+    , std::make_shared<Player>(EntityId::Player_3, mMouse_1)
 //    , std::make_shared<Player>("player_4")
    };
 
-   mFieldGen = std::make_shared<ArenaGenerator>();
-   mFieldGen->SetArenaPosition({ DefaultSize::ARENA_POS_X, DefaultSize::ARENA_POS_Y });
-   mFieldGen->SetArenaSize({ DefaultSize::ARENA_WIDTH, DefaultSize::ARENA_HEIGHT });
-   auto arena = mFieldGen->GetDefaultArena(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, players.size());
+   mArenaGen = std::make_shared<ArenaGenerator>();
+   mArenaGen->SetArenaPosition({ DefaultSize::ARENA_POS_X, DefaultSize::ARENA_POS_Y });
+   mArenaGen->SetArenaSize({ DefaultSize::ARENA_WIDTH, DefaultSize::ARENA_HEIGHT });
+   mArenaGen->SetArenaBorderSize({ DefaultSize::ARENA_BORDER_WIDTH, DefaultSize::ARENA_BORDER_HEIGHT });
+   auto arena = mArenaGen->GetDefaultArena(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, players.size());
 
    const auto parent_cell_p1 = arena->GetCellFromCoordinates(DefaultSize::PLAYER_1_CELL_X, DefaultSize::PLAYER_1_CELL_Y);
    players[0]->SetParentCell(parent_cell_p1);
@@ -236,7 +232,11 @@ void Logic::ShowGame()
    players[1]->SetPosition(parent_cell_p2->GetPosition());
    players[1]->SetSize({ DefaultSize::PLAYER_WIDTH, DefaultSize::PLAYER_HEIGHT });
 
-   mMatch = std::make_shared<Match>(arena, players);
+   const auto parent_cell_p3 = arena->GetCellFromCoordinates(DefaultSize::PLAYER_3_CELL_X, DefaultSize::PLAYER_3_CELL_Y);
+   players[2]->SetParentCell(parent_cell_p3);
+   players[2]->SetPosition(parent_cell_p3->GetPosition());
+   players[2]->SetSize({ DefaultSize::PLAYER_WIDTH, DefaultSize::PLAYER_HEIGHT });
 
+   mMatch = std::make_shared<Match>(arena, players);
    mCurrentState = GameState::Running;
 }

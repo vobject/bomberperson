@@ -1,6 +1,7 @@
 #ifndef SPRITE_RESOURCE_HPP
 #define SPRITE_RESOURCE_HPP
 
+#include "../game/EntityId.hpp"
 #include "../utils/Utils.hpp"
 
 #include <string>
@@ -12,19 +13,19 @@ class SpriteResource
 {
 public:
    SpriteResource();
-   SpriteResource(const std::string& id, const std::vector<SDL_Surface*>& textures);
+   SpriteResource(EntityId id, const std::vector<SDL_Surface*>& textures);
    virtual ~SpriteResource();
 
    SpriteResource(const SpriteResource&) = default;
    SpriteResource& operator=(const SpriteResource&) = default;
 
-   std::string GetId() const;
+   EntityId GetId() const;
    int GetFrameCount() const;
    SDL_Surface* GetFrame(int n) const;
    Size GetSize() const;
 
 private:
-   std::string mId;
+   EntityId mId;
    std::vector<SDL_Surface*> mFrames;
 };
 

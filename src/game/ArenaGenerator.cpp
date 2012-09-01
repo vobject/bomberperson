@@ -28,6 +28,11 @@ void ArenaGenerator::SetArenaSize(const Size& size)
    mSize = size;
 }
 
+void ArenaGenerator::SetArenaBorderSize(const Size& borders)
+{
+   mBorders = borders;
+}
+
 std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
    const int cells_x,
    const int cells_y,
@@ -38,9 +43,10 @@ std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
       throw "Arena size not yet set.";
    }
 
-   auto arena = std::make_shared<Arena>("arena");
+   auto arena = std::make_shared<Arena>();
    arena->SetPosition(mPos);
    arena->SetSize(mSize);
+   arena->SetBorderSize(mBorders);
    arena->SetDimensions(cells_x, cells_y);
 
    const auto cells = CreateDefaultCells(cells_x, cells_y, arena);
@@ -61,16 +67,16 @@ std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
 
    if (players >= 3)
    {
-      cells[cells_x - 2]->SetWall(nullptr);
-      cells[cells_x - 1]->SetWall(nullptr);
-      cells[cells_x * 2 - 1]->SetWall(nullptr);
+      cells[cells_x * cells_y - cells_x * 2]->SetWall(nullptr);
+      cells[cells_x * cells_y - cells_x]->SetWall(nullptr);
+      cells[cells_x * cells_y - cells_x + 1]->SetWall(nullptr);
    }
 
    if (players >= 4)
    {
-      cells[cells_x * cells_y - cells_x * 2]->SetWall(nullptr);
-      cells[cells_x * cells_y - cells_x]->SetWall(nullptr);
-      cells[cells_x * cells_y - cells_x + 1]->SetWall(nullptr);
+      cells[cells_x - 2]->SetWall(nullptr);
+      cells[cells_x - 1]->SetWall(nullptr);
+      cells[cells_x * 2 - 1]->SetWall(nullptr);
    }
 
    for (auto& cell : cells)
@@ -87,26 +93,21 @@ std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
          continue;
       }
 
-      std::string extra_name;
-      ExtraType extra_type;
+      std::shared_ptr<Extra> extra = nullptr;
 
       switch (rand() % 3)
       {
          case 0:
-            extra_name = "extra_speed";
-            extra_type = ExtraType::Speed;
+            extra = std::make_shared<Extra>(EntityId::SpeedExtra);
             break;
          case 1:
-            extra_name = "extra_bombs";
-            extra_type = ExtraType::BombSupply;
+            extra = std::make_shared<Extra>(EntityId::BombsExtra);
             break;
          case 2:
-            extra_name = "extra_range";
-            extra_type = ExtraType::BombRange;
+            extra = std::make_shared<Extra>(EntityId::RangeExtra);
             break;
       }
 
-      auto extra = std::make_shared<Extra>(extra_name, extra_type);
       extra->SetPosition(cell->GetPosition());
       extra->SetSize(cell->GetSize());
       cell->SetExtra(extra);
@@ -130,28 +131,25 @@ std::vector<std::shared_ptr<Cell>> ArenaGenerator::CreateDefaultCells(
       const int cell_field_pos_x = i % cells_x;
       const int cell_field_pos_y = i / cells_x;
 
-      auto cell = std::make_shared<Cell>("cell",
-                                         cell_field_pos_x,
+      auto cell = std::make_shared<Cell>(cell_field_pos_x,
                                          cell_field_pos_y,
                                          arena);
 
-      cell->SetPosition({ arena->GetPosition().X + (cell_size.Width * cell_field_pos_x),
-                          arena->GetPosition().Y + (cell_size.Height * cell_field_pos_y) });
+      cell->SetPosition({ arena->GetPosition().X + mBorders.Width + (cell_size.Width * cell_field_pos_x),
+                          arena->GetPosition().Y + mBorders.Height + (cell_size.Height * cell_field_pos_y) });
       cell->SetSize(cell_size);
 
       // Create the field boundary and pattern.
       if ((cell_field_pos_x % 2) && (cell_field_pos_y % 2)) // Pattern
       {
-         auto wall = std::make_shared<Wall>("wall_indestructible",
-                                            WallType::Indestructible);
+         auto wall = std::make_shared<Wall>(EntityId::IndestructibleWall);
          wall->SetPosition(cell->GetPosition());
          wall->SetSize(cell->GetSize());
          cell->SetWall(wall);
       }
       else
       {
-         auto wall = std::make_shared<Wall>("wall_destructible",
-                                            WallType::Destructible);
+         auto wall = std::make_shared<Wall>(EntityId::DestructibleWall);
          wall->SetPosition(cell->GetPosition());
          wall->SetSize(cell->GetSize());
          cell->SetWall(wall);
@@ -163,7 +161,8 @@ std::vector<std::shared_ptr<Cell>> ArenaGenerator::CreateDefaultCells(
 
 Size ArenaGenerator::GetCellSize(const int cells_x, const int cells_y) const
 {
-   return { mSize.Width / cells_x, mSize.Height / cells_y };
+   return { (mSize.Width - (mBorders.Width * 2)) / cells_x,
+            (mSize.Height - (mBorders.Height * 2)) / cells_y };
 }
 
 bool ArenaGenerator::ShouldCreateItem() const
