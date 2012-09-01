@@ -10,7 +10,6 @@
 
 class Arena;
 class Cell;
-enum class CellItem;
 
 class ArenaGenerator
 {

@@ -16,11 +16,6 @@ void Wall::Update(const int elapsed_time)
 
 }
 
-//WallType Wall::GetType() const
-//{
-//   return mType;
-//}
-
 bool Wall::IsDestructible() const
 {
    switch (GetId())

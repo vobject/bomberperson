@@ -24,9 +24,6 @@ public:
 
    void Update(int elapsed_time) override;
 
-//   std::shared_ptr<InputDevice> GetInputDevice() const;
-//   void SetInputDevice(const std::shared_ptr<InputDevice>& input);
-
    void SetParentCell(const std::shared_ptr<Cell>& cell);
 
    Direction GetDirection() const;

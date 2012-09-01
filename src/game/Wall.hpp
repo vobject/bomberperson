@@ -32,11 +32,7 @@ public:
 
    void Update(int elapsed_time) override;
 
-//   WallType GetType() const;
    bool IsDestructible() const;
-
-//private:
-//   WallType mType;
 };
 
 #endif // WALL_HPP

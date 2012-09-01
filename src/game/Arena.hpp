@@ -10,7 +10,6 @@
 class Cell;
 struct Point;
 struct Size;
-enum class CellItem;
 
 class Arena : public SceneObject
 {

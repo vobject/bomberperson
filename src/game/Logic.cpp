@@ -213,7 +213,7 @@ void Logic::ShowGame()
       std::make_shared<Player>(EntityId::Player_1, mKeyboard_1)
     , std::make_shared<Player>(EntityId::Player_2, mKeyboard_2)
     , std::make_shared<Player>(EntityId::Player_3, mMouse_1)
-//    , std::make_shared<Player>("player_4")
+//    , std::make_shared<Player>(EntityId::Player_4, mKinect)
    };
 
    mArenaGen = std::make_shared<ArenaGenerator>();

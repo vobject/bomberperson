@@ -26,11 +26,6 @@ EntityId SceneObject::GetId() const
    return mId;
 }
 
-//void SceneObject::SetResourceId(const EntityId id)
-//{
-//   mId = id;
-//}
-
 Point SceneObject::GetPosition() const
 {
    return mPos;
