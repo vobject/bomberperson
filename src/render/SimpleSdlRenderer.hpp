@@ -21,6 +21,7 @@ public:
    void Render(const std::shared_ptr<MainMenu>& mainmenu) override;
    void Render(const std::shared_ptr<Match>& match) override;
    void Render(const std::shared_ptr<Arena>& arena) override;
+   void Render(const std::shared_ptr<Scoreboard>& scoreboard) override;
    void Render(const std::shared_ptr<Cell>& cell) override;
    void Render(const std::shared_ptr<Wall>& explosion) override;
    void Render(const std::shared_ptr<Extra>& bomb) override;

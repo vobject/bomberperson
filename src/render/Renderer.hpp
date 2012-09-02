@@ -6,6 +6,7 @@
 class MainMenu;
 class Match;
 class Arena;
+class Scoreboard;
 class Cell;
 class Wall;
 class Extra;
@@ -24,7 +25,8 @@ public:
    virtual void PostRender() { }
    virtual void Render(const std::shared_ptr<MainMenu>& mainmenu) = 0;
    virtual void Render(const std::shared_ptr<Match>& match) = 0;
-   virtual void Render(const std::shared_ptr<Arena>& field) = 0;
+   virtual void Render(const std::shared_ptr<Arena>& arena) = 0;
+   virtual void Render(const std::shared_ptr<Scoreboard>& scoreboard) = 0;
    virtual void Render(const std::shared_ptr<Cell>& cell) = 0;
    virtual void Render(const std::shared_ptr<Wall>& wall) = 0;
    virtual void Render(const std::shared_ptr<Extra>& extra) = 0;

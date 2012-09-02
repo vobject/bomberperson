@@ -182,7 +182,13 @@ void Logic::UpdateMainMenuState(const int elapsed_time)
 
 void Logic::UpdateRunningState(const int elapsed_time)
 {
-   mMatch->Update(elapsed_time);
+   if (!mMatch->IsOver())
+   {
+      mMatch->Update(elapsed_time);
+      return;
+   }
+
+   ShowMainMenu();
 }
 
 void Logic::ShowMainMenu()

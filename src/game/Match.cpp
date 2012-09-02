@@ -1,8 +1,10 @@
 #include "Match.hpp"
 #include "Arena.hpp"
+#include "Scoreboard.hpp"
 #include "Cell.hpp"
 #include "Player.hpp"
 #include "../utils/Utils.hpp"
+#include "../Options.hpp"
 
 Match::Match(
    const std::shared_ptr<Arena>& arena,
@@ -10,8 +12,15 @@ Match::Match(
 )
    : mArena(arena)
    , mPlayers(players)
+   , mScoreboard(std::make_shared<Scoreboard>())
 {
+   mScoreboard->SetPosition({ DefaultSize::SCOREBOARD_POS_X,
+                              DefaultSize::SCOREBOARD_POS_Y });
+   mScoreboard->SetSize({ DefaultSize::SCOREBOARD_WIDTH,
+                          DefaultSize::SCOREBOARD_HEIGHT });
 
+   mScoreboard->KeepTrackOf(mArena);
+   mScoreboard->KeepTrackOf(mPlayers);
 }
 
 Match::~Match()
@@ -21,8 +30,6 @@ Match::~Match()
 
 void Match::Update(const int elapsed_time)
 {
-   // TODO: End game if all but one players are dead.
-
    mArena->Update(elapsed_time);
 
    auto player = std::begin(mPlayers);
@@ -39,6 +46,8 @@ void Match::Update(const int elapsed_time)
          player = mPlayers.erase(player);
       }
    }
+
+   mScoreboard->Update(elapsed_time);
 }
 
 std::shared_ptr<Arena> Match::GetArena() const
@@ -49,6 +58,16 @@ std::shared_ptr<Arena> Match::GetArena() const
 std::vector<std::shared_ptr<Player>> Match::GetPlayers() const
 {
    return mPlayers;
+}
+
+std::shared_ptr<Scoreboard> Match::GetScoreboard() const
+{
+   return mScoreboard;
+}
+
+bool Match::IsOver() const
+{
+   return (mPlayers.size() <= 1);
 }
 
 std::shared_ptr<Cell> Match::GetCellFromObject(
