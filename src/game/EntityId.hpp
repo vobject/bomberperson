@@ -12,6 +12,8 @@ enum class EntityId
 
    Arena,
 
+   Scoreboard,
+
    Cell,
 
    IndestructibleWall,

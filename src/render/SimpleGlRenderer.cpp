@@ -2,6 +2,7 @@
 #include "../game/MainMenu.hpp"
 #include "../game/Match.hpp"
 #include "../game/Arena.hpp"
+#include "../game/Scoreboard.hpp"
 #include "../game/Cell.hpp"
 #include "../game/Wall.hpp"
 #include "../game/Extra.hpp"
@@ -74,6 +75,11 @@ void SimpleGlRenderer::Render(const std::shared_ptr<Match>& match)
 }
 
 void SimpleGlRenderer::Render(const std::shared_ptr<Arena>& arena)
+{
+   // TODO: Implement Me!
+}
+
+void SimpleGlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
 {
    // TODO: Implement Me!
 }
