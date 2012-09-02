@@ -12,21 +12,7 @@ Player::Player(
    : SceneObject(player_id)
    , mInput(input)
 {
-//   mWalkUpAnimation.SetFrameCount(mWalkAnimationFrames);
-//   mWalkUpAnimation.SetLength(mWalkAnimationLength);
-//   mWalkUpAnimation.SetLooping(true);
 
-//   mWalkDownAnimation.SetFrameCount(mWalkAnimationFrames);
-//   mWalkDownAnimation.SetLength(mWalkAnimationLength);
-//   mWalkDownAnimation.SetLooping(true);
-
-//   mWalkLeftAnimation.SetFrameCount(mWalkAnimationFrames);
-//   mWalkLeftAnimation.SetLength(mWalkAnimationLength);
-//   mWalkLeftAnimation.SetLooping(true);
-
-//   mWalkRightAnimation.SetFrameCount(mWalkAnimationFrames);
-//   mWalkRightAnimation.SetLength(mWalkAnimationLength);
-//   mWalkRightAnimation.SetLooping(true);
 }
 
 Player::~Player()
@@ -37,30 +23,6 @@ Player::~Player()
 void Player::Update(const int elapsed_time)
 {
    const auto old_state = mState;
-
-   mMoveIdleTime += elapsed_time;
-   if (mMoveIdleTime > mMovementSpeed)
-   {
-      UpdateMovement(mMoveIdleTime);
-   }
-
-   mBombIdleTime += elapsed_time;
-   if (mBombIdleTime > mPlantingSpeed)
-   {
-      UpdateBombing(mBombIdleTime);
-   }
-
-   if (old_state == mState) {
-      mStateTime += elapsed_time;
-   }
-   else {
-      mStateTime = 0; // Start new state.
-   }
-}
-
-void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
-{
-   mParentCell = cell;
 
    if (mParentCell->HasExplosion())
    {
@@ -89,17 +51,22 @@ void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
             break;
       }
    }
+
+   UpdateMovement(elapsed_time);
+   UpdateBombing(elapsed_time);
+
+   if (old_state == mState) {
+      mStateTime += elapsed_time;
+   }
+   else {
+      mStateTime = 0; // Start new state.
+   }
 }
 
-//Direction Player::GetDirection() const
-//{
-//   return mDirection;
-//}
-
-//int Player::GetAnimationFrame() const
-//{
-//   return GetCurrentDirectionAnimation().GetCurrentFrame();
-//}
+void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
+{
+   mParentCell = cell;
+}
 
 PlayerState Player::GetState() const
 {
@@ -119,7 +86,11 @@ int Player::GetSpeed() const
 
 void Player::UpdateMovement(const int elapsed_time)
 {
-   const auto distance = 1;
+   mMoveIdleTime += elapsed_time;
+   if (mMoveIdleTime < mMovementSpeed) {
+      return;
+   }
+
    auto up = 0;
    auto down = 0;
    auto left = 0;
@@ -131,8 +102,8 @@ void Player::UpdateMovement(const int elapsed_time)
       update_anim = true;
       mState = PlayerState::WalkUp;
 
-      if (CanMove(Direction::Up, distance)) {
-         up++;
+      if (CanMove(Direction::Up, mMovementDistance)) {
+         up += mMovementDistance;
       }
    }
    if (mInput->TestDown())
@@ -140,8 +111,8 @@ void Player::UpdateMovement(const int elapsed_time)
       update_anim = true;
       mState = PlayerState::WalkDown;
 
-      if (CanMove(Direction::Down, distance)) {
-         down++;
+      if (CanMove(Direction::Down, mMovementDistance)) {
+         down += mMovementDistance;
       }
    }
    if (mInput->TestLeft())
@@ -149,8 +120,8 @@ void Player::UpdateMovement(const int elapsed_time)
       update_anim = true;
       mState = PlayerState::WalkLeft;
 
-      if (CanMove(Direction::Left, distance)) {
-         left++;
+      if (CanMove(Direction::Left, mMovementDistance)) {
+         left += mMovementDistance;
       }
    }
    if (mInput->TestRight())
@@ -158,8 +129,8 @@ void Player::UpdateMovement(const int elapsed_time)
       update_anim = true;
       mState = PlayerState::WalkRight;
 
-      if (CanMove(Direction::Right, distance)) {
-         right++;
+      if (CanMove(Direction::Right, mMovementDistance)) {
+         right += mMovementDistance;
       }
    }
 
@@ -175,6 +146,11 @@ void Player::UpdateMovement(const int elapsed_time)
 
 void Player::UpdateBombing(const int elapsed_time)
 {
+   mBombIdleTime += elapsed_time;
+   if (mBombIdleTime < mPlantingSpeed) {
+      return;
+   }
+
    if (!mInput->TestAction1() && !mInput->TestAction2())
    {
       // The user did not request to plant a bomb.
@@ -202,37 +178,6 @@ void Player::UpdateBombing(const int elapsed_time)
    mPlantedBombs.push_back(bomb);
    mBombIdleTime = 0;
 }
-
-//void Player::UpdateAnimation(const int elapsed_time)
-//{
-//   switch (mDirection)
-//   {
-//      case Direction::Up:
-//         mWalkUpAnimation.Update(elapsed_time);
-//         mWalkDownAnimation.Reset();
-//         mWalkLeftAnimation.Reset();
-//         mWalkRightAnimation.Reset();
-//         break;
-//      case Direction::Down:
-//         mWalkUpAnimation.Reset();
-//         mWalkDownAnimation.Update(elapsed_time);
-//         mWalkLeftAnimation.Reset();
-//         mWalkRightAnimation.Reset();
-//         break;
-//      case Direction::Left:
-//         mWalkUpAnimation.Reset();
-//         mWalkDownAnimation.Reset();
-//         mWalkLeftAnimation.Update(elapsed_time);
-//         mWalkRightAnimation.Reset();
-//         break;
-//      case Direction::Right:
-//         mWalkUpAnimation.Reset();
-//         mWalkDownAnimation.Reset();
-//         mWalkLeftAnimation.Reset();
-//         mWalkRightAnimation.Update(elapsed_time);
-//         break;
-//   }
-//}
 
 bool Player::CanMove(const Direction dir, const int distance) const
 {
@@ -295,16 +240,14 @@ bool Player::CanPlantBomb()
 
 void Player::IncreaseSpeed()
 {
-   if (mMovementSpeed > 2) {
-      mMovementSpeed -= 2;
-
-//      mWalkAnimationLength -= 60;
-//      mWalkUpAnimation.SetLength(mWalkAnimationLength);
-//      mWalkDownAnimation.SetLength(mWalkAnimationLength);
-//      mWalkLeftAnimation.SetLength(mWalkAnimationLength);
-//      mWalkRightAnimation.SetLength(mWalkAnimationLength);
+   if (mMovementSpeed > MAX_SPEED)
+   {
+      mMovementSpeed -= 2_ms;
    }
-   // The player is already at maximum speed.
+   else
+   {
+      mMovementDistance++;
+   }
 }
 
 PlayerState Player::GetStopWalkingState(const PlayerState state) const

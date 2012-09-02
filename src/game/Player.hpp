@@ -2,7 +2,6 @@
 #define PLAYER_HPP
 
 #include "SceneObject.hpp"
-//#include "Animation.hpp"
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
@@ -12,16 +11,6 @@
 class InputDevice;
 class Cell;
 class Bomb;
-
-//enum class PlayerState
-//{
-//   Stand,
-//   Walk,
-////   Idle,
-////   Lockedin,
-////   Die,
-////   Win
-//};
 
 enum class PlayerState
 {
@@ -38,6 +27,21 @@ enum class PlayerState
 //   Die,
 //   Win
 };
+
+//struct PlayerData
+//{
+//   PlayerState state;
+//   int state_time;
+
+//   int speed;
+//   int bombs;
+//   int range;
+
+//   bool reverse;
+
+//   int wins;
+//   int kills;
+//};
 
 //class PlayerAnimation
 //{
@@ -69,16 +73,13 @@ public:
 
    void SetParentCell(const std::shared_ptr<Cell>& cell);
 
-   Direction GetDirection() const;
-   int GetAnimationFrame() const;
-
    PlayerState GetState() const;
    int GetStateTime() const;
    int GetSpeed() const;
 
 private:
-   static const int SPEED_MIN = 1;
-   static const int SPEED_MAX = 20;
+   static const int MIN_SPEED = 16_ms;
+   static const int MAX_SPEED = 2_ms;
 
    void UpdateMovement(int elapsed_time);
    void UpdateBombing(int elapsed_time);
@@ -90,32 +91,21 @@ private:
    void IncreaseSpeed();
    PlayerState GetStopWalkingState(PlayerState state) const;
 
-//   const Animation& GetCurrentDirectionAnimation() const;
-
    std::shared_ptr<InputDevice> mInput;
    std::shared_ptr<Cell> mParentCell;
    int mMoveIdleTime = 0;
    int mBombIdleTime = 0;
 
    // Number of milliseconds the player has to wait to move another pixel.
-   int mMovementSpeed = 8;
-   // How many milliseconds does the player have to wait to plant another bomb?
-   int mPlantingSpeed = 200;
+   int mMovementSpeed = MIN_SPEED;
+   int mMovementDistance = 1;
 
-   int mWalkAnimationFrames = 2;
-   int mWalkAnimationLength = mMovementSpeed * 40;
+   // How many milliseconds does the player have to wait to plant another bomb?
+   int mPlantingSpeed = 200_ms;
 
    int mBombRange = 1;
    int mBombSupply = 1;
    std::vector<std::shared_ptr<Bomb>> mPlantedBombs;
-
-//   Direction mDirection = Direction::Down;
-//   Animation mWalkUpAnimation;
-//   Animation mWalkDownAnimation;
-//   Animation mWalkLeftAnimation;
-//   Animation mWalkRightAnimation;
-//   Animation mDeathAnimation;
-//   Animation mWinAnimation;
 
    PlayerState mState = PlayerState::StandDown;
    int mStateTime = 0;

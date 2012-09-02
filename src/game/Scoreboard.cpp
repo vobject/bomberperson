@@ -37,7 +37,6 @@ std::vector<std::string> Scoreboard::GetScore() const
 
    lines.push_back("Arena:");
 
-   os.clear();
    os << "  Cells: " << mArena->GetCells().size();
    lines.push_back(os.str());
 
@@ -48,6 +47,21 @@ std::vector<std::string> Scoreboard::GetScore() const
 //   os.clear();
 //   os << "\tCell height: " << mArena->GetCellSize().Height << "px";
 //   lines.push_back(os.str());
+
+   for (const auto& player : mPlayers)
+   {
+      lines.push_back("");
+
+      os.clear();
+      os.str("");
+      os << "Player " << static_cast<int>(player->GetId()) << ":";
+      lines.push_back(os.str());
+
+      os.clear();
+      os.str("");
+      os << "  Speed: " << player->GetSpeed();
+      lines.push_back(os.str());
+   }
 
    return lines;
 }

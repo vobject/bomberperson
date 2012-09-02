@@ -36,7 +36,7 @@ void BomberPersonApp::Mainloop()
    //  http://gafferongames.com/game-physics/fix-your-timestep/
 
    // A game update call will update the game status by this amount of time.
-   const std::chrono::milliseconds delta_time(8_ms);
+   const std::chrono::milliseconds delta_time(2_ms);
 
    auto old_time = std::chrono::milliseconds(SDL_GetTicks());
    auto game_time = std::chrono::milliseconds::zero();
@@ -94,7 +94,7 @@ void BomberPersonApp::ProcessInput()
    }
 
    // Handle application-level requests, e.g. change of the renderer.
-   if (SDL_KEYDOWN == event.type && (event.key.keysym.mod & KMOD_LALT))
+   if (SDL_KEYDOWN == event.type && (event.key.keysym.mod & KMOD_LCTRL))
    {
       const Size screen_size = { DefaultSize::SCREEN_WIDTH,
                                  DefaultSize::SCREEN_HEIGHT };
@@ -109,7 +109,7 @@ void BomberPersonApp::ProcessInput()
          mRenderer = std::make_shared<SimpleGlRenderer>(screen_size);
       }
 
-      // TODO: KMOD_LALT + SDLK_K -> try connecting to kinect device.
+      // TODO: KMOD_LCTRL + SDLK_K -> try connecting to kinect device.
 
       return;
    }
