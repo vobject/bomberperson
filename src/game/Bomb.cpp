@@ -3,11 +3,10 @@
 #include "Wall.hpp"
 #include "Explosion.hpp"
 
-Bomb::Bomb(const std::string& name, const std::shared_ptr<Cell>& cell)
-   : mParentCell(cell)
+Bomb::Bomb(const std::shared_ptr<Cell>& cell)
+   : SceneObject(EntityId::Bomb)
+   , mParentCell(cell)
 {
-   SetResourceId(name);
-
    mAnimation.SetFrameCount(3);
    mAnimation.SetLength(DEFAULT_LIFETIME);
    mAnimation.SetLooping(true);
@@ -58,8 +57,7 @@ void Bomb::Detonate()
 
 void Bomb::PlantCenterExplosion() const
 {
-   auto explosion = std::make_shared<Explosion>("explosion",
-                                                ExplosionType::Crossway);
+   auto explosion = std::make_shared<Explosion>();
    explosion->SetSize(mParentCell->GetSize());
    explosion->SetPosition(mParentCell->GetPosition());
    mParentCell->SetExplosion(explosion);
@@ -88,8 +86,7 @@ void Bomb::PlantRangeExplosion(Direction dir) const
       //  as this one, e.g. Vertical or Horizontal.
 
       // TODO: Select the right ExplosionType.
-      auto range_exp = std::make_shared<Explosion>("explosion",
-                                                   ExplosionType::Crossway);
+      auto range_exp = std::make_shared<Explosion>();
       range_exp->SetSize(range_cell->GetSize());
       range_exp->SetPosition(range_cell->GetPosition());
       range_cell->SetExplosion(range_exp);

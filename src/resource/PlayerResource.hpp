@@ -1,6 +1,7 @@
 #ifndef PLAYER_RESOURCE_HPP
 #define PLAYER_RESOURCE_HPP
 
+#include "../game/EntityId.hpp"
 #include "../utils/Utils.hpp"
 
 #include <map>
@@ -15,13 +16,13 @@ class PlayerResource
 {
 public:
    PlayerResource();
-   PlayerResource(const std::string& id);
+   PlayerResource(EntityId id);
    ~PlayerResource();
 
    PlayerResource(const PlayerResource&) = default;
    PlayerResource& operator=(const PlayerResource&) = default;
 
-   std::string GetId() const;
+   EntityId GetId() const;
 
 //   void SetWalkFrames(Direction dir, const std::vector<SDL_Surface*>& textures);
    void SetFrames(PlayerState state, const std::vector<SDL_Surface*>& textures);
@@ -39,7 +40,7 @@ public:
    // SetLooping(bool)
 
 private:
-   std::string mId;
+   EntityId mId;
 //   std::map<Direction, std::vector<SDL_Surface*>> mWalkFrames;
    std::map<PlayerState, std::vector<SDL_Surface*>> mFrames;
    int mAnimationLength = 0_ms;

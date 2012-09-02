@@ -36,7 +36,7 @@ void BomberPersonApp::Mainloop()
    //  http://gafferongames.com/game-physics/fix-your-timestep/
 
    // A game update call will update the game status by this amount of time.
-   const std::chrono::milliseconds delta_time(2_ms);
+   const std::chrono::milliseconds delta_time(8_ms);
 
    auto old_time = std::chrono::milliseconds(SDL_GetTicks());
    auto game_time = std::chrono::milliseconds::zero();
@@ -87,8 +87,8 @@ void BomberPersonApp::ProcessInput()
       return;
    }
 
-   if((SDL_QUIT == event.type) || (SDLK_ESCAPE == event.key.keysym.sym)) {
-      // The user closed the window or pressed ESC.
+   if((SDL_QUIT == event.type) || mLogic->Done()) {
+      // The user closed the window.
       mQuitRequested = true;
       return;
    }
@@ -118,9 +118,14 @@ void BomberPersonApp::ProcessInput()
    {
       case SDL_KEYDOWN:
       case SDL_KEYUP:
-         {
-            mLogic->ProcessInput(event.key);
-         }
+         mLogic->ProcessInput(event.key);
+         break;
+      case SDL_MOUSEMOTION:
+         mLogic->ProcessInput(event.motion);
+         break;
+      case SDL_MOUSEBUTTONDOWN:
+      case SDL_MOUSEBUTTONUP:
+         mLogic->ProcessInput(event.button);
          break;
       default:
          break;

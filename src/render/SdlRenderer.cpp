@@ -1,5 +1,5 @@
 #include "SdlRenderer.hpp"
-#include "../game/Background.hpp"
+#include "../game/MainMenu.hpp"
 #include "../game/Match.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Cell.hpp"
@@ -51,11 +51,30 @@ void SdlRenderer::PostRender()
    SDL_Flip(mScreen);
 }
 
-void SdlRenderer::Render(const std::shared_ptr<Background>& bg)
+void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
 {
-   const auto name = bg->GetResourceId();
-   const auto frame = mResCache->GetBgResource(name).GetFrame(0);
-   Render(bg, frame);
+   const auto id = mainmenu->GetId();
+   const auto frame = mResCache->GetMenuResource(id).GetFrame(0);
+   Render(mainmenu, frame);
+
+   const auto pos = mainmenu->GetPosition();
+   const auto selection = mainmenu->GetSelection();
+
+   const auto menu_item_cnt = static_cast<int>(MainMenuItem::Exit) + 1;
+   const auto selected_item = static_cast<int>(selection);
+   for (int i = 0; i < menu_item_cnt; i++)
+   {
+      int item_color = 0xc0c0c0;
+      if (selected_item == i) {
+         item_color = 0x804000;
+      }
+
+      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + 70),
+                             static_cast<Sint16>(pos.Y + 55 + (55 * i)),
+                             static_cast<Uint16>(20),
+                             static_cast<Uint16>(20) };
+      SDL_FillRect(mScreen, &item_rect, item_color);
+   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Match>& match)
@@ -76,6 +95,10 @@ void SdlRenderer::Render(const std::shared_ptr<Match>& match)
 
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
+   const auto name = arena->GetId();
+   const auto frame = mResCache->GetArenaResource(name).GetFrame(0);
+   Render(arena, frame);
+
    for (const auto& cell : arena->GetCells())
    {
       Render(cell);
@@ -108,21 +131,21 @@ void SdlRenderer::Render(const std::shared_ptr<Cell>& cell)
 
 void SdlRenderer::Render(const std::shared_ptr<Wall>& wall)
 {
-   const auto name = wall->GetResourceId();
+   const auto name = wall->GetId();
    const auto frame = mResCache->GetWallResource(name).GetFrame(0);
    Render(wall, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Extra>& extra)
 {
-   const auto name = extra->GetResourceId();
+   const auto name = extra->GetId();
    const auto frame = mResCache->GetExtraResource(name).GetFrame(0);
    Render(extra, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Bomb>& bomb)
 {
-   const auto name = bomb->GetResourceId();
+   const auto name = bomb->GetId();
    const auto index = bomb->GetAnimationFrame();
    const auto frame = mResCache->GetBombResource(name).GetFrame(index);
    Render(bomb, frame);
@@ -130,7 +153,7 @@ void SdlRenderer::Render(const std::shared_ptr<Bomb>& bomb)
 
 void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 {
-   const auto name = explosion->GetResourceId();
+   const auto name = explosion->GetId();
    const auto index = explosion->GetAnimationFrame();
    const auto frame = mResCache->GetExplosionResource(name).GetFrame(index);
    Render(explosion, frame);
@@ -138,12 +161,12 @@ void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 
 void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 {
-   const auto name = player->GetResourceId();
+   const auto id = player->GetId();
    const auto state = player->GetState();
    const auto state_time = player->GetStateTime();
    const auto speed = player->GetSpeed();
 
-   const auto res = mResCache->GetPlayerResource(name);
+   const auto res = mResCache->GetPlayerResource(id);
    const auto frame = res.GetFrame(state, state_time, speed);
    Render(player, frame);
 }

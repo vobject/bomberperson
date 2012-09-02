@@ -5,10 +5,13 @@
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
-Player::Player(const std::string& res_name)
+Player::Player(
+   const EntityId player_id,
+   const std::shared_ptr<InputDevice>& input
+)
+   : SceneObject(player_id)
+   , mInput(input)
 {
-   SetResourceId(res_name);
-
 //   mWalkUpAnimation.SetFrameCount(mWalkAnimationFrames);
 //   mWalkUpAnimation.SetLength(mWalkAnimationLength);
 //   mWalkUpAnimation.SetLooping(true);
@@ -55,16 +58,6 @@ void Player::Update(const int elapsed_time)
    }
 }
 
-std::shared_ptr<InputDevice> Player::GetInputDevice() const
-{
-   return mInput;
-}
-
-void Player::SetInputDevice(const std::shared_ptr<InputDevice>& input)
-{
-   mInput = input;
-}
-
 void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
 {
    mParentCell = cell;
@@ -78,16 +71,19 @@ void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
 
    if (mParentCell->HasExtra())
    {
-      switch (mParentCell->CollectExtra()->GetType())
+      switch (mParentCell->CollectExtra()->GetId())
       {
-         case ExtraType::Speed:
+         case EntityId::SpeedExtra:
             IncreaseSpeed();
             break;
-         case ExtraType::BombRange:
+         case EntityId::BombsExtra:
+            mBombSupply++;
+            break;
+         case EntityId::RangeExtra:
             mBombRange++;
             break;
-         case ExtraType::BombSupply:
-            mBombSupply++;
+         case EntityId::GoldRangeExtra:
+            mBombRange = 999;
             break;
          default:
             break;
@@ -179,11 +175,13 @@ void Player::UpdateMovement(const int elapsed_time)
 
 void Player::UpdateBombing(const int elapsed_time)
 {
-   if (!mInput->TestPlantBomb())
+   if (!mInput->TestAction1() && !mInput->TestAction2())
    {
       // The user did not request to plant a bomb.
       return;
    }
+
+   // TODO: Use Action2 input to detonate remote controlled bombs etc.
 
    if (mParentCell->HasBomb()) {
       // Only one bomb per cell.
@@ -195,7 +193,7 @@ void Player::UpdateBombing(const int elapsed_time)
       return;
    }
 
-   auto bomb = std::make_shared<Bomb>("bomb", mParentCell);
+   auto bomb = std::make_shared<Bomb>(mParentCell);
    bomb->SetRange(mBombRange);
    bomb->SetSize(mParentCell->GetSize());
    bomb->SetPosition(mParentCell->GetPosition());

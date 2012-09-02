@@ -3,28 +3,28 @@
 
 #include "SceneObject.hpp"
 
-enum class WallType
-{
-//   Crossway,
-//   Vertical,
-//   VerticalLeftEnd,
-//   VerticalRightEnd,
-//   Horizontal,
-//   HorizontalLeftEnd,
-//   HorizontalRightEnd,
-//   NorthWestCorner,
-//   NorthEastCorner,
-//   SouthWestCorner,
-//   SouthEastCorner
+//enum class WallType
+//{
+////   Crossway,
+////   Vertical,
+////   VerticalLeftEnd,
+////   VerticalRightEnd,
+////   Horizontal,
+////   HorizontalLeftEnd,
+////   HorizontalRightEnd,
+////   NorthWestCorner,
+////   NorthEastCorner,
+////   SouthWestCorner,
+////   SouthEastCorner
 
-   Indestructible,
-   Destructible
-};
+//   Indestructible,
+//   Destructible
+//};
 
 class Wall : public SceneObject
 {
 public:
-   Wall(const std::string& name, WallType type);
+   Wall(EntityId wall_id);
    virtual ~Wall();
 
    Wall(const Wall&) = delete;
@@ -32,11 +32,7 @@ public:
 
    void Update(int elapsed_time) override;
 
-   WallType GetType() const;
    bool IsDestructible() const;
-
-private:
-   WallType mType;
 };
 
 #endif // WALL_HPP

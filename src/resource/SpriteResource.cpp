@@ -8,7 +8,7 @@ SpriteResource::SpriteResource()
 }
 
 SpriteResource::SpriteResource(
-   const std::string& id,
+   const EntityId id,
    const std::vector<SDL_Surface*>& textures
 )
    : mId(id)
@@ -22,7 +22,7 @@ SpriteResource::~SpriteResource()
 
 }
 
-std::string SpriteResource::GetId() const
+EntityId SpriteResource::GetId() const
 {
    return mId;
 }

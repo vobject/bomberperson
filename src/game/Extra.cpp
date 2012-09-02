@@ -1,9 +1,9 @@
 #include "Extra.hpp"
 
-Extra::Extra(const std::string& name, const ExtraType type)
-   : mType(type)
+Extra::Extra(const EntityId extra_id)
+   : SceneObject(extra_id)
 {
-   SetResourceId(name);
+
 }
 
 Extra::~Extra()
@@ -14,9 +14,4 @@ Extra::~Extra()
 void Extra::Update(const int elapsed_time)
 {
 
-}
-
-ExtraType Extra::GetType() const
-{
-   return mType;
 }
