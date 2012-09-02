@@ -95,14 +95,14 @@ void Logic::Render(const std::shared_ptr<Renderer>& renderer)
    switch (mCurrentState)
    {
       case GameState::MainMenu:
-         mRenderer->PreRender();
-         mRenderer->Render(mMainMenu);
-         mRenderer->PostRender();
+         renderer->PreRender();
+         renderer->Render(mMainMenu);
+         renderer->PostRender();
          break;
       case GameState::Running:
-         mRenderer->PreRender();
-         mRenderer->Render(mMatch);
-         mRenderer->PostRender();
+         renderer->PreRender();
+         renderer->Render(mMatch);
+         renderer->PostRender();
          break;
       case GameState::Exit:
          break;
