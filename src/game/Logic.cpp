@@ -8,74 +8,21 @@
 #include "Player.hpp"
 #include "../input/KeyboardInput.hpp"
 #include "../input/MouseInput.hpp"
+#include "../audio/Audio.hpp"
 #include "../render/Renderer.hpp"
 #include "../utils/Utils.hpp"
 #include "../Options.hpp"
 
 #include <SDL_events.h>
-#include <SDL_mixer.h>
-
-//The music that will be played
-Mix_Music *music = NULL;
 
 Logic::Logic()
 {
    ShowMainMenu();
-
-   // SOUND TEST
-
-   if(0 > SDL_Init(SDL_INIT_AUDIO)) {
-      throw "Cannot init SDL audio subsystem.";
-   }
-   atexit(SDL_Quit);
-
-   if(0 > Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096)) {
-      throw "Cannot init SDL audio subsystem.";
-   }
-
-//   //The sound effects that will be used
-//   Mix_Chunk *scratch = NULL;
-//   Mix_Chunk *high = NULL;
-//   Mix_Chunk *med = NULL;
-//   Mix_Chunk *low = NULL;
-
-   //Load the music
-   music = Mix_LoadMUS( "sound4.mp3" );
-
-   //If there was a problem loading the music
-   if( music == NULL ) {
-      throw "Music load failed.";
-   }
-//   //Load the sound effects
-//   scratch = Mix_LoadWAV( "scratch.wav" );
-//   high = Mix_LoadWAV( "high.wav" );
-//   med = Mix_LoadWAV( "medium.wav" );
-//   low = Mix_LoadWAV( "low.wav" );
-//   //If there was a problem loading the sound effects
-//   if( ( scratch == NULL ) ||
-//         ( high == NULL ) ||
-//         ( med == NULL ) ||
-//         ( low == NULL ) ) {
-//      return false;
-//   }
-
-   //If there is no music playing
-   if( Mix_PlayingMusic() == 0 )
-   {
-      //Play the music
-      if( Mix_PlayMusic( music, -1 ) == -1 ) {
-         throw "Music play failed.";
-      }
-   }
 }
 
 Logic::~Logic()
 {
-   //Free the music
-   Mix_FreeMusic( music );
 
-   //Quit SDL_mixer
-   Mix_CloseAudio();
 }
 
 void Logic::ProcessInput(const SDL_KeyboardEvent& key)
@@ -138,6 +85,20 @@ void Logic::Update(const int app_time, const int elapsed_time)
          break;
       case GameState::Running:
          UpdateRunningState(elapsed_time);
+         break;
+      case GameState::Exit:
+         break;
+   }
+}
+
+void Logic::Play(const std::shared_ptr<Audio>& audio)
+{
+   switch (mCurrentState)
+   {
+      case GameState::MainMenu:
+         break;
+      case GameState::Running:
+         audio->Play(mMatch);
          break;
       case GameState::Exit:
          break;

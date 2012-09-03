@@ -9,6 +9,7 @@
 class Nui;
 #endif // USE_OPENNI
 class WindowFrame;
+class Audio;
 class Renderer;
 class Logic;
 
@@ -45,6 +46,7 @@ private:
    std::shared_ptr<Nui> mNui;
 #endif // USE_OPENNI
    std::shared_ptr<WindowFrame> mWndFrame;
+   std::shared_ptr<Audio> mAudio;
    std::shared_ptr<Renderer> mRenderer;
    std::shared_ptr<Logic> mLogic;
 };

@@ -35,6 +35,8 @@ private:
    int mLifeTime = 0;
 
    Animation mAnimation;
+
+   bool mSoundProcessed = false;
 };
 
 #endif // EXPLOSION_HPP

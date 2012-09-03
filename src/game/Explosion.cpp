@@ -15,6 +15,10 @@ Explosion::~Explosion()
 
 void Explosion::Update(const int elapsed_time)
 {
+   if (mSoundProcessed) {
+      SetSound(SoundId::None);
+   }
+
    mLifeTime += elapsed_time;
 
    if (mLifeTime >= DEFAULT_LIFETIME)
@@ -23,6 +27,8 @@ void Explosion::Update(const int elapsed_time)
    }
 
    mAnimation.Update(elapsed_time);
+
+   mSoundProcessed = true;
 }
 
 int Explosion::GetAnimationFrame() const

@@ -9,6 +9,7 @@ struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
 
 class MainMenu;
+class Audio;
 class Renderer;
 class ArenaGenerator;
 class KeyboardInput;
@@ -40,6 +41,7 @@ public:
 //   void ProcessInput(const kinex::Nui& kinect);
 
    void Update(int app_time, int elapsed_time);
+   void Play(const std::shared_ptr<Audio>& audio);
    void Render(const std::shared_ptr<Renderer>& renderer);
 
    bool Done() const;

@@ -75,3 +75,13 @@ void SceneObject::SetAlive(const bool alive)
 {
    mIsAlive = alive;
 }
+
+SoundId SceneObject::GetSound() const
+{
+   return mSoundId;
+}
+
+void SceneObject::SetSound(SoundId id)
+{
+   mSoundId = id;
+}

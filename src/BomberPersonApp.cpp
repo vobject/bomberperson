@@ -3,6 +3,7 @@
 #include "Options.hpp"
 #include "nui/Kinect.hpp"
 #include "nui/KinectDummy.hpp"
+#include "audio/Audio.hpp"
 #include "render/SimpleGlRenderer.hpp"
 #include "render/SimpleSdlRenderer.hpp"
 #include "render/SdlRenderer.hpp"
@@ -74,6 +75,8 @@ void BomberPersonApp::Initialize()
 
    const Size screen_size = { DefaultSize::SCREEN_WIDTH,
                               DefaultSize::SCREEN_HEIGHT };
+
+   mAudio = std::make_shared<Audio>();
    mRenderer = std::make_shared<SdlRenderer>(screen_size);
    mWndFrame = std::make_shared<WindowFrame>("BomberPerson");
    mLogic = std::make_shared<Logic>();
@@ -138,6 +141,7 @@ void BomberPersonApp::ProcessInput()
 void BomberPersonApp::UpdateScene(const int app_time, const int elapsed_time)
 {
    mLogic->Update(app_time, elapsed_time);
+   mLogic->Play(mAudio);
    mWndFrame->UpdateDone();
 }
 

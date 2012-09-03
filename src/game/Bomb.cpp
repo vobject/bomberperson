@@ -20,6 +20,8 @@ Bomb::~Bomb()
 
 void Bomb::Update(const int elapsed_time)
 {
+   SetSound(SoundId::None);
+
    mLifeTime += elapsed_time;
 
    if (mLifeTime >= DEFAULT_LIFETIME)
@@ -70,6 +72,7 @@ void Bomb::PlantCenterExplosion() const
    auto explosion = std::make_shared<Explosion>();
    explosion->SetSize(mParentCell->GetSize());
    explosion->SetPosition(mParentCell->GetPosition());
+   explosion->SetSound(SoundId::Explosion);
    mParentCell->SetExplosion(explosion);
 }
 

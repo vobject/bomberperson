@@ -22,11 +22,14 @@ Player::~Player()
 
 void Player::Update(const int elapsed_time)
 {
+   SetSound(SoundId::None);
+
    const auto old_state = mState;
 
    if (mParentCell->HasExplosion())
    {
       // Explosions kill the player instantly.
+      SetSound(SoundId::PlayerDies);
       SetAlive(false);
       return;
    }
@@ -50,6 +53,7 @@ void Player::Update(const int elapsed_time)
          default:
             break;
       }
+      SetSound(SoundId::PlayerPicksUpExtra);
    }
 
    UpdateMovement(elapsed_time);
@@ -173,6 +177,7 @@ void Player::UpdateBombing(const int elapsed_time)
    bomb->SetRange(mBombRange);
    bomb->SetSize(mParentCell->GetSize());
    bomb->SetPosition(mParentCell->GetPosition());
+   bomb->SetSound(SoundId::BombPlanted);
    mParentCell->SetBomb(bomb);
 
    mPlantedBombs.push_back(bomb);

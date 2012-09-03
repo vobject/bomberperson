@@ -15,6 +15,24 @@
 //   zo_Messagebox
 //};
 
+enum class SoundId
+{
+   None,
+
+//   MainMenuSwitch,
+//   MainMenuSelect,
+
+//   WallDestruction,
+
+   BombPlanted,
+
+   Explosion,
+
+   PlayerPicksUpExtra,
+   PlayerDies,
+//   PlayerWins
+};
+
 class SceneObject
 {
 public:
@@ -43,6 +61,9 @@ public:
    bool IsAlive() const;
    void SetAlive(bool alive);
 
+   SoundId GetSound() const;
+   void SetSound(SoundId id);
+
 //   virtual SceneObject* Create() = 0;
 //   virtual SceneObject* Clone() = 0;
 //   virtual void Destroy();
@@ -54,6 +75,7 @@ private:
 //   ZOrder mZOrder;
 //   bool mIsVisible;
    bool mIsAlive;
+   SoundId mSoundId = SoundId::None;
 };
 
 #endif // SCENE_OBJECT_HPP
