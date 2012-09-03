@@ -7,16 +7,16 @@
 #include "../utils/Utils.hpp"
 
 Cell::Cell(
-   const std::string& name,
    const int field_pos_x,
    const int field_pos_y,
    const std::shared_ptr<Arena>& field
 )
-   : mFieldPosX(field_pos_x)
+   : SceneObject(EntityId::Cell)
+   , mFieldPosX(field_pos_x)
    , mFieldPosY(field_pos_y)
    , mField(field) // Do not use inside the ctor - object is not ready yet.
 {
-   SetResourceId(name);
+
 }
 
 Cell::~Cell()

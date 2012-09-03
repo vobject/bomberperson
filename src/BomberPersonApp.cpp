@@ -72,10 +72,11 @@ void BomberPersonApp::Initialize()
 
    InitNui();
 
-   const Size screen_size = { DefaultSize::SCREEN_WIDTH, DefaultSize::SCREEN_HEIGHT };
+   const Size screen_size = { DefaultSize::SCREEN_WIDTH,
+                              DefaultSize::SCREEN_HEIGHT };
    mRenderer = std::make_shared<SdlRenderer>(screen_size);
    mWndFrame = std::make_shared<WindowFrame>("BomberPerson");
-   mLogic = std::make_shared<Logic>(mRenderer);
+   mLogic = std::make_shared<Logic>();
 }
 
 void BomberPersonApp::ProcessInput()
@@ -86,9 +87,30 @@ void BomberPersonApp::ProcessInput()
       return;
    }
 
-   if((SDL_QUIT == event.type) || (SDLK_ESCAPE == event.key.keysym.sym)) {
-      // The user closed the window or pressed ESC.
+   if((SDL_QUIT == event.type) || mLogic->Done()) {
+      // The user closed the window.
       mQuitRequested = true;
+      return;
+   }
+
+   // Handle application-level requests, e.g. change of the renderer.
+   if (SDL_KEYDOWN == event.type && (event.key.keysym.mod & KMOD_LCTRL))
+   {
+      const Size screen_size = { DefaultSize::SCREEN_WIDTH,
+                                 DefaultSize::SCREEN_HEIGHT };
+
+      if (SDLK_1 == event.key.keysym.sym) {
+         mRenderer = std::make_shared<SimpleSdlRenderer>(screen_size);
+      }
+      else if (SDLK_2 == event.key.keysym.sym) {
+         mRenderer = std::make_shared<SdlRenderer>(screen_size);
+      }
+      else if (SDLK_3 == event.key.keysym.sym) {
+         mRenderer = std::make_shared<SimpleGlRenderer>(screen_size);
+      }
+
+      // TODO: KMOD_LCTRL + SDLK_K -> try connecting to kinect device.
+
       return;
    }
 
@@ -96,22 +118,14 @@ void BomberPersonApp::ProcessInput()
    {
       case SDL_KEYDOWN:
       case SDL_KEYUP:
-         {
-            // TODO: Enable switching renderers with Strg-ANYKEY keys.
-
-//            if (SDLK_s == event.key.keysym.sym) {
-//               mCurrentVideoMode = VideoMode::Software;
-//               InitVideo();
-//               SelectRenderer();
-//            }
-//            else if (SDLK_o == event.key.keysym.sym) {
-//               mCurrentVideoMode = VideoMode::OpenGL;
-//               InitVideo();
-//               SelectRenderer();
-//            }
-
-            mLogic->ProcessInput(event.key);
-         }
+         mLogic->ProcessInput(event.key);
+         break;
+      case SDL_MOUSEMOTION:
+         mLogic->ProcessInput(event.motion);
+         break;
+      case SDL_MOUSEBUTTONDOWN:
+      case SDL_MOUSEBUTTONUP:
+         mLogic->ProcessInput(event.button);
          break;
       default:
          break;
@@ -129,7 +143,7 @@ void BomberPersonApp::UpdateScene(const int app_time, const int elapsed_time)
 
 void BomberPersonApp::RenderScene()
 {
-   mLogic->Render();
+   mLogic->Render(mRenderer);
    mWndFrame->FrameDone();
 }
 

@@ -12,18 +12,22 @@ struct DefaultSize
    static const int SCREEN_WIDTH            = 640_px;
    static const int SCREEN_HEIGHT           = 480_px;
 
-   static const int ARENA_BG_WIDTH          = SCREEN_WIDTH;
-   static const int ARENA_BG_HEIGHT         = SCREEN_HEIGHT;
-
-   static const int ARENA_POS_X             = 20_px;
-   static const int ARENA_POS_Y             = 16_px;
-   static const int ARENA_WIDTH             = SCREEN_WIDTH - (ARENA_POS_X * 2);
-   static const int ARENA_HEIGHT            = SCREEN_HEIGHT - (ARENA_POS_Y * 2) - 48;
+   static const int ARENA_POS_X             = 0_px;
+   static const int ARENA_POS_Y             = 0_px;
+   static const int ARENA_WIDTH             = SCREEN_WIDTH * .8;
+   static const int ARENA_HEIGHT            = SCREEN_HEIGHT;
+   static const int ARENA_BORDER_WIDTH      = .03125 * SCREEN_WIDTH;
+   static const int ARENA_BORDER_HEIGHT     = .03704 * SCREEN_HEIGHT;
    static const int ARENA_CELLS_X           = 15;
    static const int ARENA_CELLS_Y           = 11;
 
-   static const int CELL_WIDTH              = ARENA_WIDTH / ARENA_CELLS_X;
-   static const int CELL_HEIGHT             = ARENA_HEIGHT / ARENA_CELLS_Y;
+   static const int SCOREBOARD_POS_X        = ARENA_POS_X + ARENA_WIDTH;
+   static const int SCOREBOARD_POS_Y        = ARENA_POS_Y;
+   static const int SCOREBOARD_WIDTH        = SCREEN_WIDTH - ARENA_WIDTH;
+   static const int SCOREBOARD_HEIGHT       = ARENA_HEIGHT;
+
+   static const int CELL_WIDTH              = (ARENA_WIDTH - ARENA_BORDER_WIDTH) / ARENA_CELLS_X;
+   static const int CELL_HEIGHT             = (ARENA_HEIGHT - ARENA_BORDER_HEIGHT) / ARENA_CELLS_Y;
 
    static const int WALL_WIDTH              = CELL_WIDTH;
    static const int WALL_HEIGHT             = CELL_HEIGHT;

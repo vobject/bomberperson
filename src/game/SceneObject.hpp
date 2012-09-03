@@ -1,6 +1,7 @@
 #ifndef SCENE_OBJECT_HPP
 #define SCENE_OBJECT_HPP
 
+#include "EntityId.hpp"
 #include "../utils/Utils.hpp"
 
 #include <string>
@@ -17,7 +18,7 @@
 class SceneObject
 {
 public:
-   SceneObject();
+   SceneObject(EntityId id);
    virtual ~SceneObject();
 
 //   virtual bool operator<(const SceneObject& other);
@@ -25,7 +26,7 @@ public:
    virtual void Update(int elapsed_time) = 0;
 //   virtual void Restore() = 0;
 
-   std::string GetResourceId() const;
+   EntityId GetId() const;
 
    Point GetPosition() const;
    void SetPosition(const Point& pos);
@@ -46,11 +47,8 @@ public:
 //   virtual SceneObject* Clone() = 0;
 //   virtual void Destroy();
 
-protected:
-   void SetResourceId(const std::string& resource);
-
 private:
-   std::string mResource;
+   EntityId mId;
    Point mPos;
    Size mSize;
 //   ZOrder mZOrder;

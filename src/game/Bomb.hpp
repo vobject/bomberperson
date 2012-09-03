@@ -13,7 +13,7 @@ class Cell;
 class Bomb : public SceneObject
 {
 public:
-   Bomb(const std::string& name, const std::shared_ptr<Cell>& cell);
+   Bomb(const std::shared_ptr<Cell>& cell);
    virtual ~Bomb();
 
    Bomb(const Bomb&) = delete;

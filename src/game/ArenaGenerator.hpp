@@ -10,7 +10,6 @@
 
 class Arena;
 class Cell;
-enum class CellItem;
 
 class ArenaGenerator
 {
@@ -23,6 +22,7 @@ public:
 
    void SetArenaPosition(const Point& pos);
    void SetArenaSize(const Size& size);
+   void SetArenaBorderSize(const Size& size);
 
 //   std::shared_ptr<Field> FromLevel(const std::string& name) const;
    std::shared_ptr<Arena> GetDefaultArena(int cells_x, int cells_y, int players) const;
@@ -36,8 +36,9 @@ private:
 
    // Absolute position on the screen.
    Point mPos = { 0, 0 };
-   // Size of the playing field.
+   // Size of the whole arena.
    Size mSize = { 0, 0 };
+   Size mBorders = { 0, 0 };
 };
 
 #endif // ARENA_GENERATOR_HPP

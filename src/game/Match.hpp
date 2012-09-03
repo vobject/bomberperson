@@ -7,6 +7,7 @@
 
 class Arena;
 class Player;
+class Scoreboard;
 class Cell;
 class SceneObject;
 
@@ -24,12 +25,16 @@ public:
 
    std::shared_ptr<Arena> GetArena() const;
    std::vector<std::shared_ptr<Player>> GetPlayers() const;
+   std::shared_ptr<Scoreboard> GetScoreboard() const;
+
+   bool IsOver() const;
 
 private:
    std::shared_ptr<Cell> GetCellFromObject(const std::shared_ptr<SceneObject>& obj) const;
 
    std::shared_ptr<Arena> mArena;
    std::vector<std::shared_ptr<Player>> mPlayers;
+   std::shared_ptr<Scoreboard> mScoreboard;
 };
 
 #endif // MATCH_HPP

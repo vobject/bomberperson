@@ -11,49 +11,10 @@ class Extra;
 class Bomb;
 class Explosion;
 
-//enum class CellType
-//{
-//   Floor,
-//   IndestructibleWall,
-//   DestructibleWall
-//};
-//
-//enum class CellItem
-//{
-//   None,
-//   Speed,
-//   BombRange,
-//   BombSupply,
-//   CELL_ITEM_COUNT
-//};
-
-//class CellObject
-//{
-//
-//};
-
-//enum class ExtraType
-//{
-//   Speed,
-//   BombRange,
-//   BombSupply
-//};
-//
-//class Extra : public SceneObject
-//{
-//
-//};
-//
-//class Wall : public SceneObject
-//{
-//
-//};
-
 class Cell : public SceneObject
 {
 public:
-   Cell(const std::string& name,
-        int field_pos_x,
+   Cell(int field_pos_x,
         int field_pos_y,
         const std::shared_ptr<Arena>& field);
    virtual ~Cell();

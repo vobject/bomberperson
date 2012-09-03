@@ -5,25 +5,14 @@
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
-Player::Player(const std::string& res_name)
+Player::Player(
+   const EntityId player_id,
+   const std::shared_ptr<InputDevice>& input
+)
+   : SceneObject(player_id)
+   , mInput(input)
 {
-   SetResourceId(res_name);
 
-   mWalkUpAnimation.SetFrameCount(mWalkAnimationFrames);
-   mWalkUpAnimation.SetLength(mWalkAnimationLength);
-   mWalkUpAnimation.SetLooping(true);
-
-   mWalkDownAnimation.SetFrameCount(mWalkAnimationFrames);
-   mWalkDownAnimation.SetLength(mWalkAnimationLength);
-   mWalkDownAnimation.SetLooping(true);
-
-   mWalkLeftAnimation.SetFrameCount(mWalkAnimationFrames);
-   mWalkLeftAnimation.SetLength(mWalkAnimationLength);
-   mWalkLeftAnimation.SetLooping(true);
-
-   mWalkRightAnimation.SetFrameCount(mWalkAnimationFrames);
-   mWalkRightAnimation.SetLength(mWalkAnimationLength);
-   mWalkRightAnimation.SetLooping(true);
 }
 
 Player::~Player()
@@ -33,32 +22,7 @@ Player::~Player()
 
 void Player::Update(const int elapsed_time)
 {
-   mMoveIdleTime += elapsed_time;
-   if (mMoveIdleTime > mMovementSpeed)
-   {
-      UpdateMovement(mMoveIdleTime);
-   }
-
-   mBombIdleTime += elapsed_time;
-   if (mBombIdleTime > mPlantingSpeed)
-   {
-      UpdateBombing(mBombIdleTime);
-   }
-}
-
-std::shared_ptr<InputDevice> Player::GetInputDevice() const
-{
-   return mInput;
-}
-
-void Player::SetInputDevice(const std::shared_ptr<InputDevice>& input)
-{
-   mInput = input;
-}
-
-void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
-{
-   mParentCell = cell;
+   const auto old_state = mState;
 
    if (mParentCell->HasExplosion())
    {
@@ -69,89 +33,131 @@ void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
 
    if (mParentCell->HasExtra())
    {
-      switch (mParentCell->CollectExtra()->GetType())
+      switch (mParentCell->CollectExtra()->GetId())
       {
-         case ExtraType::Speed:
+         case EntityId::SpeedExtra:
             IncreaseSpeed();
             break;
-         case ExtraType::BombRange:
+         case EntityId::BombsExtra:
+            mBombSupply++;
+            break;
+         case EntityId::RangeExtra:
             mBombRange++;
             break;
-         case ExtraType::BombSupply:
-            mBombSupply++;
+         case EntityId::GoldRangeExtra:
+            mBombRange = 999;
             break;
          default:
             break;
       }
    }
+
+   UpdateMovement(elapsed_time);
+   UpdateBombing(elapsed_time);
+
+   if (old_state == mState) {
+      mStateTime += elapsed_time;
+   }
+   else {
+      mStateTime = 0; // Start new state.
+   }
 }
 
-Direction Player::GetDirection() const
+void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
 {
-   return mDirection;
+   mParentCell = cell;
 }
 
-int Player::GetAnimationFrame() const
+PlayerState Player::GetState() const
 {
-   return GetCurrentDirectionAnimation().GetCurrentFrame();
+   return mState;
+}
+
+int Player::GetStateTime() const
+{
+   return mStateTime;
+}
+
+int Player::GetSpeed() const
+{
+   // FIXME
+   return mMovementSpeed;
 }
 
 void Player::UpdateMovement(const int elapsed_time)
 {
-   const int distance = 1;
-   int up = 0;
-   int down = 0;
-   int left = 0;
-   int right = 0;
+   mMoveIdleTime += elapsed_time;
+   if (mMoveIdleTime < mMovementSpeed) {
+      return;
+   }
+
+   auto up = 0;
+   auto down = 0;
+   auto left = 0;
+   auto right = 0;
+   auto update_anim = false;
 
    if (mInput->TestUp())
    {
-      mDirection = Direction::Up;
-      UpdateAnimation(elapsed_time);
+      update_anim = true;
+      mState = PlayerState::WalkUp;
 
-      if (CanMove(mDirection, distance)) {
-         up++;
+      if (CanMove(Direction::Up, mMovementDistance)) {
+         up += mMovementDistance;
       }
    }
    if (mInput->TestDown())
    {
-      mDirection = Direction::Down;
-      UpdateAnimation(elapsed_time);
+      update_anim = true;
+      mState = PlayerState::WalkDown;
 
-      if (CanMove(mDirection, distance)) {
-         down++;
+      if (CanMove(Direction::Down, mMovementDistance)) {
+         down += mMovementDistance;
       }
    }
    if (mInput->TestLeft())
    {
-      mDirection = Direction::Left;
-      UpdateAnimation(elapsed_time);
+      update_anim = true;
+      mState = PlayerState::WalkLeft;
 
-      if (CanMove(mDirection, distance)) {
-         left++;
+      if (CanMove(Direction::Left, mMovementDistance)) {
+         left += mMovementDistance;
       }
    }
    if (mInput->TestRight())
    {
-      mDirection = Direction::Right;
-      UpdateAnimation(elapsed_time);
+      update_anim = true;
+      mState = PlayerState::WalkRight;
 
-      if (CanMove(mDirection, distance)) {
-         right++;
+      if (CanMove(Direction::Right, mMovementDistance)) {
+         right += mMovementDistance;
       }
    }
 
    SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
+
+   if (!update_anim)
+   {
+      mState = GetStopWalkingState(mState);
+   }
+
    mMoveIdleTime = 0;
 }
 
 void Player::UpdateBombing(const int elapsed_time)
 {
-   if (!mInput->TestPlantBomb())
+   mBombIdleTime += elapsed_time;
+   if (mBombIdleTime < mPlantingSpeed) {
+      return;
+   }
+
+   if (!mInput->TestAction1() && !mInput->TestAction2())
    {
       // The user did not request to plant a bomb.
       return;
    }
+
+   // TODO: Use Action2 input to detonate remote controlled bombs etc.
 
    if (mParentCell->HasBomb()) {
       // Only one bomb per cell.
@@ -163,7 +169,7 @@ void Player::UpdateBombing(const int elapsed_time)
       return;
    }
 
-   auto bomb = std::make_shared<Bomb>("bomb", mParentCell);
+   auto bomb = std::make_shared<Bomb>(mParentCell);
    bomb->SetRange(mBombRange);
    bomb->SetSize(mParentCell->GetSize());
    bomb->SetPosition(mParentCell->GetPosition());
@@ -171,37 +177,6 @@ void Player::UpdateBombing(const int elapsed_time)
 
    mPlantedBombs.push_back(bomb);
    mBombIdleTime = 0;
-}
-
-void Player::UpdateAnimation(const int elapsed_time)
-{
-   switch (mDirection)
-   {
-      case Direction::Up:
-         mWalkUpAnimation.Update(elapsed_time);
-         mWalkDownAnimation.Reset();
-         mWalkLeftAnimation.Reset();
-         mWalkRightAnimation.Reset();
-         break;
-      case Direction::Down:
-         mWalkUpAnimation.Reset();
-         mWalkDownAnimation.Update(elapsed_time);
-         mWalkLeftAnimation.Reset();
-         mWalkRightAnimation.Reset();
-         break;
-      case Direction::Left:
-         mWalkUpAnimation.Reset();
-         mWalkDownAnimation.Reset();
-         mWalkLeftAnimation.Update(elapsed_time);
-         mWalkRightAnimation.Reset();
-         break;
-      case Direction::Right:
-         mWalkUpAnimation.Reset();
-         mWalkDownAnimation.Reset();
-         mWalkLeftAnimation.Reset();
-         mWalkRightAnimation.Update(elapsed_time);
-         break;
-   }
 }
 
 bool Player::CanMove(const Direction dir, const int distance) const
@@ -265,30 +240,29 @@ bool Player::CanPlantBomb()
 
 void Player::IncreaseSpeed()
 {
-   if (mMovementSpeed > 2) {
-      mMovementSpeed -= 2;
-
-      mWalkAnimationLength -= 60;
-      mWalkUpAnimation.SetLength(mWalkAnimationLength);
-      mWalkDownAnimation.SetLength(mWalkAnimationLength);
-      mWalkLeftAnimation.SetLength(mWalkAnimationLength);
-      mWalkRightAnimation.SetLength(mWalkAnimationLength);
+   if (mMovementSpeed > MAX_SPEED)
+   {
+      mMovementSpeed -= 2_ms;
    }
-   // The player is already at maximum speed.
+   else
+   {
+      mMovementDistance++;
+   }
 }
 
-const Animation& Player::GetCurrentDirectionAnimation() const
+PlayerState Player::GetStopWalkingState(const PlayerState state) const
 {
-   switch (mDirection)
+   switch (state)
    {
-      case Direction::Up:
-         return mWalkUpAnimation;
-      case Direction::Down:
-         return mWalkDownAnimation;
-      case Direction::Left:
-         return mWalkLeftAnimation;
-      case Direction::Right:
-         return mWalkRightAnimation;
+      case PlayerState::WalkUp:
+         return PlayerState::StandUp;
+      case PlayerState::WalkDown:
+         return PlayerState::StandDown;
+      case PlayerState::WalkLeft:
+         return PlayerState::StandLeft;
+      case PlayerState::WalkRight:
+         return PlayerState::StandRight;
+      default:
+         return state;
    }
-   return mWalkDownAnimation;
 }
