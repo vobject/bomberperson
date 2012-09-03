@@ -72,7 +72,7 @@ void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
    mParentCell = cell;
 }
 
-PlayerState Player::GetState() const
+PlayerAnimation Player::GetState() const
 {
    return mState;
 }
@@ -104,7 +104,7 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInput->TestUp())
    {
       update_anim = true;
-      mState = PlayerState::WalkUp;
+      mState = PlayerAnimation::WalkUp;
 
       if (CanMove(Direction::Up, mMovementDistance)) {
          up += mMovementDistance;
@@ -113,7 +113,7 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInput->TestDown())
    {
       update_anim = true;
-      mState = PlayerState::WalkDown;
+      mState = PlayerAnimation::WalkDown;
 
       if (CanMove(Direction::Down, mMovementDistance)) {
          down += mMovementDistance;
@@ -122,7 +122,7 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInput->TestLeft())
    {
       update_anim = true;
-      mState = PlayerState::WalkLeft;
+      mState = PlayerAnimation::WalkLeft;
 
       if (CanMove(Direction::Left, mMovementDistance)) {
          left += mMovementDistance;
@@ -131,7 +131,7 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInput->TestRight())
    {
       update_anim = true;
-      mState = PlayerState::WalkRight;
+      mState = PlayerAnimation::WalkRight;
 
       if (CanMove(Direction::Right, mMovementDistance)) {
          right += mMovementDistance;
@@ -255,18 +255,18 @@ void Player::IncreaseSpeed()
    }
 }
 
-PlayerState Player::GetStopWalkingState(const PlayerState state) const
+PlayerAnimation Player::GetStopWalkingState(const PlayerAnimation state) const
 {
    switch (state)
    {
-      case PlayerState::WalkUp:
-         return PlayerState::StandUp;
-      case PlayerState::WalkDown:
-         return PlayerState::StandDown;
-      case PlayerState::WalkLeft:
-         return PlayerState::StandLeft;
-      case PlayerState::WalkRight:
-         return PlayerState::StandRight;
+      case PlayerAnimation::WalkUp:
+         return PlayerAnimation::StandUp;
+      case PlayerAnimation::WalkDown:
+         return PlayerAnimation::StandDown;
+      case PlayerAnimation::WalkLeft:
+         return PlayerAnimation::StandLeft;
+      case PlayerAnimation::WalkRight:
+         return PlayerAnimation::StandRight;
       default:
          return state;
    }

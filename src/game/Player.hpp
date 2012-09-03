@@ -18,7 +18,7 @@ enum class PlayerSound
 
 };
 
-enum class PlayerState
+enum class PlayerAnimation
 {
    StandUp,
    StandDown,
@@ -79,7 +79,7 @@ public:
 
    void SetParentCell(const std::shared_ptr<Cell>& cell);
 
-   PlayerState GetState() const;
+   PlayerAnimation GetState() const;
    int GetStateTime() const;
    int GetSpeed() const;
 
@@ -95,7 +95,7 @@ private:
    bool CanPlantBomb();
 
    void IncreaseSpeed();
-   PlayerState GetStopWalkingState(PlayerState state) const;
+   PlayerAnimation GetStopWalkingState(PlayerAnimation state) const;
 
    std::shared_ptr<InputDevice> mInput;
    std::shared_ptr<Cell> mParentCell;
@@ -113,7 +113,7 @@ private:
    int mBombSupply = 1;
    std::vector<std::shared_ptr<Bomb>> mPlantedBombs;
 
-   PlayerState mState = PlayerState::StandDown;
+   PlayerAnimation mState = PlayerAnimation::StandDown;
    int mStateTime = 0;
 };
 
