@@ -16,15 +16,16 @@ public:
                  SDLKey action2_keycode);
    virtual ~KeyboardInput();
 
+   void Press(SDLKey key);
+   void Release(SDLKey key);
+
+protected:
    bool TestUp() const override;
    bool TestDown() const override;
    bool TestLeft() const override;
    bool TestRight() const override;
    bool TestAction1() const override;
    bool TestAction2() const override;
-
-   void Press(SDLKey key);
-   void Release(SDLKey key);
 
 private:
    const int mUpKey;

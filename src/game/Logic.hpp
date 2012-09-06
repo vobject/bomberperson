@@ -1,6 +1,8 @@
 #ifndef LOGIC_HPP
 #define LOGIC_HPP
 
+#include "EntityManager.hpp"
+
 #include <memory>
 #include <list>
 
@@ -19,7 +21,7 @@ enum class GameState
 {
    MainMenu,
 //   GameSetup,
-   Running,
+   Active,
 //   Options,
 //   Credits,
    Exit
@@ -57,10 +59,14 @@ private:
    GameState mCurrentState = GameState::MainMenu;
 
    std::shared_ptr<MainMenu> mMainMenu;
+
    std::shared_ptr<KeyboardInput> mKeyboard_1;
    std::shared_ptr<KeyboardInput> mKeyboard_2;
    std::shared_ptr<MouseInput> mMouse_1;
+
    std::shared_ptr<Match> mMatch;
+
+   EntityManager mEntityManager;
 };
 
 #endif // LOGIC_HPP

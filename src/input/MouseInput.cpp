@@ -16,36 +16,6 @@ MouseInput::~MouseInput()
 
 }
 
-bool MouseInput::TestUp() const
-{
-   return mMoveUp;
-}
-
-bool MouseInput::TestDown() const
-{
-   return mMoveDown;
-}
-
-bool MouseInput::TestLeft() const
-{
-   return mMoveLeft;
-}
-
-bool MouseInput::TestRight() const
-{
-   return mMoveRight;
-}
-
-bool MouseInput::TestAction1() const
-{
-   return mAction1ButtonPressed;
-}
-
-bool MouseInput::TestAction2() const
-{
-   return mAction2ButtonPressed;
-}
-
 void MouseInput::Press(const int button)
 {
    if (button == mAction1Button)
@@ -97,4 +67,34 @@ void MouseInput::Move(const Point pt)
       mMoveLeft = false;
       mMoveRight = false;
    }
+}
+
+bool MouseInput::TestUp() const
+{
+   return mMoveUp;
+}
+
+bool MouseInput::TestDown() const
+{
+   return mMoveDown;
+}
+
+bool MouseInput::TestLeft() const
+{
+   return mMoveLeft;
+}
+
+bool MouseInput::TestRight() const
+{
+   return mMoveRight;
+}
+
+bool MouseInput::TestAction1() const
+{
+   return mAction1ButtonPressed;
+}
+
+bool MouseInput::TestAction2() const
+{
+   return mAction2ButtonPressed;
 }

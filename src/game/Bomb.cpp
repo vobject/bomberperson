@@ -1,10 +1,12 @@
 #include "Bomb.hpp"
+#include "EntityManager.hpp"
 #include "Cell.hpp"
 #include "Wall.hpp"
 #include "Explosion.hpp"
 
-Bomb::Bomb(const std::shared_ptr<Cell>& cell)
+Bomb::Bomb(EntityManager& entity_factory, const std::shared_ptr<Cell>& cell)
    : SceneObject(EntityId::Bomb)
+   , mEntityFactory(entity_factory)
    , mParentCell(cell)
 {
    mAnimation.SetFrameCount(3);
@@ -57,9 +59,7 @@ void Bomb::Detonate()
 
 void Bomb::PlantCenterExplosion() const
 {
-   auto explosion = std::make_shared<Explosion>();
-   explosion->SetSize(mParentCell->GetSize());
-   explosion->SetPosition(mParentCell->GetPosition());
+   auto explosion = mEntityFactory.CreateExplosion(mParentCell);
    mParentCell->SetExplosion(explosion);
 }
 
@@ -86,9 +86,7 @@ void Bomb::PlantRangeExplosion(Direction dir) const
       //  as this one, e.g. Vertical or Horizontal.
 
       // TODO: Select the right ExplosionType.
-      auto range_exp = std::make_shared<Explosion>();
-      range_exp->SetSize(range_cell->GetSize());
-      range_exp->SetPosition(range_cell->GetPosition());
+      auto range_exp = mEntityFactory.CreateExplosion(range_cell);
       range_cell->SetExplosion(range_exp);
 
       if (range_cell->HasWall() && range_cell->GetWall()->IsDestructible())

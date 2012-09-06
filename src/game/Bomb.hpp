@@ -7,12 +7,13 @@
 
 #include <memory>
 
+class EntityManager;
 class Cell;
 
 class Bomb : public SceneObject
 {
 public:
-   Bomb(const std::shared_ptr<Cell>& cell);
+   Bomb(EntityManager& entity_factory, const std::shared_ptr<Cell>& cell);
    virtual ~Bomb();
 
    Bomb(const Bomb&) = delete;
@@ -32,6 +33,8 @@ private:
 
    void PlantCenterExplosion() const;
    void PlantRangeExplosion(Direction dir) const;
+
+   EntityManager& mEntityFactory;
 
    std::shared_ptr<Cell> mParentCell;
    int mLifeTime = 0;

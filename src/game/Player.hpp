@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 
-class InputDevice;
 class Cell;
 class Bomb;
 
@@ -60,10 +59,12 @@ enum class PlayerState
 //   Direction mDirection = Direction::Down;
 //};
 
+class EntityManager;
+
 class Player : public SceneObject
 {
 public:
-   Player(const EntityId player_id, const std::shared_ptr<InputDevice>& input);
+   Player(EntityId player_id, EntityManager& entity_factory);
    virtual ~Player();
 
    Player(const Player&) = delete;
@@ -72,6 +73,7 @@ public:
    void Update(int elapsed_time) override;
 
    void SetParentCell(const std::shared_ptr<Cell>& cell);
+   void SetInputCommands(InputCommands cmds);
 
    PlayerState GetState() const;
    int GetStateTime() const;
@@ -91,8 +93,12 @@ private:
    void IncreaseSpeed();
    PlayerState GetStopWalkingState(PlayerState state) const;
 
-   std::shared_ptr<InputDevice> mInput;
+   EntityManager& mEntityFactory;
+
+//   std::shared_ptr<InputDevice> mInput;
    std::shared_ptr<Cell> mParentCell;
+   InputCommands mCurrentCommands;
+
    int mMoveIdleTime = 0;
    int mBombIdleTime = 0;
 

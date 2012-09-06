@@ -54,6 +54,11 @@ private:
 //   ZOrder mZOrder;
 //   bool mIsVisible;
    bool mIsAlive;
+
+   // Do we really need Size in Gamelogic? Isnt a simple point enough?
+   // RenderInfo
+   // SoundInfo
+   // Create Render and Audio objects out of this gamelogic objects.
 };
 
 #endif // SCENE_OBJECT_HPP

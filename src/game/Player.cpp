@@ -1,16 +1,13 @@
 #include "Player.hpp"
+#include "EntityManager.hpp"
 #include "Cell.hpp"
 #include "Extra.hpp"
 #include "Bomb.hpp"
-#include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
-Player::Player(
-   const EntityId player_id,
-   const std::shared_ptr<InputDevice>& input
-)
+Player::Player(const EntityId player_id, EntityManager& entity_factory)
    : SceneObject(player_id)
-   , mInput(input)
+   , mEntityFactory(entity_factory)
 {
 
 }
@@ -68,6 +65,11 @@ void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
    mParentCell = cell;
 }
 
+void Player::SetInputCommands(const InputCommands cmds)
+{
+   mCurrentCommands = cmds;
+}
+
 PlayerState Player::GetState() const
 {
    return mState;
@@ -97,7 +99,7 @@ void Player::UpdateMovement(const int elapsed_time)
    auto right = 0;
    auto update_anim = false;
 
-   if (mInput->TestUp())
+   if (mCurrentCommands.up)
    {
       update_anim = true;
       mState = PlayerState::WalkUp;
@@ -106,7 +108,7 @@ void Player::UpdateMovement(const int elapsed_time)
          up += mMovementDistance;
       }
    }
-   if (mInput->TestDown())
+   if (mCurrentCommands.down)
    {
       update_anim = true;
       mState = PlayerState::WalkDown;
@@ -115,7 +117,7 @@ void Player::UpdateMovement(const int elapsed_time)
          down += mMovementDistance;
       }
    }
-   if (mInput->TestLeft())
+   if (mCurrentCommands.left)
    {
       update_anim = true;
       mState = PlayerState::WalkLeft;
@@ -124,7 +126,7 @@ void Player::UpdateMovement(const int elapsed_time)
          left += mMovementDistance;
       }
    }
-   if (mInput->TestRight())
+   if (mCurrentCommands.right)
    {
       update_anim = true;
       mState = PlayerState::WalkRight;
@@ -151,7 +153,7 @@ void Player::UpdateBombing(const int elapsed_time)
       return;
    }
 
-   if (!mInput->TestAction1() && !mInput->TestAction2())
+   if (!mCurrentCommands.action1 && !mCurrentCommands.action2)
    {
       // The user did not request to plant a bomb.
       return;
@@ -169,10 +171,9 @@ void Player::UpdateBombing(const int elapsed_time)
       return;
    }
 
-   auto bomb = std::make_shared<Bomb>(mParentCell);
+   auto bomb = mEntityFactory.CreateBomb(mParentCell);
    bomb->SetRange(mBombRange);
-   bomb->SetSize(mParentCell->GetSize());
-   bomb->SetPosition(mParentCell->GetPosition());
+//   bomb->SetOwningPlayer();
    mParentCell->SetBomb(bomb);
 
    mPlantedBombs.push_back(bomb);
