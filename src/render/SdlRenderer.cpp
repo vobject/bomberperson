@@ -89,33 +89,28 @@ void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
    }
 }
 
-void SdlRenderer::Render(const std::shared_ptr<Match>& match)
-{
-   // FIXME: Match is not a SceneObject! Is that a design problem?
-   // Who should orchestrate the rendering of the various objects?
-   // Currently the renderer is responsible for it.
+//void SdlRenderer::Render(const std::shared_ptr<Match>& match)
+//{
+//   // FIXME: Match is not a SceneObject! Is that a design problem?
+//   // Who should orchestrate the rendering of the various objects?
+//   // Currently the renderer is responsible for it.
 
-   // TODO: Get Match statistics and render them to the screen.
+//   // TODO: Get Match statistics and render them to the screen.
 
-   Render(match->GetArena());
-   Render(match->GetScoreboard());
+//   Render(match->GetArena());
+//   Render(match->GetScoreboard());
 
-   for (const auto& player : match->GetPlayers())
-   {
-      Render(player);
-   }
-}
+//   for (const auto& player : match->GetPlayers())
+//   {
+//      Render(player);
+//   }
+//}
 
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
    const auto id = arena->GetId();
    const auto frame = mResCache->GetArenaResource(id).GetFrame(0);
    Render(arena, frame);
-
-   for (const auto& cell : arena->GetCells())
-   {
-      Render(cell);
-   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
@@ -154,26 +149,26 @@ void SdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
 
 void SdlRenderer::Render(const std::shared_ptr<Cell>& cell)
 {
-   if (cell->HasWall())
-   {
-      Render(cell->GetWall());
-      return;
-   }
+//   if (cell->HasWall())
+//   {
+//      Render(cell->GetWall());
+//      return;
+//   }
 
-   if (cell->HasExtra())
-   {
-      Render(cell->GetExtra());
-   }
+//   if (cell->HasExtra())
+//   {
+//      Render(cell->GetExtra());
+//   }
 
-   if (cell->HasBomb())
-   {
-      Render(cell->GetBomb());
-   }
+//   if (cell->HasBomb())
+//   {
+//      Render(cell->GetBomb());
+//   }
 
-   if (cell->HasExplosion())
-   {
-      Render(cell->GetExplosion());
-   }
+//   if (cell->HasExplosion())
+//   {
+//      Render(cell->GetExplosion());
+//   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Wall>& wall)
@@ -220,7 +215,43 @@ void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 
 void SdlRenderer::Render(const std::shared_ptr<SceneObject>& obj)
 {
-   LOG(logDEBUG) << "SdlRenderer::Render(SceneObject) not implemented!";
+//   LOG(logDEBUG) << "SdlRenderer::Render(SceneObject) not implemented!";
+
+   // Quick & dirty hack to support polymorthism by function parameter.
+   // Stupid C++ does not support multiple dispatch natively and I am not
+   //  motivated to implement the visitor pattern or double dispatch.
+   // So we'll be using good old dynamic_cast (sort of).
+
+   if (const auto ptr = std::dynamic_pointer_cast<Arena>(obj)) {
+      Render(ptr);
+      return;
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Cell>(obj)) {
+      Render(ptr);
+      return;
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Wall>(obj)) {
+      Render(ptr);
+      return;
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Bomb>(obj)) {
+      Render(ptr);
+      return;
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Explosion>(obj)) {
+      Render(ptr);
+      return;
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Extra>(obj)) {
+      Render(ptr);
+      return;
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Player>(obj)) {
+      Render(ptr);
+      return;
+   }
+
+   LOG(logDEBUG) << "SdlRenderer::Render(SceneObject) Unknown object!";
 }
 
 void SdlRenderer::Render(

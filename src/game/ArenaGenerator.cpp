@@ -1,4 +1,5 @@
 #include "ArenaGenerator.hpp"
+#include "EntityManager.hpp"
 #include "Arena.hpp"
 #include "Cell.hpp"
 #include "Wall.hpp"
@@ -8,7 +9,8 @@
 #include <cstdlib>
 #include <ctime>
 
-ArenaGenerator::ArenaGenerator()
+ArenaGenerator::ArenaGenerator(EntityManager& entity_factory)
+   : mEntityFactory(entity_factory)
 {
    srand(time(nullptr));
 }
@@ -93,28 +95,27 @@ std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
          continue;
       }
 
-      std::shared_ptr<Extra> extra = nullptr;
-
-      switch (rand() % 3)
-      {
-         case 0:
-            extra = std::make_shared<Extra>(EntityId::SpeedExtra);
-            break;
-         case 1:
-            extra = std::make_shared<Extra>(EntityId::BombsExtra);
-            break;
-         case 2:
-            extra = std::make_shared<Extra>(EntityId::RangeExtra);
-            break;
-      }
+      std::shared_ptr<Extra> extra;
 
       if (!(rand() % (cells_x * cells_y / 3)))
       {
-         extra = std::make_shared<Extra>(EntityId::GoldRangeExtra);
+         extra = mEntityFactory.CreateExtra(EntityId::GoldRangeExtra, cell);
       }
-
-      extra->SetPosition(cell->GetPosition());
-      extra->SetSize(cell->GetSize());
+      else
+      {
+         switch (rand() % 3)
+         {
+            case 0:
+               extra = mEntityFactory.CreateExtra(EntityId::SpeedExtra, cell);
+               break;
+            case 1:
+               extra = mEntityFactory.CreateExtra(EntityId::BombsExtra, cell);
+               break;
+            case 2:
+               extra = mEntityFactory.CreateExtra(EntityId::RangeExtra, cell);
+               break;
+         }
+      }
       cell->SetExtra(extra);
    }
 
@@ -136,10 +137,9 @@ std::vector<std::shared_ptr<Cell>> ArenaGenerator::CreateDefaultCells(
       const int cell_field_pos_x = i % cells_x;
       const int cell_field_pos_y = i / cells_x;
 
-      auto cell = std::make_shared<Cell>(cell_field_pos_x,
-                                         cell_field_pos_y,
-                                         arena);
-
+      auto cell = mEntityFactory.CreateCell(cell_field_pos_x,
+                                            cell_field_pos_y,
+                                            arena);
       cell->SetPosition({ arena->GetPosition().X + mBorders.Width + (cell_size.Width * cell_field_pos_x),
                           arena->GetPosition().Y + mBorders.Height + (cell_size.Height * cell_field_pos_y) });
       cell->SetSize(cell_size);
@@ -147,16 +147,12 @@ std::vector<std::shared_ptr<Cell>> ArenaGenerator::CreateDefaultCells(
       // Create the field boundary and pattern.
       if ((cell_field_pos_x % 2) && (cell_field_pos_y % 2)) // Pattern
       {
-         auto wall = std::make_shared<Wall>(EntityId::IndestructibleWall);
-         wall->SetPosition(cell->GetPosition());
-         wall->SetSize(cell->GetSize());
+         auto wall = mEntityFactory.CreateWall(EntityId::IndestructibleWall, cell);
          cell->SetWall(wall);
       }
       else
       {
-         auto wall = std::make_shared<Wall>(EntityId::DestructibleWall);
-         wall->SetPosition(cell->GetPosition());
-         wall->SetSize(cell->GetSize());
+         auto wall = mEntityFactory.CreateWall(EntityId::DestructibleWall, cell);
          cell->SetWall(wall);
       }
       cells[i] = cell;

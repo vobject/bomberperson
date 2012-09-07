@@ -11,10 +11,13 @@
 class Arena;
 class Cell;
 
+class EntityManager;
+
 class ArenaGenerator
 {
 public:
-   ArenaGenerator(); // TODO: Init with ResCache or Options class.
+   // TODO: Init with ResCache or Options class.
+   ArenaGenerator(EntityManager& entity_factory);
    ~ArenaGenerator();
 
    ArenaGenerator(const ArenaGenerator&) = delete;
@@ -33,6 +36,8 @@ private:
 
    Size GetCellSize(int cells_x, int cells_y) const;
    bool ShouldCreateItem() const;
+
+   EntityManager& mEntityFactory;
 
    // Absolute position on the screen.
    Point mPos = { 0, 0 };

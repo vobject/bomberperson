@@ -15,12 +15,7 @@ Arena::~Arena()
 
 void Arena::Update(const int elapsed_time)
 {
-   // TODO: May also be used for an animated ground (e.g. grass or craters).
-
-   for (auto& cell : mCells)
-   {
-      cell->Update(elapsed_time);
-   }
+   // TODO: May be used for an animated ground (e.g. grass or craters).
 }
 
 void Arena::SetBorderSize(const Size& borders)

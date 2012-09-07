@@ -56,7 +56,7 @@ private:
    bool mIsAlive;
 
    // Do we really need Size in Gamelogic? Isnt a simple point enough?
-   // RenderInfo
+   // RenderInfo -> could also contain animation info
    // SoundInfo
    // Create Render and Audio objects out of this gamelogic objects.
 };

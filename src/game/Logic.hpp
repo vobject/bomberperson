@@ -1,8 +1,6 @@
 #ifndef LOGIC_HPP
 #define LOGIC_HPP
 
-#include "EntityManager.hpp"
-
 #include <memory>
 #include <list>
 
@@ -10,22 +8,22 @@ struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
 
-class MainMenu;
+//class MainMenu;
 class Renderer;
 class ArenaGenerator;
 class KeyboardInput;
 class MouseInput;
 class Match;
 
-enum class GameState
-{
-   MainMenu,
-//   GameSetup,
-   Active,
-//   Options,
-//   Credits,
-   Exit
-};
+//enum class GameState
+//{
+//   MainMenu,
+////   GameSetup,
+//   Active,
+////   Options,
+////   Credits,
+//   Exit
+//};
 
 class Logic
 {
@@ -47,26 +45,26 @@ public:
    bool Done() const;
 
 private:
-   void ProcessInputMainMenuState(const SDL_KeyboardEvent& ev);
-   void ProcessInputRunningState(const SDL_KeyboardEvent& ev);
+//   void ProcessInputMainMenuState(const SDL_KeyboardEvent& ev);
+//   void ProcessInputRunningState(const SDL_KeyboardEvent& ev);
 
-   void UpdateMainMenuState(int elapsed_time);
-   void UpdateRunningState(int elapsed_time);
+//   void UpdateMainMenuState(int elapsed_time);
+//   void UpdateRunningState(int elapsed_time);
 
-   void ShowMainMenu();
-   void ShowGame();
+//   void ShowMainMenu();
+//   void ShowGame();
 
-   GameState mCurrentState = GameState::MainMenu;
+   // TODO:
+   // class MatchSettings{ nplayers, player:inputdev };
+   // std::shared_ptr<UserInterface> mUserInterface;
+   // std::shared_ptr<Match> mMatch;
+   // mMatch = std::make_shared<Match>(mUserInterface->GetMatchSettings());
 
-   std::shared_ptr<MainMenu> mMainMenu;
+//   GameState mCurrentState = GameState::MainMenu;
 
-   std::shared_ptr<KeyboardInput> mKeyboard_1;
-   std::shared_ptr<KeyboardInput> mKeyboard_2;
-   std::shared_ptr<MouseInput> mMouse_1;
+//   std::shared_ptr<MainMenu> mMainMenu;
 
    std::shared_ptr<Match> mMatch;
-
-   EntityManager mEntityManager;
 };
 
 #endif // LOGIC_HPP

@@ -28,7 +28,7 @@ void Cell::Update(const int elapsed_time)
 {
    if (mWall)
    {
-      mWall->Update(elapsed_time);
+//      mWall->Update(elapsed_time);
 
       if (!mWall->IsAlive()) {
          mWall = nullptr;
@@ -37,7 +37,7 @@ void Cell::Update(const int elapsed_time)
 
    if (mExtra)
    {
-      mExtra->Update(elapsed_time);
+//      mExtra->Update(elapsed_time);
 
       if (!mExtra->IsAlive()) {
          mExtra = nullptr;
@@ -46,7 +46,7 @@ void Cell::Update(const int elapsed_time)
 
    if (mBomb)
    {
-      mBomb->Update(elapsed_time);
+//      mBomb->Update(elapsed_time);
 
       if (!mBomb->IsAlive()) {
          mBomb = nullptr;
@@ -55,7 +55,7 @@ void Cell::Update(const int elapsed_time)
 
    if (mExplosion)
    {
-      mExplosion->Update(elapsed_time);
+//      mExplosion->Update(elapsed_time);
 
       if (!mExplosion->IsAlive()) {
          mExplosion = nullptr;

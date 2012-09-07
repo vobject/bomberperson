@@ -95,7 +95,6 @@ private:
 
    EntityManager& mEntityFactory;
 
-//   std::shared_ptr<InputDevice> mInput;
    std::shared_ptr<Cell> mParentCell;
    InputCommands mCurrentCommands;
 

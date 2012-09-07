@@ -85,15 +85,15 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
    }
 }
 
-void SimpleSdlRenderer::Render(const std::shared_ptr<Match>& match)
-{
-   Render(match->GetArena());
+//void SimpleSdlRenderer::Render(const std::shared_ptr<Match>& match)
+//{
+//   Render(match->GetArena());
 
-   for (const auto& player : match->GetPlayers())
-   {
-      Render(player);
-   }
-}
+//   for (const auto& player : match->GetPlayers())
+//   {
+//      Render(player);
+//   }
+//}
 
 void SimpleSdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
