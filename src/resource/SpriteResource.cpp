@@ -2,11 +2,6 @@
 
 #include <SDL.h>
 
-SpriteResource::SpriteResource()
-{
-
-}
-
 SpriteResource::SpriteResource(
    const EntityId id,
    const std::vector<SDL_Surface*>& textures
@@ -37,11 +32,11 @@ SDL_Surface* SpriteResource::GetFrame(const int n) const
    return mFrames.at(n);
 }
 
-Size SpriteResource::GetSize() const
-{
-   if (mFrames.empty()) {
-      throw "No frames associated with the current sprite";
-   }
-   // All frames ought to have the exact same size.
-   return { mFrames.at(0)->w, mFrames.at(0)->h };
-}
+//Size SpriteResource::GetSize() const
+//{
+//   if (mFrames.empty()) {
+//      throw "No frames associated with the current sprite";
+//   }
+//   // All frames ought to have the exact same size.
+//   return { mFrames.at(0)->w, mFrames.at(0)->h };
+//}

@@ -2,11 +2,6 @@
 
 #include <SDL.h>
 
-PlayerResource::PlayerResource()
-{
-
-}
-
 PlayerResource::PlayerResource(const EntityId id)
    : mId(id)
 {

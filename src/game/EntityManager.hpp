@@ -30,7 +30,7 @@ public:
 
    std::shared_ptr<Player> CreatePlayer(EntityId id, const std::shared_ptr<Arena>& arena);
 
-   std::shared_ptr<Arena> GetArena() const;
+//   std::shared_ptr<Arena> GetArena() const;
 //   std::vector<std::shared_ptr<Player>> GetPlayers() const;
    std::vector<std::shared_ptr<SceneObject>> GetEntities() const;
 
