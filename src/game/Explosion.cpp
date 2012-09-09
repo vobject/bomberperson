@@ -15,7 +15,7 @@ void Explosion::Update(const int elapsed_time)
 {
    mLifeTime += elapsed_time;
 
-   if (IsAlive() && (mLifeTime >= DEFAULT_LIFETIME))
+   if (mLifeTime >= DEFAULT_LIFETIME)
    {
       // The explosion has burned out.
       SetAlive(false);

@@ -3,8 +3,8 @@
 
 #include <memory>
 
+class SceneObject;
 class MainMenu;
-class Match;
 class Arena;
 class Scoreboard;
 class Cell;
@@ -13,7 +13,6 @@ class Extra;
 class Bomb;
 class Explosion;
 class Player;
-class SceneObject;
 
 class Renderer
 {
@@ -23,8 +22,9 @@ public:
 
    virtual void PreRender() { }
    virtual void PostRender() { }
+
+   virtual void Render(const std::shared_ptr<SceneObject>& obj) = 0;
    virtual void Render(const std::shared_ptr<MainMenu>& mainmenu) = 0;
-//   virtual void Render(const std::shared_ptr<Match>& match) = 0;
    virtual void Render(const std::shared_ptr<Arena>& arena) = 0;
    virtual void Render(const std::shared_ptr<Scoreboard>& scoreboard) = 0;
    virtual void Render(const std::shared_ptr<Cell>& cell) = 0;
@@ -33,7 +33,6 @@ public:
    virtual void Render(const std::shared_ptr<Bomb>& bomb) = 0;
    virtual void Render(const std::shared_ptr<Explosion>& explosion) = 0;
    virtual void Render(const std::shared_ptr<Player>& player) = 0;
-   virtual void Render(const std::shared_ptr<SceneObject>& obj) = 0;
 };
 
 #endif // RENDERER_HPP

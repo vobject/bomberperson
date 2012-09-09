@@ -38,7 +38,7 @@ SdlRenderer::SdlRenderer(const Size res)
       throw "Cannot init SDL ttf feature.";
    }
 
-   mFont = TTF_OpenFont("VeraMono.ttf", 16);
+   mFont = TTF_OpenFont("VeraMono.ttf", 14);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
@@ -61,6 +61,42 @@ void SdlRenderer::PreRender()
 void SdlRenderer::PostRender()
 {
    SDL_Flip(mScreen);
+}
+
+void SdlRenderer::Render(const std::shared_ptr<SceneObject>& obj)
+{
+   // Quick & dirty hack to support polymorthism by function parameter.
+   // Stupid C++ does not support multiple dispatch natively and I am not
+   //  motivated to implement the visitor pattern or double dispatch.
+   // So we'll be using good old dynamic_cast (sort of).
+
+   if (const auto ptr = std::dynamic_pointer_cast<Arena>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Scoreboard>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Cell>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Wall>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Bomb>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Explosion>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Extra>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Player>(obj)) {
+      Render(ptr);
+   }
+   else {
+      LOG(logERROR) << "SdlRenderer::Render(SceneObject) Unknown object!";
+   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
@@ -89,23 +125,6 @@ void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
    }
 }
 
-//void SdlRenderer::Render(const std::shared_ptr<Match>& match)
-//{
-//   // FIXME: Match is not a SceneObject! Is that a design problem?
-//   // Who should orchestrate the rendering of the various objects?
-//   // Currently the renderer is responsible for it.
-
-//   // TODO: Get Match statistics and render them to the screen.
-
-//   Render(match->GetArena());
-//   Render(match->GetScoreboard());
-
-//   for (const auto& player : match->GetPlayers())
-//   {
-//      Render(player);
-//   }
-//}
-
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
    const auto id = arena->GetId();
@@ -127,7 +146,7 @@ void SdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
    const auto line_dist = 20;
    const auto lines = scoreboard->GetScore();
 
-   for (int i = 0; i < lines.size(); i++)
+   for (size_t i = 0; i < lines.size(); i++)
    {
       auto surface = TTF_RenderText_Blended(mFont, lines[i].c_str(), { 0xff,
                                                                        0xff,
@@ -141,34 +160,11 @@ void SdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
       SDL_BlitSurface(surface, NULL, mScreen, &txt_rect);
       SDL_FreeSurface(surface);
    }
-
-//   for (const auto& line : scoreboard->GetScore()) {
-//      LOG(logDEBUG) << line;
-//   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Cell>& cell)
 {
-//   if (cell->HasWall())
-//   {
-//      Render(cell->GetWall());
-//      return;
-//   }
-
-//   if (cell->HasExtra())
-//   {
-//      Render(cell->GetExtra());
-//   }
-
-//   if (cell->HasBomb())
-//   {
-//      Render(cell->GetBomb());
-//   }
-
-//   if (cell->HasExplosion())
-//   {
-//      Render(cell->GetExplosion());
-//   }
+   (void) cell;
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Wall>& wall)
@@ -209,47 +205,6 @@ void SdlRenderer::Render(const std::shared_ptr<Player>& player)
    const auto res = mResCache->GetPlayerResource(id);
    const auto frame = res.GetFrame(data.anim, data.anim_time, data.speed);
    Render(player, frame);
-}
-
-void SdlRenderer::Render(const std::shared_ptr<SceneObject>& obj)
-{
-//   LOG(logDEBUG) << "SdlRenderer::Render(SceneObject) not implemented!";
-
-   // Quick & dirty hack to support polymorthism by function parameter.
-   // Stupid C++ does not support multiple dispatch natively and I am not
-   //  motivated to implement the visitor pattern or double dispatch.
-   // So we'll be using good old dynamic_cast (sort of).
-
-   if (const auto ptr = std::dynamic_pointer_cast<Arena>(obj)) {
-      Render(ptr);
-      return;
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Cell>(obj)) {
-      Render(ptr);
-      return;
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Wall>(obj)) {
-      Render(ptr);
-      return;
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Bomb>(obj)) {
-      Render(ptr);
-      return;
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Explosion>(obj)) {
-      Render(ptr);
-      return;
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Extra>(obj)) {
-      Render(ptr);
-      return;
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Player>(obj)) {
-      Render(ptr);
-      return;
-   }
-
-   LOG(logDEBUG) << "SdlRenderer::Render(SceneObject) Unknown object!";
 }
 
 void SdlRenderer::Render(

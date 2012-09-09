@@ -8,7 +8,7 @@
 Player::Player(const EntityId player_id, EntityManager& entity_factory)
    : SceneObject(player_id)
    , mEntityFactory(entity_factory)
-   , mData(PlayerAnimation::StandDown, 0_ms, MIN_SPEED, 1, 1, 1, 0, 0)
+   , mData(PlayerAnimation::StandDown, 0_ms, MIN_SPEED, 1, 1, 1, 0)
 {
    SetZOrder(ZOrder::Layer_5);
 }
@@ -37,10 +37,10 @@ void Player::Update(const int elapsed_time)
             IncreaseSpeed();
             break;
          case EntityId::BombsExtra:
-            mData.bombs++;
+            mData.bombs = (mData.bombs + 1) % 999;
             break;
          case EntityId::RangeExtra:
-            mData.range++;
+            mData.range = (mData.range + 1) % 999;
             break;
          case EntityId::GoldRangeExtra:
             mData.range = 999;

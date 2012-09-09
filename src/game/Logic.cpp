@@ -111,6 +111,9 @@ void Logic::Update(const int app_time, const int elapsed_time)
 
    for (auto& ent : mMatch->GetEntities())
    {
+      if (!ent->IsAlive()) {
+         continue;
+      }
       ent->Update(elapsed_time);
    }
 

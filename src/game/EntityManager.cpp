@@ -2,6 +2,7 @@
 #include "EntityId.hpp"
 #include "Arena.hpp"
 #include "ArenaGenerator.hpp"
+#include "Scoreboard.hpp"
 #include "Cell.hpp"
 #include "Wall.hpp"
 #include "Extra.hpp"
@@ -30,6 +31,16 @@ std::shared_ptr<Arena> EntityManager::CreateArena(const int player_count)
 
    mEntities.insert(arena);
    return arena;
+}
+
+std::shared_ptr<Scoreboard> EntityManager::CreateScoreboard()
+{
+   auto scoreboard = std::make_shared<Scoreboard>();
+   scoreboard->SetPosition({ DefaultSize::SCOREBOARD_POS_X, DefaultSize::SCOREBOARD_POS_Y });
+   scoreboard->SetSize({ DefaultSize::SCOREBOARD_WIDTH, DefaultSize::SCOREBOARD_HEIGHT });
+
+   mEntities.insert(scoreboard);
+   return scoreboard;
 }
 
 std::shared_ptr<Cell> EntityManager::CreateCell(

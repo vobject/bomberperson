@@ -13,5 +13,5 @@ Extra::~Extra()
 
 void Extra::Update(const int elapsed_time)
 {
-
+   (void) elapsed_time;
 }

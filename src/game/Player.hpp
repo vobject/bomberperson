@@ -38,8 +38,7 @@ struct PlayerData
                         const int distance,
                         const int bombs,
                         const int range,
-                        const int wins,
-                        const int kills)
+                        const int wins)
       : anim(PlayerAnimation::StandDown)
       , anim_time(0_ms)
       , speed(speed)
@@ -47,7 +46,6 @@ struct PlayerData
       , bombs(bombs)
       , range(range)
       , wins(wins)
-      , kills(kills)
    { }
 
    PlayerAnimation anim;
@@ -59,7 +57,6 @@ struct PlayerData
    int range;
 
    int wins;
-   int kills;
 };
 
 class Player : public SceneObject

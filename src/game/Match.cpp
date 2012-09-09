@@ -1,37 +1,28 @@
 #include "Match.hpp"
-
-#include "../input/KeyboardInput.hpp"
-#include "../input/MouseInput.hpp"
-
 #include "Arena.hpp"
 #include "ArenaGenerator.hpp"
-
-#include "Scoreboard.hpp"
 #include "Cell.hpp"
 #include "Player.hpp"
+#include "Scoreboard.hpp"
+#include "../input/KeyboardInput.hpp"
+#include "../input/MouseInput.hpp"
 #include "../utils/Utils.hpp"
 #include "../Options.hpp"
 
 Match::Match(const MatchSettings& settings)
    : mSettings(settings)
-//   , mPlayers(players)
-//   , mScoreboard(std::make_shared<Scoreboard>())
 {
-//   mScoreboard->SetPosition({ DefaultSize::SCOREBOARD_POS_X,
-//                              DefaultSize::SCOREBOARD_POS_Y });
-//   mScoreboard->SetSize({ DefaultSize::SCOREBOARD_WIDTH,
-//                          DefaultSize::SCOREBOARD_HEIGHT });
-
-//   mScoreboard->KeepTrackOf(mArena);
-//   mScoreboard->KeepTrackOf(mPlayers);
-
    // The arena is needed for the creation of the players.
    mArena = mEntityManager.CreateArena(mSettings.players.size());
+   auto scoreboard = mEntityManager.CreateScoreboard();
 
    for (const auto& p2i : mSettings.players)
    {
-      mPlayerInputPair.push_back({ CreatePlayerFromPlayerId(p2i.first, mArena),
-                                   CreateInputFromInputId(p2i.second) });
+      const auto player = CreatePlayerFromPlayerId(p2i.first, mArena);
+      const auto input = CreateInputFromInputId(p2i.second);
+
+      scoreboard->KeepTrackOf(player);
+      mPlayerInputPair.push_back({ player, input });
    }
 }
 
@@ -75,8 +66,6 @@ void Match::Input(const SDL_MouseButtonEvent& button)
 
 void Match::Update(const int elapsed_time)
 {
-//   mArena->Update(elapsed_time);
-
 //   auto player = std::begin(mPlayers);
 //   while (player != std::end(mPlayers))
 //   {
@@ -92,8 +81,6 @@ void Match::Update(const int elapsed_time)
 //      }
 //   }
 
-//   mScoreboard->Update(elapsed_time);
-
    (void) elapsed_time; // TODO: Keep track of how long the game went on.
 
    for (const auto& player_input : mPlayerInputPair)
@@ -102,21 +89,6 @@ void Match::Update(const int elapsed_time)
       player_input.first->SetParentCell(GetCellFromObject(player_input.first));
    }
 }
-
-//std::shared_ptr<Arena> Match::GetArena() const
-//{
-//   return mArena;
-//}
-
-//std::vector<std::shared_ptr<Player>> Match::GetPlayers() const
-//{
-//   return mPlayers;
-//}
-
-//std::shared_ptr<Scoreboard> Match::GetScoreboard() const
-//{
-//   return mScoreboard;
-//}
 
 //bool Match::IsOver() const
 //{

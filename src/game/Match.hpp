@@ -13,11 +13,11 @@ struct SDL_MouseButtonEvent;
 class InputDevice;
 class KeyboardInput;
 class MouseInput;
+//class KinectInput;
 class Arena;
 class Player;
 class Scoreboard;
 class Cell;
-class SceneObject;
 
 // Move these into UserInterface class -> where they are created.
 enum class InputId
@@ -60,11 +60,7 @@ public:
 
    void Update(int elapsed_time);
 
-//   std::shared_ptr<Arena> GetArena() const;
-//   std::vector<std::shared_ptr<Player>> GetPlayers() const;
-//   std::shared_ptr<Scoreboard> GetScoreboard() const;
-
-   bool IsOver() const;
+//   bool IsOver() const;
    EntitySet GetEntities() const;
 
 private:
@@ -92,8 +88,6 @@ private:
    //  to which player.
    std::vector<std::pair<std::shared_ptr<Player>,
                          std::shared_ptr<InputDevice>>> mPlayerInputPair;
-
-//   std::vector<std::shared_ptr<Player>> mPlayers;
 //   std::shared_ptr<Scoreboard> mScoreboard;
 };
 

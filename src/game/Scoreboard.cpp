@@ -1,5 +1,4 @@
 #include "Scoreboard.hpp"
-#include "Arena.hpp"
 #include "Player.hpp"
 
 #include <sstream>
@@ -17,17 +16,12 @@ Scoreboard::~Scoreboard()
 
 void Scoreboard::Update(const int elapsed_time)
 {
-
+   mGameTime += elapsed_time;
 }
 
-void Scoreboard::KeepTrackOf(const std::shared_ptr<Arena> &arena)
+void Scoreboard::KeepTrackOf(const std::shared_ptr<Player>& player)
 {
-   mArena = arena;
-}
-
-void Scoreboard::KeepTrackOf(const std::vector<std::shared_ptr<Player>>& players)
-{
-   mPlayers = players;
+   mPlayers.push_back(player);
 }
 
 std::vector<std::string> Scoreboard::GetScore() const
@@ -35,32 +29,41 @@ std::vector<std::string> Scoreboard::GetScore() const
    std::vector<std::string> lines;
    std::ostringstream os;
 
-   lines.push_back("Arena:");
-
-   os << "  Cells: " << mArena->GetCells().size();
+   os << "Time: " << (mGameTime / 1000) << "s";
    lines.push_back(os.str());
-
-//   os.clear();
-//   os << "\tCell width: " << mArena->GetCellSize().Width << "px";
-//   lines.push_back(os.str());
-
-//   os.clear();
-//   os << "\tCell height: " << mArena->GetCellSize().Height << "px";
-//   lines.push_back(os.str());
+   os.clear();
+   os.str("");
 
    for (const auto& player : mPlayers)
    {
-//      lines.push_back("");
+      lines.push_back("");
 
-//      os.clear();
-//      os.str("");
-//      os << "Player " << static_cast<int>(player->GetId()) << ":";
-//      lines.push_back(os.str());
+      const auto data = player->GetData();
 
-//      os.clear();
-//      os.str("");
-//      os << "  Speed: " << player->GetSpeed();
-//      lines.push_back(os.str());
+      os << "Player " << static_cast<int>(player->GetId()) << ":";
+      lines.push_back(os.str());
+      os.clear();
+      os.str("");
+
+      os << "  Speed: " << data.speed;
+      lines.push_back(os.str());
+      os.clear();
+      os.str("");
+
+      os << "  Bombs: " << data.bombs;
+      lines.push_back(os.str());
+      os.clear();
+      os.str("");
+
+      os << "  Range: " << data.range;
+      lines.push_back(os.str());
+      os.clear();
+      os.str("");
+
+      os << "  Wins: " << data.wins;
+      lines.push_back(os.str());
+      os.clear();
+      os.str("");
    }
 
    return lines;

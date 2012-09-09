@@ -2,12 +2,12 @@
 #define SCOREBOARD_HPP
 
 #include "SceneObject.hpp"
+#include "../utils/Utils.hpp"
 
 #include <memory>
 #include <string>
 #include <vector>
 
-class Arena;
 class Player;
 
 class Scoreboard : public SceneObject
@@ -21,13 +21,12 @@ public:
 
    void Update(int elapsed_time) override;
 
-   void KeepTrackOf(const std::shared_ptr<Arena>& arena);
-   void KeepTrackOf(const std::vector<std::shared_ptr<Player>>& players);
+   void KeepTrackOf(const std::shared_ptr<Player>& player);
 
    std::vector<std::string> GetScore() const;
 
 private:
-   std::shared_ptr<Arena> mArena = nullptr;
+   int mGameTime = 0_ms;
    std::vector<std::shared_ptr<Player>> mPlayers;
 };
 

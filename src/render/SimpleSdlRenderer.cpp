@@ -53,6 +53,39 @@ void SimpleSdlRenderer::PostRender()
    SDL_Flip(mScreen);
 }
 
+void SimpleSdlRenderer::Render(const std::shared_ptr<SceneObject>& obj)
+{
+   // See SdlRenderer::Render(SceneObject) for a short explanation of this (crap).
+
+   if (const auto ptr = std::dynamic_pointer_cast<Arena>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Scoreboard>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Cell>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Wall>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Bomb>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Explosion>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Extra>(obj)) {
+      Render(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Player>(obj)) {
+      Render(ptr);
+   }
+   else {
+      LOG(logERROR) << "SimpleSdlRenderer::Render(SceneObject) Unknown object!";
+   }
+}
+
 void SimpleSdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
 {
    const auto pos = mainmenu->GetPosition();
@@ -85,16 +118,6 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
    }
 }
 
-//void SimpleSdlRenderer::Render(const std::shared_ptr<Match>& match)
-//{
-//   Render(match->GetArena());
-
-//   for (const auto& player : match->GetPlayers())
-//   {
-//      Render(player);
-//   }
-//}
-
 void SimpleSdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
    const auto pos = arena->GetPosition();
@@ -105,36 +128,16 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<Arena>& arena)
                      static_cast<Uint16>(size.Width),
                      static_cast<Uint16>(size.Height) };
    SDL_FillRect(mScreen, &rect, 0x7f7f00);
-
-   for (const auto& cell : arena->GetCells())
-   {
-      Render(cell);
-   }
 }
 
 void SimpleSdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
 {
-   // TODO: Implement Me!
+   // No font resource available to render.
 }
 
 void SimpleSdlRenderer::Render(const std::shared_ptr<Cell>& cell)
 {
-   if (cell->HasWall()) {
-      Render(cell->GetWall());
-      return;
-   }
-
-   if (cell->HasExtra()) {
-      Render(cell->GetExtra());
-   }
-
-   if (cell->HasBomb()) {
-      Render(cell->GetBomb());
-   }
-
-   if (cell->HasExplosion()) {
-      Render(cell->GetExplosion());
-   }
+   (void) cell;
 }
 
 void SimpleSdlRenderer::Render(const std::shared_ptr<Wall>& wall)
@@ -225,18 +228,6 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<Player>& player)
                      static_cast<Uint16>(size.Width),
                      static_cast<Uint16>(size.Height) };
    SDL_FillRect(mScreen, &rect, 0x00afaf);
-}
-
-void SimpleSdlRenderer::Render(const std::shared_ptr<SceneObject>& obj)
-{
-   const auto pos = obj->GetPosition();
-   const auto size = obj->GetSize();
-
-   SDL_Rect rect = { static_cast<Sint16>(pos.X),
-                     static_cast<Sint16>(pos.Y),
-                     static_cast<Uint16>(size.Width),
-                     static_cast<Uint16>(size.Height) };
-   SDL_FillRect(mScreen, &rect, 0xffffff);
 }
 
 //void SimpleSdlRenderer::DrawLine(const Point& src_pos, const Point& dest_pos, const unsigned int color)

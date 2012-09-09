@@ -7,6 +7,7 @@
 enum class EntityId;
 class SceneObject;
 class Arena;
+class Scoreboard;
 class Cell;
 class Wall;
 class Extra;
@@ -33,6 +34,7 @@ public:
    ~EntityManager();
 
    std::shared_ptr<Arena> CreateArena(int player_count);
+   std::shared_ptr<Scoreboard> CreateScoreboard();
    std::shared_ptr<Cell> CreateCell(const std::shared_ptr<Arena>& arena, int x, int y);
    std::shared_ptr<Wall> CreateWall(EntityId id, const std::shared_ptr<Cell>& cell);
    std::shared_ptr<Extra> CreateExtra(EntityId id, const std::shared_ptr<Cell>& cell);
