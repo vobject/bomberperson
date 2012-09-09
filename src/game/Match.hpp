@@ -2,6 +2,7 @@
 #define MATCH_HPP
 
 #include "EntityManager.hpp"
+#include "../utils/Utils.hpp"
 
 #include <memory>
 #include <vector>
@@ -88,7 +89,10 @@ private:
    //  to which player.
    std::vector<std::pair<std::shared_ptr<Player>,
                          std::shared_ptr<InputDevice>>> mPlayerInputPair;
-//   std::shared_ptr<Scoreboard> mScoreboard;
+
+   // We will clean up the mEntityManager of dead entities every X seconds.
+   // This will keep track of the timing.
+   int mCleanupIdleTime = 0_ms;
 };
 
 #endif // MATCH_HPP

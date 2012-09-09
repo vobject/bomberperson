@@ -145,6 +145,22 @@ EntitySet EntityManager::GetEntities() const
    return mEntities;
 }
 
+void EntityManager::Cleanup()
+{
+   auto entity = std::begin(mEntities);
+   while (entity != std::end(mEntities))
+   {
+      if ((*entity)->IsAlive())
+      {
+         entity++;
+      }
+      else
+      {
+         entity = mEntities.erase(entity);
+      }
+   }
+}
+
 void EntityManager::Reset()
 {
    mEntities.clear();

@@ -44,6 +44,7 @@ public:
 
    EntitySet GetEntities() const;
 
+   void Cleanup();
    void Reset();
 
 private:

@@ -37,13 +37,13 @@ void Player::Update(const int elapsed_time)
             IncreaseSpeed();
             break;
          case EntityId::BombsExtra:
-            mData.bombs = (mData.bombs + 1) % 999;
+            mData.bombs = std::min(mData.bombs + 1, 99);
             break;
          case EntityId::RangeExtra:
-            mData.range = (mData.range + 1) % 999;
+            mData.range = std::min(mData.range + 1, 99);
             break;
          case EntityId::GoldRangeExtra:
-            mData.range = 999;
+            mData.range = 99;
             break;
          default:
             break;

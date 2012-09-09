@@ -66,22 +66,13 @@ void Match::Input(const SDL_MouseButtonEvent& button)
 
 void Match::Update(const int elapsed_time)
 {
-//   auto player = std::begin(mPlayers);
-//   while (player != std::end(mPlayers))
-//   {
-//      if ((*player)->IsAlive())
-//      {
-//         (*player)->Update(elapsed_time);
-//         (*player)->SetParentCell(GetCellFromObject(*player));
-//         player++;
-//      }
-//      else
-//      {
-//         player = mPlayers.erase(player);
-//      }
-//   }
-
-   (void) elapsed_time; // TODO: Keep track of how long the game went on.
+   mCleanupIdleTime += elapsed_time;
+   if (mCleanupIdleTime >= 1000_ms)
+   {
+      // Remove dead sprites every second.
+      mEntityManager.Cleanup();
+      mCleanupIdleTime = 0_ms;
+   }
 
    for (const auto& player_input : mPlayerInputPair)
    {
