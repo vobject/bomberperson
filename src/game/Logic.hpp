@@ -9,6 +9,7 @@ struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
 
 //class MainMenu;
+class UserInterface;
 class Renderer;
 class ArenaGenerator;
 class KeyboardInput;
@@ -45,6 +46,10 @@ public:
    bool Done() const;
 
 private:
+   void NewGame();
+//   void ReturnToGame();
+//   void GameOver();
+
 //   void ProcessInputMainMenuState(const SDL_KeyboardEvent& ev);
 //   void ProcessInputRunningState(const SDL_KeyboardEvent& ev);
 
@@ -64,6 +69,8 @@ private:
 
 //   std::shared_ptr<MainMenu> mMainMenu;
 
+   bool mDone = false;
+   std::shared_ptr<UserInterface> mUserInterface;
    std::shared_ptr<Match> mMatch;
 };
 

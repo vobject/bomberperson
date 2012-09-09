@@ -15,7 +15,8 @@ enum class ZOrder
    Layer_4,    // Bombs
    Layer_5,    // Players
    Layer_6,    // Explosions
-   Menu,
+   MainMenu,
+   OverlayMenu,
    Messagebox
 };
 

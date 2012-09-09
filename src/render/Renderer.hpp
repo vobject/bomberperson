@@ -17,13 +17,13 @@ class Player;
 class Renderer
 {
 public:
-   Renderer() { }
-   virtual ~Renderer() { }
+   Renderer();
+   virtual ~Renderer();
 
-   virtual void PreRender() { }
-   virtual void PostRender() { }
+   virtual void PreRender();
+   virtual void PostRender();
+   virtual void Render(const std::shared_ptr<SceneObject>& obj);
 
-   virtual void Render(const std::shared_ptr<SceneObject>& obj) = 0;
    virtual void Render(const std::shared_ptr<MainMenu>& mainmenu) = 0;
    virtual void Render(const std::shared_ptr<Arena>& arena) = 0;
    virtual void Render(const std::shared_ptr<Scoreboard>& scoreboard) = 0;

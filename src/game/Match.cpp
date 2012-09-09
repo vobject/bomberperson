@@ -74,17 +74,24 @@ void Match::Update(const int elapsed_time)
       mCleanupIdleTime = 0_ms;
    }
 
+   int active_player_count = 0;
    for (const auto& player_input : mPlayerInputPair)
    {
       player_input.first->SetInputCommands(player_input.second->GetCommands());
       player_input.first->SetParentCell(GetCellFromObject(player_input.first));
+
+      if (player_input.first->IsAlive()) {
+         active_player_count++;
+      }
    }
+
+   mIsGameOver = (active_player_count <= 1) ? true : false;
 }
 
-//bool Match::IsOver() const
-//{
-//   return (mPlayers.size() <= 1);
-//}
+bool Match::GameOver() const
+{
+   return mIsGameOver;
+}
 
 EntitySet Match::GetEntities() const
 {

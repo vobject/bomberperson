@@ -2,6 +2,7 @@
 #define MATCH_HPP
 
 #include "EntityManager.hpp"
+#include "UserInterface.hpp"
 #include "../utils/Utils.hpp"
 
 #include <memory>
@@ -20,31 +21,6 @@ class Player;
 class Scoreboard;
 class Cell;
 
-// Move these into UserInterface class -> where they are created.
-enum class InputId
-{
-   Keyboard_1,
-   Keyboard_2,
-   Mouse_1,
-   Kinect_1
-};
-
-// Move these into UserInterface class -> where they are created.
-enum class PlayerId
-{
-   Player_1,
-   Player_2,
-   Player_3,
-   Player_4
-};
-
-struct MatchSettings
-{
-   std::vector<std::pair<PlayerId, InputId>> players;
-   // Level
-   // Key config
-};
-
 class Match
 {
 public:
@@ -61,7 +37,7 @@ public:
 
    void Update(int elapsed_time);
 
-//   bool IsOver() const;
+   bool GameOver() const;
    EntitySet GetEntities() const;
 
 private:
@@ -93,6 +69,8 @@ private:
    // We will clean up the mEntityManager of dead entities every X seconds.
    // This will keep track of the timing.
    int mCleanupIdleTime = 0_ms;
+
+   bool mIsGameOver = false;
 };
 
 #endif // MATCH_HPP

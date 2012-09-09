@@ -1,34 +1,17 @@
 #include "Logic.hpp"
-#include "EntityId.hpp"
-#include "MainMenu.hpp"
+#include "UserInterface.hpp"
+//#include "MainMenu.hpp"
 #include "Match.hpp"
-#include "ArenaGenerator.hpp"
-#include "Arena.hpp"
-#include "Cell.hpp"
-#include "Player.hpp"
-#include "../input/KeyboardInput.hpp"
-#include "../input/MouseInput.hpp"
+#include "SceneObject.hpp"
 #include "../render/Renderer.hpp"
 #include "../utils/Utils.hpp"
-#include "../Options.hpp"
 
 #include <SDL_events.h>
 
-#include <queue>
-
 Logic::Logic()
 {
-//   ShowMainMenu();
-
-   MatchSettings match_settings = {
-      {
-         { PlayerId::Player_1, InputId::Keyboard_1 },
-         { PlayerId::Player_2, InputId::Keyboard_2 },
-         { PlayerId::Player_3, InputId::Mouse_1 }
-      }
-   };
-
-   mMatch = std::make_shared<Match>(match_settings);
+   mUserInterface = std::make_shared<UserInterface>();
+   mUserInterface->ShowMainMenu();
 }
 
 Logic::~Logic()
@@ -38,6 +21,15 @@ Logic::~Logic()
 
 void Logic::ProcessInput(const SDL_KeyboardEvent& key)
 {
+   if (mUserInterface->IsActive())
+   {
+      mUserInterface->Input(key);
+   }
+   else
+   {
+      mMatch->Input(key);
+   }
+
 //   switch (mCurrentState)
 //   {
 //      case GameState::MainMenu:
@@ -50,8 +42,6 @@ void Logic::ProcessInput(const SDL_KeyboardEvent& key)
 //         LOG(logERROR) << "ProcessInput: GameState is Exit.";
 //         break;
 //   }
-
-   mMatch->Input(key);
 }
 
 void Logic::ProcessInput(const SDL_MouseMotionEvent& motion)
@@ -63,7 +53,14 @@ void Logic::ProcessInput(const SDL_MouseMotionEvent& motion)
 
 //   mMouse_1->Move({ motion.x, motion.y });
 
-   mMatch->Input(motion);
+   if (mUserInterface->IsActive())
+   {
+      mUserInterface->Input(motion);
+   }
+   else
+   {
+      mMatch->Input(motion);
+   }
 }
 
 void Logic::ProcessInput(const SDL_MouseButtonEvent& button)
@@ -82,7 +79,14 @@ void Logic::ProcessInput(const SDL_MouseButtonEvent& button)
 //      mMouse_1->Release(button.button);
 //   }
 
-   mMatch->Input(button);
+   if (mUserInterface->IsActive())
+   {
+      mUserInterface->Input(button);
+   }
+   else
+   {
+      mMatch->Input(button);
+   }
 }
 
 //void Logic::ProcessInput(const kinex::Nui& kinect)
@@ -107,18 +111,57 @@ void Logic::Update(const int app_time, const int elapsed_time)
 //         break;
 //   }
 
-   mMatch->Update(elapsed_time);
-
-   for (auto& ent : mMatch->GetEntities())
+   if (mUserInterface->IsActive())
    {
-      if (!ent->IsAlive()) {
-         continue;
+      if (!mUserInterface->IsDone())
+      {
+         mUserInterface->Update(elapsed_time);
       }
-      ent->Update(elapsed_time);
-   }
+      else
+      {
+         switch (mUserInterface->GetSelection())
+         {
+            case UserInterfaceItem::MainMenu_NewGame:
+               {
+                  mUserInterface->HideMainMenu();
 
-   // TODO: NOW is the time for collision detection.
-   // TODO: Update all entities againg after collisions were detected.
+                  const auto settings = mUserInterface->GetMatchSettings();
+                  mMatch = std::make_shared<Match>(settings);
+               }
+               break;
+            case UserInterfaceItem::MainMenu_Exit:
+               mDone = true;
+               break;
+            default:
+               LOG(logERROR) << "ProcessInput: Unknown menu selection.";
+               break;
+         }
+      }
+   }
+   else
+   {
+      if (mMatch->GameOver())
+      {
+         mMatch = nullptr;
+         mUserInterface->ShowMainMenu();
+      }
+      else
+      {
+         mMatch->Update(elapsed_time);
+
+         // TODO: Why not put this into Match::Update().
+         for (auto& ent : mMatch->GetEntities())
+         {
+            if (!ent->IsAlive()) {
+               continue;
+            }
+            ent->Update(elapsed_time);
+         }
+
+         // TODO: NOW is the time for collision detection.
+         // TODO: Update all entities againg after collisions were detected.
+      }
+   }
 }
 
 void Logic::Render(const std::shared_ptr<Renderer>& renderer)
@@ -139,14 +182,28 @@ void Logic::Render(const std::shared_ptr<Renderer>& renderer)
 //         break;
 //   }
 
+
    renderer->PreRender();
 
-   for (const auto& ent : mMatch->GetEntities())
+   if (mUserInterface->IsActive())
    {
-      if (!ent->IsAlive()) {
-         continue;
+      for (const auto& ent : mUserInterface->GetEntities())
+      {
+         if (!ent->IsAlive()) {
+            continue;
+         }
+         renderer->Render(ent);
       }
-      renderer->Render(ent);
+   }
+   else
+   {
+      for (const auto& ent : mMatch->GetEntities())
+      {
+         if (!ent->IsAlive()) {
+            continue;
+         }
+         renderer->Render(ent);
+      }
    }
 
    renderer->PostRender();
@@ -154,8 +211,7 @@ void Logic::Render(const std::shared_ptr<Renderer>& renderer)
 
 bool Logic::Done() const
 {
-//   return (mCurrentState == GameState::Exit);
-   return false;
+   return mDone;
 }
 
 //void Logic::ProcessInputMainMenuState(const SDL_KeyboardEvent& key)

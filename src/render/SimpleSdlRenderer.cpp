@@ -1,6 +1,5 @@
 #include "SimpleSdlRenderer.hpp"
 #include "../game/MainMenu.hpp"
-#include "../game/Match.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Scoreboard.hpp"
 #include "../game/Cell.hpp"
@@ -53,44 +52,11 @@ void SimpleSdlRenderer::PostRender()
    SDL_Flip(mScreen);
 }
 
-void SimpleSdlRenderer::Render(const std::shared_ptr<SceneObject>& obj)
-{
-   // See SdlRenderer::Render(SceneObject) for a short explanation of this (crap).
-
-   if (const auto ptr = std::dynamic_pointer_cast<Arena>(obj)) {
-      Render(ptr);
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Scoreboard>(obj)) {
-      Render(ptr);
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Cell>(obj)) {
-      Render(ptr);
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Wall>(obj)) {
-      Render(ptr);
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Bomb>(obj)) {
-      Render(ptr);
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Explosion>(obj)) {
-      Render(ptr);
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Extra>(obj)) {
-      Render(ptr);
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Player>(obj)) {
-      Render(ptr);
-   }
-   else {
-      LOG(logERROR) << "SimpleSdlRenderer::Render(SceneObject) Unknown object!";
-   }
-}
-
 void SimpleSdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
 {
    const auto pos = mainmenu->GetPosition();
    const auto size = mainmenu->GetSize();
-   const auto selection = mainmenu->GetSelection();
+//   const auto selection = mainmenu->GetSelection();
 
    const int border_x = .1f * size.Width;
    const int border_y = .1f * size.Height;
@@ -101,21 +67,21 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
                      static_cast<Uint16>(size.Height - (2 * border_y)) };
    SDL_FillRect(mScreen, &rect, 0x7f7f6f);
 
-   const auto menu_item_cnt = static_cast<int>(MainMenuItem::Exit) + 1;
-   const auto selected_item = static_cast<int>(selection);
-   for (int i = 0; i < menu_item_cnt; i++)
-   {
-      int item_color = 0x000000;
-      if (selected_item == i) {
-         item_color = 0xffffff;
-      }
+//   const auto menu_item_cnt = static_cast<int>(MainMenuItem::Exit) + 1;
+//   const auto selected_item = static_cast<int>(selection);
+//   for (int i = 0; i < menu_item_cnt; i++)
+//   {
+//      int item_color = 0x000000;
+//      if (selected_item == i) {
+//         item_color = 0xffffff;
+//      }
 
-      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + (2 * border_x)),
-                             static_cast<Sint16>(pos.Y + (2 * border_y) + (border_y * i)),
-                             static_cast<Uint16>(10),
-                             static_cast<Uint16>(10) };
-      SDL_FillRect(mScreen, &item_rect, item_color);
-   }
+//      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + (2 * border_x)),
+//                             static_cast<Sint16>(pos.Y + (2 * border_y) + (border_y * i)),
+//                             static_cast<Uint16>(10),
+//                             static_cast<Uint16>(10) };
+//      SDL_FillRect(mScreen, &item_rect, item_color);
+//   }
 }
 
 void SimpleSdlRenderer::Render(const std::shared_ptr<Arena>& arena)
