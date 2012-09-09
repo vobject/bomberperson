@@ -15,7 +15,10 @@ struct SDL_Surface;
 class SpriteResource
 {
 public:
-   SpriteResource(EntityId id, const std::vector<SDL_Surface*>& textures);
+   SpriteResource(EntityId id,
+                  const std::vector<SDL_Surface*>& textures,
+                  int animation_length = 0_ms,
+                  bool looping = false);
    virtual ~SpriteResource();
 
    SpriteResource(const SpriteResource&) = default;
@@ -23,13 +26,14 @@ public:
 
    EntityId GetId() const;
 
-   int GetFrameCount() const;
-   SDL_Surface* GetFrame(int n) const;
-//   Size GetSize() const;
+   SDL_Surface* GetFrame(int anim_time = 0_ms) const;
 
 private:
    const EntityId mId;
-   std::vector<SDL_Surface*> mFrames;
+   const std::vector<SDL_Surface*> mFrames;
+   const int mAnimationLength;
+   const bool mLooping;
+   int mMsPerFrame;
 };
 
 #endif // SPRITE_RESOURCE_HPP

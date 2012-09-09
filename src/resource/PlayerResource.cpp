@@ -2,8 +2,9 @@
 
 #include <SDL.h>
 
-PlayerResource::PlayerResource(const EntityId id)
+PlayerResource::PlayerResource(const EntityId id, const int animation_length /*=0_ms*/)
    : mId(id)
+   , mAnimationLength(animation_length)
 {
 
 }
@@ -88,7 +89,7 @@ void PlayerResource::SetFrames(
 
 SDL_Surface* PlayerResource::GetFrame(
    const PlayerState state,
-   const int state_time,
+   const int anim_time,
    const int speed) const
 {
    const auto iter = mFrames.find(state);
@@ -101,27 +102,6 @@ SDL_Surface* PlayerResource::GetFrame(
 
    const auto anim_len = mAnimationLength - (speed * mAnimationLength * .05);
    const auto ms_per_frame = anim_len / iter->second.size();
-   const int current_frame_index = state_time / ms_per_frame;
+   const int current_frame_index = anim_time / ms_per_frame;
    return iter->second.at(current_frame_index % iter->second.size());
 }
-
-void PlayerResource::SetAnimationLength(const int ms)
-{
-   mAnimationLength = ms;
-}
-
-//Size DirectedSpriteResource::GetSize(const Direction dir) const
-//{
-//   switch (dir)
-//   {
-//      case Direction::Up:
-//         return { mFramesUp.at(0)->w, mFramesUp.at(0)->h };
-//      case Direction::Down:
-//         return { mFramesDown.at(0)->w, mFramesDown.at(0)->h };
-//      case Direction::Left:
-//         return { mFramesLeft.at(0)->w, mFramesLeft.at(0)->h };
-//      case Direction::Right:
-//         return { mFramesRight.at(0)->w, mFramesRight.at(0)->h };
-//   }
-//   return { 0, 0 };
-//}

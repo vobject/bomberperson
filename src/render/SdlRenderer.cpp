@@ -66,7 +66,7 @@ void SdlRenderer::PostRender()
 void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
 {
    const auto id = mainmenu->GetId();
-   const auto frame = mResCache->GetMenuResource(id).GetFrame(0);
+   const auto frame = mResCache->GetMenuResource(id).GetFrame();
    Render(mainmenu, frame);
 
    const auto pos = mainmenu->GetPosition();
@@ -109,7 +109,7 @@ void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
    const auto id = arena->GetId();
-   const auto frame = mResCache->GetArenaResource(id).GetFrame(0);
+   const auto frame = mResCache->GetArenaResource(id).GetFrame();
    Render(arena, frame);
 }
 
@@ -174,30 +174,30 @@ void SdlRenderer::Render(const std::shared_ptr<Cell>& cell)
 void SdlRenderer::Render(const std::shared_ptr<Wall>& wall)
 {
    const auto id = wall->GetId();
-   const auto frame = mResCache->GetWallResource(id).GetFrame(0);
+   const auto frame = mResCache->GetWallResource(id).GetFrame();
    Render(wall, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Extra>& extra)
 {
    const auto id = extra->GetId();
-   const auto frame = mResCache->GetExtraResource(id).GetFrame(0);
+   const auto frame = mResCache->GetExtraResource(id).GetFrame();
    Render(extra, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Bomb>& bomb)
 {
    const auto id = bomb->GetId();
-   const auto index = bomb->GetAnimationFrame();
-   const auto frame = mResCache->GetBombResource(id).GetFrame(index);
+   const auto anim_time = bomb->GetAnimationTime();
+   const auto frame = mResCache->GetBombResource(id).GetFrame(anim_time);
    Render(bomb, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 {
    const auto id = explosion->GetId();
-   const auto index = explosion->GetAnimationFrame();
-   const auto frame = mResCache->GetExplosionResource(id).GetFrame(index);
+   const auto anim_time = explosion->GetAnimationTime();
+   const auto frame = mResCache->GetExplosionResource(id).GetFrame(anim_time);
    Render(explosion, frame);
 }
 
@@ -205,11 +205,11 @@ void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 {
    const auto id = player->GetId();
    const auto state = player->GetState();
-   const auto state_time = player->GetStateTime();
+   const auto anim_time = player->GetStateTime();
    const auto speed = player->GetSpeed();
 
    const auto res = mResCache->GetPlayerResource(id);
-   const auto frame = res.GetFrame(state, state_time, speed);
+   const auto frame = res.GetFrame(state, anim_time, speed);
    Render(player, frame);
 }
 

@@ -2,7 +2,6 @@
 #define BOMB_HPP
 
 #include "SceneObject.hpp"
-#include "Animation.hpp"
 #include "../utils/Utils.hpp"
 
 #include <memory>
@@ -21,7 +20,7 @@ public:
 
    void Update(int elapsed_time) override;
 
-   int GetAnimationFrame() const;
+   int GetAnimationTime() const;
 
    int GetRange() const;
    void SetRange(int range);
@@ -29,6 +28,8 @@ public:
    void Detonate();
 
 private:
+   // TODO: Keep this in sync with the animation length
+   //  specified in the resource cache.
    static const int DEFAULT_LIFETIME = 2500_ms;
 
    void PlantCenterExplosion() const;
@@ -37,10 +38,10 @@ private:
    EntityManager& mEntityFactory;
 
    std::shared_ptr<Cell> mParentCell;
-   int mLifeTime = 0;
+   int mLifeTime = 0_ms;
    int mRange = 1;
 
-   Animation mAnimation;
+//   Animation mAnimation;
 };
 
 #endif // BOMB_HPP

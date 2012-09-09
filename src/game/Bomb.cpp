@@ -9,9 +9,9 @@ Bomb::Bomb(EntityManager& entity_factory, const std::shared_ptr<Cell>& cell)
    , mEntityFactory(entity_factory)
    , mParentCell(cell)
 {
-   mAnimation.SetFrameCount(3);
-   mAnimation.SetLength(DEFAULT_LIFETIME);
-   mAnimation.SetLooping(true);
+//   mAnimation.SetFrameCount(3);
+//   mAnimation.SetLength(DEFAULT_LIFETIME);
+//   mAnimation.SetLooping(true);
 }
 
 Bomb::~Bomb()
@@ -33,13 +33,11 @@ void Bomb::Update(const int elapsed_time)
       PlantRangeExplosion(Direction::Left);
       PlantRangeExplosion(Direction::Right);
    }
-
-   mAnimation.Update(elapsed_time);
 }
 
-int Bomb::GetAnimationFrame() const
+int Bomb::GetAnimationTime() const
 {
-   return mAnimation.GetCurrentFrame();
+   return mLifeTime;
 }
 
 int Bomb::GetRange() const

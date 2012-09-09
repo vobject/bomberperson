@@ -145,9 +145,17 @@ void ResourceCache::LoadBombResources()
    const Size size = { DefaultSize::BOMB_WIDTH,
                        DefaultSize::BOMB_HEIGHT };
 
-   mBombRes.insert({ id, { id, { LoadTexture("sprite/bomb_1.png", size),
-                                 LoadTexture("sprite/bomb_2.png", size),
-                                 LoadTexture("sprite/bomb_3.png", size) } } });
+   // TODO: Align animation speed and bomb lifetime.
+   mBombRes.insert({
+      id,
+      { id,
+        { LoadTexture("sprite/bomb_1.png", size),
+          LoadTexture("sprite/bomb_2.png", size),
+          LoadTexture("sprite/bomb_3.png", size) },
+         2500_ms,
+         false
+      }
+   });
 }
 
 void ResourceCache::LoadExplosionResources()
@@ -156,10 +164,18 @@ void ResourceCache::LoadExplosionResources()
    const Size size = { DefaultSize::EXPLOSION_WIDTH,
                        DefaultSize::EXPLOSION_HEIGHT };
 
-   mExplosionRes.insert({ id, { id, { LoadTexture("sprite/explosion_1.png", size),
-                                      LoadTexture("sprite/explosion_2.png", size),
-                                      LoadTexture("sprite/explosion_3.png", size),
-                                      LoadTexture("sprite/explosion_4.png", size) } } });
+   // TODO: Align animation speed and explosion lifetime.
+   mExplosionRes.insert({
+      id,
+      { id,
+        { LoadTexture("sprite/explosion_1.png", size),
+          LoadTexture("sprite/explosion_2.png", size),
+          LoadTexture("sprite/explosion_3.png", size),
+          LoadTexture("sprite/explosion_4.png", size) },
+         1000_ms,
+         false
+      }
+   });
 }
 
 void ResourceCache::LoadPlayerResources()
@@ -167,7 +183,8 @@ void ResourceCache::LoadPlayerResources()
    const Size size = { DefaultSize::PLAYER_WIDTH,
                        DefaultSize::PLAYER_HEIGHT };
 
-   PlayerResource player_1(EntityId::Player_1);
+   // TODO: align player speed and animation speed!!
+   PlayerResource player_1(EntityId::Player_1, 2000_ms);
    player_1.SetFrames(PlayerState::StandUp, { LoadTexture("sprite/player_1_up.png", size) });
    player_1.SetFrames(PlayerState::StandDown, { LoadTexture("sprite/player_1_down.png", size) });
    player_1.SetFrames(PlayerState::StandLeft, { LoadTexture("sprite/player_1_left.png", size) });
@@ -176,10 +193,9 @@ void ResourceCache::LoadPlayerResources()
    player_1.SetFrames(PlayerState::WalkDown, { LoadTexture("sprite/player_1_down_1.png", size), LoadTexture("sprite/player_1_down_2.png", size) });
    player_1.SetFrames(PlayerState::WalkLeft, { LoadTexture("sprite/player_1_left_1.png", size), LoadTexture("sprite/player_1_left_2.png", size) });
    player_1.SetFrames(PlayerState::WalkRight, { LoadTexture("sprite/player_1_right_1.png", size), LoadTexture("sprite/player_1_right_2.png", size) });
-   player_1.SetAnimationLength(2000); // TODO: align player speed and animation speed!!
    mPlayerRes.insert({ player_1.GetId(), player_1 });
 
-   PlayerResource player_2(EntityId::Player_2);
+   PlayerResource player_2(EntityId::Player_2, 2000_ms);
    player_2.SetFrames(PlayerState::StandUp, { LoadTexture("sprite/player_2_up.png", size) });
    player_2.SetFrames(PlayerState::StandDown, { LoadTexture("sprite/player_2_down.png", size) });
    player_2.SetFrames(PlayerState::StandLeft, { LoadTexture("sprite/player_2_left.png", size) });
@@ -188,10 +204,9 @@ void ResourceCache::LoadPlayerResources()
    player_2.SetFrames(PlayerState::WalkDown, { LoadTexture("sprite/player_2_down_1.png", size), LoadTexture("sprite/player_2_down_2.png", size) });
    player_2.SetFrames(PlayerState::WalkLeft, { LoadTexture("sprite/player_2_left_1.png", size), LoadTexture("sprite/player_2_left_2.png", size) });
    player_2.SetFrames(PlayerState::WalkRight, { LoadTexture("sprite/player_2_right_1.png", size), LoadTexture("sprite/player_2_right_2.png", size) });
-   player_2.SetAnimationLength(2000); // TODO: align player speed and animation speed!!
    mPlayerRes.insert({ player_2.GetId(), player_2 });
 
-   PlayerResource player_3(EntityId::Player_3);
+   PlayerResource player_3(EntityId::Player_3, 2000_ms);
    player_3.SetFrames(PlayerState::StandUp, { LoadTexture("sprite/player_3_up.png", size) });
    player_3.SetFrames(PlayerState::StandDown, { LoadTexture("sprite/player_3_down.png", size) });
    player_3.SetFrames(PlayerState::StandLeft, { LoadTexture("sprite/player_3_left.png", size) });
@@ -200,10 +215,9 @@ void ResourceCache::LoadPlayerResources()
    player_3.SetFrames(PlayerState::WalkDown, { LoadTexture("sprite/player_3_down_1.png", size), LoadTexture("sprite/player_3_down_2.png", size) });
    player_3.SetFrames(PlayerState::WalkLeft, { LoadTexture("sprite/player_3_left_1.png", size), LoadTexture("sprite/player_3_left_2.png", size) });
    player_3.SetFrames(PlayerState::WalkRight, { LoadTexture("sprite/player_3_right_1.png", size), LoadTexture("sprite/player_3_right_2.png", size) });
-   player_3.SetAnimationLength(2000); // TODO: align player speed and animation speed!!
    mPlayerRes.insert({ player_3.GetId(), player_3 });
 
-   PlayerResource player_4(EntityId::Player_4);
+   PlayerResource player_4(EntityId::Player_4, 2000_ms);
    player_4.SetFrames(PlayerState::StandUp, { LoadTexture("sprite/player_4_up.png", size) });
    player_4.SetFrames(PlayerState::StandDown, { LoadTexture("sprite/player_4_down.png", size) });
    player_4.SetFrames(PlayerState::StandLeft, { LoadTexture("sprite/player_4_left.png", size) });
@@ -212,7 +226,6 @@ void ResourceCache::LoadPlayerResources()
    player_4.SetFrames(PlayerState::WalkDown, { LoadTexture("sprite/player_4_down_1.png", size), LoadTexture("sprite/player_4_down_2.png", size) });
    player_4.SetFrames(PlayerState::WalkLeft, { LoadTexture("sprite/player_4_left_1.png", size), LoadTexture("sprite/player_4_left_2.png", size) });
    player_4.SetFrames(PlayerState::WalkRight, { LoadTexture("sprite/player_4_right_1.png", size), LoadTexture("sprite/player_4_right_2.png", size) });
-   player_4.SetAnimationLength(2000); // TODO: align player speed and animation speed!!
    mPlayerRes.insert({ player_4.GetId(), player_4 });
 }
 
