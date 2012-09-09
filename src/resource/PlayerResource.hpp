@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-enum class PlayerState;
+enum class PlayerAnimation;
 struct SDL_Surface;
 
 class PlayerResource
@@ -23,13 +23,13 @@ public:
 
    EntityId GetId() const;
 
-   SDL_Surface* GetFrame(PlayerState state, int anim_time, int speed) const;
-   void SetFrames(PlayerState state, const std::vector<SDL_Surface*>& textures);
+   SDL_Surface* GetFrame(PlayerAnimation state, int anim_time, int speed) const;
+   void SetFrames(PlayerAnimation state, const std::vector<SDL_Surface*>& textures);
 
 private:
    const EntityId mId;
    const int mAnimationLength;
-   std::map<PlayerState, std::vector<SDL_Surface*>> mFrames;
+   std::map<PlayerAnimation, std::vector<SDL_Surface*>> mFrames;
 };
 
 #endif // PLAYER_RESOURCE_HPP

@@ -28,7 +28,7 @@ EntityId PlayerResource::GetId() const
 //}
 
 void PlayerResource::SetFrames(
-   const PlayerState state,
+   const PlayerAnimation state,
    const std::vector<SDL_Surface*>& textures
 )
 {
@@ -88,7 +88,7 @@ void PlayerResource::SetFrames(
 //}
 
 SDL_Surface* PlayerResource::GetFrame(
-   const PlayerState state,
+   const PlayerAnimation state,
    const int anim_time,
    const int speed) const
 {

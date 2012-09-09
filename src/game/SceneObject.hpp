@@ -6,14 +6,18 @@
 
 #include <string>
 
-//enum class ZOrder
-//{
-//   zo_Background,
-//   zo_Layer_1,
-//   zo_Layer_2,
-//   zo_Layer_3,
-//   zo_Messagebox
-//};
+enum class ZOrder
+{
+   Background, // Nothing atm
+   Layer_1,    // Arena, Scoreboard
+   Layer_2,    // Extras
+   Layer_3,    // Cells, Walls
+   Layer_4,    // Bombs
+   Layer_5,    // Players
+   Layer_6,    // Explosions
+   Menu,
+   Messagebox
+};
 
 class SceneObject
 {
@@ -21,7 +25,7 @@ public:
    SceneObject(EntityId id);
    virtual ~SceneObject();
 
-//   virtual bool operator<(const SceneObject& other);
+   bool operator<(const SceneObject& other) const;
 
    virtual void Update(int elapsed_time) = 0;
 //   virtual void Restore() = 0;
@@ -34,8 +38,8 @@ public:
    Size GetSize() const;
    void SetSize(const Size& size);
 
-//   ZOrder GetZOrder() const;
-//   void SetZOrder(ZOrder order);
+   ZOrder GetZOrder() const;
+   void SetZOrder(ZOrder order);
 
 //   bool IsVisible() const;
 //   void SetVisible(bool visible);
@@ -51,7 +55,7 @@ private:
    EntityId mId;
    Point mPos;
    Size mSize;
-//   ZOrder mZOrder;
+   ZOrder mZOrder;
 //   bool mIsVisible;
    bool mIsAlive;
 

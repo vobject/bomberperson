@@ -14,7 +14,6 @@
 
 Match::Match(const MatchSettings& settings)
    : mSettings(settings)
-//   : mArena(arena)
 //   , mPlayers(players)
 //   , mScoreboard(std::make_shared<Scoreboard>())
 {
@@ -27,11 +26,11 @@ Match::Match(const MatchSettings& settings)
 //   mScoreboard->KeepTrackOf(mPlayers);
 
    // The arena is needed for the creation of the players.
-   auto arena = mEntityManager.CreateArena(mSettings.players.size());
+   mArena = mEntityManager.CreateArena(mSettings.players.size());
 
    for (const auto& p2i : mSettings.players)
    {
-      mPlayerInputPair.push_back({ CreatePlayerFromPlayerId(p2i.first, arena),
+      mPlayerInputPair.push_back({ CreatePlayerFromPlayerId(p2i.first, mArena),
                                    CreateInputFromInputId(p2i.second) });
    }
 }
@@ -43,7 +42,7 @@ Match::~Match()
 
 void Match::Input(const SDL_KeyboardEvent& key)
 {
-   // TODO: Handle ESC key -> bring up menu.
+   // TODO: Handle ESC key -> bring up menu and pause game.
 
    if (SDL_KEYDOWN == key.type)
    {
@@ -97,7 +96,11 @@ void Match::Update(const int elapsed_time)
 
    (void) elapsed_time; // TODO: Keep track of how long the game went on.
 
-   UpdatePlayerInputCommands();
+   for (const auto& player_input : mPlayerInputPair)
+   {
+      player_input.first->SetInputCommands(player_input.second->GetCommands());
+      player_input.first->SetParentCell(GetCellFromObject(player_input.first));
+   }
 }
 
 //std::shared_ptr<Arena> Match::GetArena() const
@@ -120,16 +123,7 @@ void Match::Update(const int elapsed_time)
 //   return (mPlayers.size() <= 1);
 //}
 
-//std::shared_ptr<Cell> Match::GetCellFromObject(
-//   const std::shared_ptr<SceneObject>& obj
-//) const
-//{
-//   const Point pos = { obj->GetPosition().X + (obj->GetSize().Width / 2),
-//                       obj->GetPosition().Y + (obj->GetSize().Height / 2) };
-//   return mArena->GetCellFromPosition(pos);
-//}
-
-std::vector<std::shared_ptr<SceneObject>> Match::GetEntities() const
+EntitySet Match::GetEntities() const
 {
    return mEntityManager.GetEntities();
 }
@@ -192,10 +186,12 @@ std::shared_ptr<InputDevice> Match::CreateInputFromInputId(const InputId id)
    return nullptr;
 }
 
-void Match::UpdatePlayerInputCommands() const
+std::shared_ptr<Cell> Match::GetCellFromObject(
+   const std::shared_ptr<SceneObject>& obj
+) const
 {
-   for (const auto& player_input : mPlayerInputPair)
-   {
-      player_input.first->SetInputCommands(player_input.second->GetCommands());
-   }
+   // The objects position is its center.
+   const Point pos = { obj->GetPosition().X + (obj->GetSize().Width / 2),
+                       obj->GetPosition().Y + (obj->GetSize().Height / 2) };
+   return mArena->GetCellFromPosition(pos);
 }

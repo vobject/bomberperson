@@ -204,12 +204,10 @@ void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 {
    const auto id = player->GetId();
-   const auto state = player->GetState();
-   const auto anim_time = player->GetStateTime();
-   const auto speed = player->GetSpeed();
+   const auto data = player->GetData();
 
    const auto res = mResCache->GetPlayerResource(id);
-   const auto frame = res.GetFrame(state, anim_time, speed);
+   const auto frame = res.GetFrame(data.anim, data.anim_time, data.speed);
    Render(player, frame);
 }
 

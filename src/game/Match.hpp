@@ -65,16 +65,18 @@ public:
 //   std::shared_ptr<Scoreboard> GetScoreboard() const;
 
    bool IsOver() const;
-   std::vector<std::shared_ptr<SceneObject>> GetEntities() const;
+   EntitySet GetEntities() const;
 
 private:
    std::shared_ptr<Player> CreatePlayerFromPlayerId(PlayerId id, const std::shared_ptr<Arena> arena);
    std::shared_ptr<InputDevice> CreateInputFromInputId(InputId id);
 
-   void UpdatePlayerInputCommands() const;
+   std::shared_ptr<Cell> GetCellFromObject(const std::shared_ptr<SceneObject>& obj) const;
 
    const MatchSettings mSettings;
    EntityManager mEntityManager;
+
+   std::shared_ptr<Arena> mArena;
 
    // The input devices get their own member variables for easier input update.
    std::shared_ptr<KeyboardInput> mKeyboard_1;
@@ -91,9 +93,6 @@ private:
    std::vector<std::pair<std::shared_ptr<Player>,
                          std::shared_ptr<InputDevice>>> mPlayerInputPair;
 
-//   std::shared_ptr<Cell> GetCellFromObject(const std::shared_ptr<SceneObject>& obj) const;
-
-//   std::shared_ptr<Arena> mArena;
 //   std::vector<std::shared_ptr<Player>> mPlayers;
 //   std::shared_ptr<Scoreboard> mScoreboard;
 };

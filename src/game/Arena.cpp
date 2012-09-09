@@ -5,7 +5,7 @@
 Arena::Arena()
    : SceneObject(EntityId::Arena)
 {
-
+   SetZOrder(ZOrder::Layer_1);
 }
 
 Arena::~Arena()

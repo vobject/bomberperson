@@ -14,6 +14,8 @@
 
 #include <SDL_events.h>
 
+#include <queue>
+
 Logic::Logic()
 {
 //   ShowMainMenu();
@@ -138,6 +140,9 @@ void Logic::Render(const std::shared_ptr<Renderer>& renderer)
 
    for (const auto& ent : mMatch->GetEntities())
    {
+      if (!ent->IsAlive()) {
+         continue;
+      }
       renderer->Render(ent);
    }
 

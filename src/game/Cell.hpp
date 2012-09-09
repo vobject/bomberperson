@@ -14,9 +14,9 @@ class Explosion;
 class Cell : public SceneObject
 {
 public:
-   Cell(int field_pos_x,
-        int field_pos_y,
-        const std::shared_ptr<Arena>& field);
+   Cell(const std::shared_ptr<Arena>& arena,
+        int arena_pos_x,
+        int arena_pos_y);
    virtual ~Cell();
 
    Cell(const Cell&) = delete;
@@ -33,7 +33,6 @@ public:
    std::shared_ptr<Extra> GetExtra() const;
    void SetExtra(const std::shared_ptr<Extra>& extra);
    void DestroyExtra();
-   std::shared_ptr<Extra> CollectExtra();
 
    bool HasBomb() const;
    std::shared_ptr<Bomb> GetBomb() const;
@@ -48,14 +47,14 @@ public:
 
 private:
    // (X,Y) index on the playing field.
-   const int mFieldPosX;
-   const int mFieldPosY;
-   const std::shared_ptr<Arena> mField;
+   const int mArenaPosX;
+   const int mArenaPosY;
+   const std::shared_ptr<Arena> mArena;
 
-   std::shared_ptr<Wall> mWall = nullptr;
-   std::shared_ptr<Extra> mExtra = nullptr;
-   std::shared_ptr<Bomb> mBomb = nullptr;
-   std::shared_ptr<Explosion> mExplosion = nullptr;
+   std::shared_ptr<Wall> mWall;
+   std::shared_ptr<Extra> mExtra;
+   std::shared_ptr<Bomb> mBomb;
+   std::shared_ptr<Explosion> mExplosion;
 };
 
 #endif // CELL_HPP

@@ -8,10 +8,13 @@
 #include <memory>
 #include <vector>
 
+class EntityManager;
 class Cell;
 class Bomb;
 
-enum class PlayerState
+// TODO: Should belong to some sort of RenderInfo data structure.
+//  Because it is not really useful for the game logic.
+enum class PlayerAnimation
 {
    StandUp,
    StandDown,
@@ -27,39 +30,37 @@ enum class PlayerState
 //   Win
 };
 
-//struct PlayerData
-//{
-//   PlayerState state;
-//   int state_time;
+struct PlayerData
+{
+   constexpr PlayerData(const PlayerAnimation anim,
+                        const int anim_time,
+                        const int speed,
+                        const int distance,
+                        const int bombs,
+                        const int range,
+                        const int wins,
+                        const int kills)
+      : anim(PlayerAnimation::StandDown)
+      , anim_time(0_ms)
+      , speed(speed)
+      , distance(distance)
+      , bombs(bombs)
+      , range(range)
+      , wins(wins)
+      , kills(kills)
+   { }
 
-//   int speed;
-//   int bombs;
-//   int range;
+   PlayerAnimation anim;
+   int anim_time;
 
-//   bool reverse;
+   int speed;
+   int distance;
+   int bombs;
+   int range;
 
-//   int wins;
-//   int kills;
-//};
-
-//class PlayerAnimation
-//{
-//public:
-//   PlayerAnimation() {}
-//   ~PlayerAnimation() {}
-
-//   PlayerState GetState() const { return mState; }
-//   void SetState(PlayerState state) { mState = state; }
-
-//   Direction GetDirection() const { return mDirection; }
-//   void SetDirection(Direction dir) { mDirection = dir; }
-
-//private:
-//   PlayerState mState = PlayerState::Stand;
-//   Direction mDirection = Direction::Down;
-//};
-
-class EntityManager;
+   int wins;
+   int kills;
+};
 
 class Player : public SceneObject
 {
@@ -75,13 +76,15 @@ public:
    void SetParentCell(const std::shared_ptr<Cell>& cell);
    void SetInputCommands(InputCommands cmds);
 
-   PlayerState GetState() const;
-   int GetStateTime() const;
-   int GetSpeed() const;
+   PlayerData GetData() const;
 
 private:
+   // Number of milliseconds the player has to wait to move another pixel.
    static const int MIN_SPEED = 16_ms;
    static const int MAX_SPEED = 2_ms;
+
+   // Number of milliseconds the player has to wait to plant another bomb.
+   static const int MIN_PLANTING_SPEED = 250_ms;
 
    void UpdateMovement(int elapsed_time);
    void UpdateBombing(int elapsed_time);
@@ -91,29 +94,22 @@ private:
    bool CanPlantBomb();
 
    void IncreaseSpeed();
-   PlayerState GetStopWalkingState(PlayerState state) const;
+   PlayerAnimation GetStopWalkingState(PlayerAnimation state) const;
 
    EntityManager& mEntityFactory;
 
    std::shared_ptr<Cell> mParentCell;
    InputCommands mCurrentCommands;
 
-   int mMoveIdleTime = 0;
-   int mBombIdleTime = 0;
+   int mMoveIdleTime = 0_ms;
+   int mBombIdleTime = 0_ms;
 
-   // Number of milliseconds the player has to wait to move another pixel.
-   int mMovementSpeed = MIN_SPEED;
-   int mMovementDistance = 1;
+   // Move this into the PlayerData object if we choose to make
+   //  it alterable from the outside (game logic).
+   int mPlantingSpeed = MIN_PLANTING_SPEED;
 
-   // How many milliseconds does the player have to wait to plant another bomb?
-   int mPlantingSpeed = 200_ms;
-
-   int mBombRange = 1;
-   int mBombSupply = 1;
+   PlayerData mData;
    std::vector<std::shared_ptr<Bomb>> mPlantedBombs;
-
-   PlayerState mState = PlayerState::StandDown;
-   int mStateTime = 0;
 };
 
 #endif // PLAYER_HPP

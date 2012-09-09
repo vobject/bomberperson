@@ -2,18 +2,29 @@
 #define ENTITYMANAGER_HPP
 
 #include <memory>
-#include <vector>
+#include <set>
 
+enum class EntityId;
 class SceneObject;
 class Arena;
-class Extra;
-class Bomb;
 class Cell;
 class Wall;
+class Extra;
+class Bomb;
 class Explosion;
-class InputDevice;
 class Player;
-enum class EntityId;
+
+template<class T>
+struct Sort_Dereferenced_SharedPtr
+{
+   bool operator()(const std::shared_ptr<T>& lhs,
+                   const std::shared_ptr<T>& rhs) const
+   {
+      return *lhs < *rhs;
+   }
+};
+
+typedef std::multiset<std::shared_ptr<SceneObject>, Sort_Dereferenced_SharedPtr<SceneObject>> EntitySet;
 
 class EntityManager
 {
@@ -22,27 +33,19 @@ public:
    ~EntityManager();
 
    std::shared_ptr<Arena> CreateArena(int player_count);
-   std::shared_ptr<Cell> CreateCell(int x, int y, const std::shared_ptr<Arena>& arena);
+   std::shared_ptr<Cell> CreateCell(const std::shared_ptr<Arena>& arena, int x, int y);
    std::shared_ptr<Wall> CreateWall(EntityId id, const std::shared_ptr<Cell>& cell);
    std::shared_ptr<Extra> CreateExtra(EntityId id, const std::shared_ptr<Cell>& cell);
    std::shared_ptr<Bomb> CreateBomb(const std::shared_ptr<Cell>& cell);
    std::shared_ptr<Explosion> CreateExplosion(const std::shared_ptr<Cell>& cell);
-
    std::shared_ptr<Player> CreatePlayer(EntityId id, const std::shared_ptr<Arena>& arena);
 
-//   std::shared_ptr<Arena> GetArena() const;
-//   std::vector<std::shared_ptr<Player>> GetPlayers() const;
-   std::vector<std::shared_ptr<SceneObject>> GetEntities() const;
+   EntitySet GetEntities() const;
 
    void Reset();
 
 private:
-//   std::shared_ptr<Arena> mArena;
-//   std::vector<std::shared_ptr<Extra>> mExtras;
-//   std::vector<std::shared_ptr<Bomb>> mBombs;
-//   std::vector<std::shared_ptr<Explosion>> mExplosions;
-//   std::vector<std::shared_ptr<Player>> mPlayers;
-   std::vector<std::shared_ptr<SceneObject>> mEntities;
+   EntitySet mEntities;
 };
 
 #endif // ENTITYMANAGER_HPP

@@ -4,17 +4,6 @@
 #include "SceneObject.hpp"
 #include "../utils/Utils.hpp"
 
-//enum class ExplosionType
-//{
-//   Crossway,
-//   Vertical,
-//   VerticalLeftEnd,
-//   VerticalRightEnd,
-//   Horizontal,
-//   HorizontalLeftEnd,
-//   HorizontalRightEnd
-//};
-
 class Explosion : public SceneObject
 {
 public:

@@ -53,45 +53,56 @@ std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
 
    const auto cells = CreateDefaultCells(cells_x, cells_y, arena);
 
+   // CreateDefaultCells() put a wall at every cell.
+   // Now clean up the cells that we want to put players on.
+
    if (players >= 1)
    {
-      cells[0]->SetWall(nullptr);
-      cells[1]->SetWall(nullptr);
-      cells[cells_x]->SetWall(nullptr);
+      cells[0]->GetWall()->SetAlive(false);
+      cells[1]->GetWall()->SetAlive(false);
+      cells[cells_x]->GetWall()->SetAlive(false);
    }
 
    if (players >= 2)
    {
-      cells[cells_x * cells_y - 1]->SetWall(nullptr);
-      cells[cells_x * cells_y - 2]->SetWall(nullptr);
-      cells[cells_x * cells_y - cells_x - 1]->SetWall(nullptr);
+      cells[cells_x * cells_y - 1]->GetWall()->SetAlive(false);
+      cells[cells_x * cells_y - 2]->GetWall()->SetAlive(false);
+      cells[cells_x * cells_y - cells_x - 1]->GetWall()->SetAlive(false);
    }
 
    if (players >= 3)
    {
-      cells[cells_x * cells_y - cells_x * 2]->SetWall(nullptr);
-      cells[cells_x * cells_y - cells_x]->SetWall(nullptr);
-      cells[cells_x * cells_y - cells_x + 1]->SetWall(nullptr);
+      cells[cells_x * cells_y - cells_x * 2]->GetWall()->SetAlive(false);
+      cells[cells_x * cells_y - cells_x]->GetWall()->SetAlive(false);
+      cells[cells_x * cells_y - cells_x + 1]->GetWall()->SetAlive(false);
    }
 
    if (players >= 4)
    {
-      cells[cells_x - 2]->SetWall(nullptr);
-      cells[cells_x - 1]->SetWall(nullptr);
-      cells[cells_x * 2 - 1]->SetWall(nullptr);
+      cells[cells_x - 2]->GetWall()->SetAlive(false);
+      cells[cells_x - 1]->GetWall()->SetAlive(false);
+      cells[cells_x * 2 - 1]->GetWall()->SetAlive(false);
    }
 
    for (auto& cell : cells)
    {
-      if (cell->HasWall() && !cell->GetWall()->IsDestructible()) {
+      if (!cell->HasWall()) {
+         // Do not put extras on a plain cell without a wall.
          continue;
       }
 
-      if (!cell->HasWall()) {
+      if (!cell->GetWall()->IsAlive()) {
+         // Do not put extras on a cell whose wall is no longer alive.
+         continue;
+      }
+
+      if (!cell->GetWall()->IsDestructible()) {
+         // Do not put extras on cells with an indestructible wall.
          continue;
       }
 
       if (!ShouldCreateItem()) {
+         // Do not put extras on the cell if Fortuna is not with us.
          continue;
       }
 
@@ -99,6 +110,7 @@ std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
 
       if (!(rand() % (cells_x * cells_y / 3)))
       {
+         // Very little chance for a golden flame (infinite explosion range).
          extra = mEntityFactory.CreateExtra(EntityId::GoldRangeExtra, cell);
       }
       else
@@ -137,9 +149,9 @@ std::vector<std::shared_ptr<Cell>> ArenaGenerator::CreateDefaultCells(
       const int cell_field_pos_x = i % cells_x;
       const int cell_field_pos_y = i / cells_x;
 
-      auto cell = mEntityFactory.CreateCell(cell_field_pos_x,
-                                            cell_field_pos_y,
-                                            arena);
+      auto cell = mEntityFactory.CreateCell(arena,
+                                            cell_field_pos_x,
+                                            cell_field_pos_y);
       cell->SetPosition({ arena->GetPosition().X + mBorders.Width + (cell_size.Width * cell_field_pos_x),
                           arena->GetPosition().Y + mBorders.Height + (cell_size.Height * cell_field_pos_y) });
       cell->SetSize(cell_size);

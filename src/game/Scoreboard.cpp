@@ -7,7 +7,7 @@
 Scoreboard::Scoreboard()
    : SceneObject(EntityId::Scoreboard)
 {
-
+   SetZOrder(ZOrder::Layer_1);
 }
 
 Scoreboard::~Scoreboard()
@@ -50,17 +50,17 @@ std::vector<std::string> Scoreboard::GetScore() const
 
    for (const auto& player : mPlayers)
    {
-      lines.push_back("");
+//      lines.push_back("");
 
-      os.clear();
-      os.str("");
-      os << "Player " << static_cast<int>(player->GetId()) << ":";
-      lines.push_back(os.str());
+//      os.clear();
+//      os.str("");
+//      os << "Player " << static_cast<int>(player->GetId()) << ":";
+//      lines.push_back(os.str());
 
-      os.clear();
-      os.str("");
-      os << "  Speed: " << player->GetSpeed();
-      lines.push_back(os.str());
+//      os.clear();
+//      os.str("");
+//      os << "  Speed: " << player->GetSpeed();
+//      lines.push_back(os.str());
    }
 
    return lines;

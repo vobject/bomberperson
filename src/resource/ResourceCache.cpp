@@ -185,47 +185,47 @@ void ResourceCache::LoadPlayerResources()
 
    // TODO: align player speed and animation speed!!
    PlayerResource player_1(EntityId::Player_1, 2000_ms);
-   player_1.SetFrames(PlayerState::StandUp, { LoadTexture("sprite/player_1_up.png", size) });
-   player_1.SetFrames(PlayerState::StandDown, { LoadTexture("sprite/player_1_down.png", size) });
-   player_1.SetFrames(PlayerState::StandLeft, { LoadTexture("sprite/player_1_left.png", size) });
-   player_1.SetFrames(PlayerState::StandRight, { LoadTexture("sprite/player_1_right.png", size) });
-   player_1.SetFrames(PlayerState::WalkUp, { LoadTexture("sprite/player_1_up_1.png", size), LoadTexture("sprite/player_1_up_2.png", size) });
-   player_1.SetFrames(PlayerState::WalkDown, { LoadTexture("sprite/player_1_down_1.png", size), LoadTexture("sprite/player_1_down_2.png", size) });
-   player_1.SetFrames(PlayerState::WalkLeft, { LoadTexture("sprite/player_1_left_1.png", size), LoadTexture("sprite/player_1_left_2.png", size) });
-   player_1.SetFrames(PlayerState::WalkRight, { LoadTexture("sprite/player_1_right_1.png", size), LoadTexture("sprite/player_1_right_2.png", size) });
+   player_1.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_1_up.png", size) });
+   player_1.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_1_down.png", size) });
+   player_1.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_1_left.png", size) });
+   player_1.SetFrames(PlayerAnimation::StandRight, { LoadTexture("sprite/player_1_right.png", size) });
+   player_1.SetFrames(PlayerAnimation::WalkUp, { LoadTexture("sprite/player_1_up_1.png", size), LoadTexture("sprite/player_1_up_2.png", size) });
+   player_1.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_1_down_1.png", size), LoadTexture("sprite/player_1_down_2.png", size) });
+   player_1.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_1_left_1.png", size), LoadTexture("sprite/player_1_left_2.png", size) });
+   player_1.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_1_right_1.png", size), LoadTexture("sprite/player_1_right_2.png", size) });
    mPlayerRes.insert({ player_1.GetId(), player_1 });
 
    PlayerResource player_2(EntityId::Player_2, 2000_ms);
-   player_2.SetFrames(PlayerState::StandUp, { LoadTexture("sprite/player_2_up.png", size) });
-   player_2.SetFrames(PlayerState::StandDown, { LoadTexture("sprite/player_2_down.png", size) });
-   player_2.SetFrames(PlayerState::StandLeft, { LoadTexture("sprite/player_2_left.png", size) });
-   player_2.SetFrames(PlayerState::StandRight, { LoadTexture("sprite/player_2_right.png", size) });
-   player_2.SetFrames(PlayerState::WalkUp, { LoadTexture("sprite/player_2_up_1.png", size), LoadTexture("sprite/player_2_up_2.png", size) });
-   player_2.SetFrames(PlayerState::WalkDown, { LoadTexture("sprite/player_2_down_1.png", size), LoadTexture("sprite/player_2_down_2.png", size) });
-   player_2.SetFrames(PlayerState::WalkLeft, { LoadTexture("sprite/player_2_left_1.png", size), LoadTexture("sprite/player_2_left_2.png", size) });
-   player_2.SetFrames(PlayerState::WalkRight, { LoadTexture("sprite/player_2_right_1.png", size), LoadTexture("sprite/player_2_right_2.png", size) });
+   player_2.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_2_up.png", size) });
+   player_2.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_2_down.png", size) });
+   player_2.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_2_left.png", size) });
+   player_2.SetFrames(PlayerAnimation::StandRight, { LoadTexture("sprite/player_2_right.png", size) });
+   player_2.SetFrames(PlayerAnimation::WalkUp, { LoadTexture("sprite/player_2_up_1.png", size), LoadTexture("sprite/player_2_up_2.png", size) });
+   player_2.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_2_down_1.png", size), LoadTexture("sprite/player_2_down_2.png", size) });
+   player_2.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_2_left_1.png", size), LoadTexture("sprite/player_2_left_2.png", size) });
+   player_2.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_2_right_1.png", size), LoadTexture("sprite/player_2_right_2.png", size) });
    mPlayerRes.insert({ player_2.GetId(), player_2 });
 
    PlayerResource player_3(EntityId::Player_3, 2000_ms);
-   player_3.SetFrames(PlayerState::StandUp, { LoadTexture("sprite/player_3_up.png", size) });
-   player_3.SetFrames(PlayerState::StandDown, { LoadTexture("sprite/player_3_down.png", size) });
-   player_3.SetFrames(PlayerState::StandLeft, { LoadTexture("sprite/player_3_left.png", size) });
-   player_3.SetFrames(PlayerState::StandRight, { LoadTexture("sprite/player_3_right.png", size) });
-   player_3.SetFrames(PlayerState::WalkUp, { LoadTexture("sprite/player_3_up_1.png", size), LoadTexture("sprite/player_3_up_2.png", size) });
-   player_3.SetFrames(PlayerState::WalkDown, { LoadTexture("sprite/player_3_down_1.png", size), LoadTexture("sprite/player_3_down_2.png", size) });
-   player_3.SetFrames(PlayerState::WalkLeft, { LoadTexture("sprite/player_3_left_1.png", size), LoadTexture("sprite/player_3_left_2.png", size) });
-   player_3.SetFrames(PlayerState::WalkRight, { LoadTexture("sprite/player_3_right_1.png", size), LoadTexture("sprite/player_3_right_2.png", size) });
+   player_3.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_3_up.png", size) });
+   player_3.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_3_down.png", size) });
+   player_3.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_3_left.png", size) });
+   player_3.SetFrames(PlayerAnimation::StandRight, { LoadTexture("sprite/player_3_right.png", size) });
+   player_3.SetFrames(PlayerAnimation::WalkUp, { LoadTexture("sprite/player_3_up_1.png", size), LoadTexture("sprite/player_3_up_2.png", size) });
+   player_3.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_3_down_1.png", size), LoadTexture("sprite/player_3_down_2.png", size) });
+   player_3.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_3_left_1.png", size), LoadTexture("sprite/player_3_left_2.png", size) });
+   player_3.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_3_right_1.png", size), LoadTexture("sprite/player_3_right_2.png", size) });
    mPlayerRes.insert({ player_3.GetId(), player_3 });
 
    PlayerResource player_4(EntityId::Player_4, 2000_ms);
-   player_4.SetFrames(PlayerState::StandUp, { LoadTexture("sprite/player_4_up.png", size) });
-   player_4.SetFrames(PlayerState::StandDown, { LoadTexture("sprite/player_4_down.png", size) });
-   player_4.SetFrames(PlayerState::StandLeft, { LoadTexture("sprite/player_4_left.png", size) });
-   player_4.SetFrames(PlayerState::StandRight, { LoadTexture("sprite/player_4_right.png", size) });
-   player_4.SetFrames(PlayerState::WalkUp, { LoadTexture("sprite/player_4_up_1.png", size), LoadTexture("sprite/player_4_up_2.png", size) });
-   player_4.SetFrames(PlayerState::WalkDown, { LoadTexture("sprite/player_4_down_1.png", size), LoadTexture("sprite/player_4_down_2.png", size) });
-   player_4.SetFrames(PlayerState::WalkLeft, { LoadTexture("sprite/player_4_left_1.png", size), LoadTexture("sprite/player_4_left_2.png", size) });
-   player_4.SetFrames(PlayerState::WalkRight, { LoadTexture("sprite/player_4_right_1.png", size), LoadTexture("sprite/player_4_right_2.png", size) });
+   player_4.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_4_up.png", size) });
+   player_4.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_4_down.png", size) });
+   player_4.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_4_left.png", size) });
+   player_4.SetFrames(PlayerAnimation::StandRight, { LoadTexture("sprite/player_4_right.png", size) });
+   player_4.SetFrames(PlayerAnimation::WalkUp, { LoadTexture("sprite/player_4_up_1.png", size), LoadTexture("sprite/player_4_up_2.png", size) });
+   player_4.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_4_down_1.png", size), LoadTexture("sprite/player_4_down_2.png", size) });
+   player_4.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_4_left_1.png", size), LoadTexture("sprite/player_4_left_2.png", size) });
+   player_4.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_4_right_1.png", size), LoadTexture("sprite/player_4_right_2.png", size) });
    mPlayerRes.insert({ player_4.GetId(), player_4 });
 }
 

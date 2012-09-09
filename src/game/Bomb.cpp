@@ -9,9 +9,7 @@ Bomb::Bomb(EntityManager& entity_factory, const std::shared_ptr<Cell>& cell)
    , mEntityFactory(entity_factory)
    , mParentCell(cell)
 {
-//   mAnimation.SetFrameCount(3);
-//   mAnimation.SetLength(DEFAULT_LIFETIME);
-//   mAnimation.SetLooping(true);
+   SetZOrder(ZOrder::Layer_4);
 }
 
 Bomb::~Bomb()
@@ -23,10 +21,12 @@ void Bomb::Update(const int elapsed_time)
 {
    mLifeTime += elapsed_time;
 
-   if (mLifeTime >= DEFAULT_LIFETIME)
+   if (IsAlive() && (mLifeTime >= DEFAULT_LIFETIME))
    {
+      // Lifetime of this bomb object ended...
       SetAlive(false);
 
+      // ... instead it creates some explosions around it.
       PlantCenterExplosion();
       PlantRangeExplosion(Direction::Up);
       PlantRangeExplosion(Direction::Down);
@@ -63,27 +63,25 @@ void Bomb::PlantCenterExplosion() const
 
 void Bomb::PlantRangeExplosion(Direction dir) const
 {
-   std::shared_ptr<Cell> range_cell = mParentCell->GetNeighborCell(dir);
-   int range_to_go = GetRange();
+   auto range_cell = mParentCell->GetNeighborCell(dir);
+   auto range_to_go = GetRange();
 
    while (range_cell && range_to_go)
    {
       if (range_cell->HasWall() && !range_cell->GetWall()->IsDestructible()) {
          // A wall that is not destructible is, well ... indestructible.
+         // Do not spread the explosion in this direction any further.
          break;
       }
 
       if (range_cell->HasBomb()) {
          // A bombs explosion range ends if it hits another bomb it its way.
-         // But it causes the othe bomb to explode.
+         // But it causes the other bomb to explode.
          range_cell->DetonateBomb();
          break;
       }
 
-      // TODO: Break if an existing explosion has the same orientation
-      //  as this one, e.g. Vertical or Horizontal.
-
-      // TODO: Select the right ExplosionType.
+      // TODO: Select the right ExplosionType (horizontal, vertical, etc).
       auto range_exp = mEntityFactory.CreateExplosion(range_cell);
       range_cell->SetExplosion(range_exp);
 

@@ -40,8 +40,6 @@ private:
    std::shared_ptr<Cell> mParentCell;
    int mLifeTime = 0_ms;
    int mRange = 1;
-
-//   Animation mAnimation;
 };
 
 #endif // BOMB_HPP
