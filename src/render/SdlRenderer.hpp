@@ -42,6 +42,7 @@ private:
    // Writing to the video surface is ok since we use double buffering.
    SDL_Surface* mScreen = nullptr;
    TTF_Font* mFont = nullptr;
+   TTF_Font* mMenuFont = nullptr;
 
    // Must be initialized after the video system has been set up.
    std::shared_ptr<ResourceCache> mResCache;

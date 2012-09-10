@@ -13,13 +13,21 @@ struct SDL_MouseButtonEvent;
 
 class MainMenu;
 
-enum class UserInterfaceItem
+enum class UserInterfaceItemId
 {
    MainMenu_NewGame,
+   MainMenu_ResumeGame,
 //   MainMenu_SetupGame,
 //   MainMenu_Options,
 //   MainMenu_Credits,
    MainMenu_Exit
+};
+
+struct UserInterfaceItem
+{
+   UserInterfaceItemId id;
+   std::string text;
+   bool active;
 };
 
 // Move these into UserInterface class -> where they are created.
@@ -65,20 +73,20 @@ public:
     bool IsActive() const;
     bool IsDone() const;
 
-    void ShowMainMenu();
+    void ShowMainMenu(bool game_paused);
     void HideMainMenu();
 
-    UserInterfaceItem GetSelection() const;
+    UserInterfaceItemId GetSelection() const;
 
     MatchSettings GetMatchSettings() const;
     EntitySet GetEntities() const;
 
 private:
-   EntityManager mEntityManager;
+//   EntityManager mEntityManager;
    MatchSettings mSettings;
    bool mActive = false;
    bool mDone = false;
-   UserInterfaceItem mSelection = UserInterfaceItem::MainMenu_Exit;
+   UserInterfaceItemId mSelection = UserInterfaceItemId::MainMenu_NewGame;
 
    std::shared_ptr<MainMenu> mMainMenu;
 };

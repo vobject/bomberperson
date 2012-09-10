@@ -37,7 +37,11 @@ public:
 
    void Update(int elapsed_time);
 
+   bool Pause() const;
+   void Resume();
+
    bool GameOver() const;
+
    EntitySet GetEntities() const;
 
 private:
@@ -70,6 +74,7 @@ private:
    // This will keep track of the timing.
    int mCleanupIdleTime = 0_ms;
 
+   bool mIsGamePaused = false;
    bool mIsGameOver = false;
 };
 

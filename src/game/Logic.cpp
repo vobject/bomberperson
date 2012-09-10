@@ -1,6 +1,5 @@
 #include "Logic.hpp"
 #include "UserInterface.hpp"
-//#include "MainMenu.hpp"
 #include "Match.hpp"
 #include "SceneObject.hpp"
 #include "../render/Renderer.hpp"
@@ -11,7 +10,7 @@
 Logic::Logic()
 {
    mUserInterface = std::make_shared<UserInterface>();
-   mUserInterface->ShowMainMenu();
+   mUserInterface->ShowMainMenu(false);
 }
 
 Logic::~Logic()
@@ -29,30 +28,10 @@ void Logic::ProcessInput(const SDL_KeyboardEvent& key)
    {
       mMatch->Input(key);
    }
-
-//   switch (mCurrentState)
-//   {
-//      case GameState::MainMenu:
-//         ProcessInputMainMenuState(key);
-//         break;
-//      case GameState::Active:
-//         ProcessInputRunningState(key);
-//         break;
-//      case GameState::Exit:
-//         LOG(logERROR) << "ProcessInput: GameState is Exit.";
-//         break;
-//   }
 }
 
 void Logic::ProcessInput(const SDL_MouseMotionEvent& motion)
 {
-//   if (GameState::Active != mCurrentState) {
-//      // Mouse input is currently only for moving players.
-//      return;
-//   }
-
-//   mMouse_1->Move({ motion.x, motion.y });
-
    if (mUserInterface->IsActive())
    {
       mUserInterface->Input(motion);
@@ -65,20 +44,6 @@ void Logic::ProcessInput(const SDL_MouseMotionEvent& motion)
 
 void Logic::ProcessInput(const SDL_MouseButtonEvent& button)
 {
-//   if (GameState::Active != mCurrentState) {
-//      // Mouse input is currently only for moving players.
-//      return;
-//   }
-
-//   if (SDL_MOUSEBUTTONDOWN == button.type)
-//   {
-//      mMouse_1->Press(button.button);
-//   }
-//   else if (SDL_MOUSEBUTTONUP == button.type)
-//   {
-//      mMouse_1->Release(button.button);
-//   }
-
    if (mUserInterface->IsActive())
    {
       mUserInterface->Input(button);
@@ -99,18 +64,6 @@ void Logic::Update(const int app_time, const int elapsed_time)
 {
    (void) app_time;
 
-//   switch (mCurrentState)
-//   {
-//      case GameState::MainMenu:
-//         UpdateMainMenuState(elapsed_time);
-//         break;
-//      case GameState::Active:
-//         UpdateRunningState(elapsed_time);
-//         break;
-//      case GameState::Exit:
-//         break;
-//   }
-
    if (mUserInterface->IsActive())
    {
       if (!mUserInterface->IsDone())
@@ -121,15 +74,26 @@ void Logic::Update(const int app_time, const int elapsed_time)
       {
          switch (mUserInterface->GetSelection())
          {
-            case UserInterfaceItem::MainMenu_NewGame:
+            case UserInterfaceItemId::MainMenu_NewGame:
                {
                   mUserInterface->HideMainMenu();
-
-                  const auto settings = mUserInterface->GetMatchSettings();
-                  mMatch = std::make_shared<Match>(settings);
+                  mMatch = std::make_shared<Match>(mUserInterface->GetMatchSettings());
                }
                break;
-            case UserInterfaceItem::MainMenu_Exit:
+            case UserInterfaceItemId::MainMenu_ResumeGame:
+               {
+                  if (mMatch)
+                  {
+                     mUserInterface->HideMainMenu();
+                     mMatch->Resume();
+                  }
+                  else
+                  {
+                     mUserInterface->ShowMainMenu(false);
+                  }
+               }
+               break;
+            case UserInterfaceItemId::MainMenu_Exit:
                mDone = true;
                break;
             default:
@@ -143,7 +107,11 @@ void Logic::Update(const int app_time, const int elapsed_time)
       if (mMatch->GameOver())
       {
          mMatch = nullptr;
-         mUserInterface->ShowMainMenu();
+         mUserInterface->ShowMainMenu(false);
+      }
+      else if (mMatch->Pause())
+      {
+         mUserInterface->ShowMainMenu(true);
       }
       else
       {
@@ -166,23 +134,6 @@ void Logic::Update(const int app_time, const int elapsed_time)
 
 void Logic::Render(const std::shared_ptr<Renderer>& renderer)
 {
-//   switch (mCurrentState)
-//   {
-//      case GameState::MainMenu:
-//         renderer->PreRender();
-//         renderer->Render(mMainMenu);
-//         renderer->PostRender();
-//         break;
-//      case GameState::Active:
-//         renderer->PreRender();
-//         renderer->Render(mMatch);
-//         renderer->PostRender();
-//         break;
-//      case GameState::Exit:
-//         break;
-//   }
-
-
    renderer->PreRender();
 
    if (mUserInterface->IsActive())

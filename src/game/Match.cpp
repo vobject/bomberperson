@@ -9,6 +9,8 @@
 #include "../utils/Utils.hpp"
 #include "../Options.hpp"
 
+#include <SDL_events.h>
+
 Match::Match(const MatchSettings& settings)
    : mSettings(settings)
 {
@@ -34,6 +36,11 @@ Match::~Match()
 void Match::Input(const SDL_KeyboardEvent& key)
 {
    // TODO: Handle ESC key -> bring up menu and pause game.
+   if ((SDL_KEYDOWN == key.type) && (SDLK_ESCAPE == key.keysym.sym))
+   {
+      mIsGamePaused = true;
+      return;
+   }
 
    if (SDL_KEYDOWN == key.type)
    {
@@ -86,6 +93,16 @@ void Match::Update(const int elapsed_time)
    }
 
    mIsGameOver = (active_player_count <= 1) ? true : false;
+}
+
+bool Match::Pause() const
+{
+   return mIsGamePaused;
+}
+
+void Match::Resume()
+{
+   mIsGamePaused = false;
 }
 
 bool Match::GameOver() const

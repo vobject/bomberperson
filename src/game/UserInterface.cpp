@@ -27,12 +27,22 @@ void UserInterface::Input(const SDL_KeyboardEvent& key)
 
    switch (key.keysym.sym)
    {
+      case SDLK_UP:
+         mMainMenu->SelectionUp();
+         break;
+      case SDLK_DOWN:
+         mMainMenu->SelectionDown();
+         break;
       case SDLK_RETURN:
-         mSelection = UserInterfaceItem::MainMenu_NewGame;
+         mSelection = mMainMenu->GetSelection().id;
+         mDone = true;
+         break;
+      case SDLK_BACKSPACE:
+         mSelection = UserInterfaceItemId::MainMenu_ResumeGame;
          mDone = true;
          break;
       case SDLK_ESCAPE:
-         mSelection = UserInterfaceItem::MainMenu_Exit;
+         mSelection = UserInterfaceItemId::MainMenu_Exit;
          mDone = true;
          break;
       default:
@@ -65,11 +75,18 @@ bool UserInterface::IsDone() const
    return mDone;
 }
 
-void UserInterface::ShowMainMenu()
+void UserInterface::ShowMainMenu(const bool game_paused)
 {
    if (!mMainMenu)
    {
       mMainMenu = std::make_shared<MainMenu>();
+      mMainMenu->AddMenuItem({ UserInterfaceItemId::MainMenu_ResumeGame, "Resume Game", true });
+      mMainMenu->AddMenuItem({ UserInterfaceItemId::MainMenu_NewGame, "New Game", true });
+      mMainMenu->AddMenuItem({ UserInterfaceItemId::MainMenu_Exit, "Exit", true });
+
+      if (!game_paused) {
+         mMainMenu->SelectionDown();
+      }
    }
 
    mActive = true;
@@ -82,7 +99,7 @@ void UserInterface::HideMainMenu()
    mActive = false;
 }
 
-UserInterfaceItem UserInterface::GetSelection() const
+UserInterfaceItemId UserInterface::GetSelection() const
 {
   return  mSelection;
 }

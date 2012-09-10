@@ -16,6 +16,8 @@
 //   Exit
 //};
 
+class UserInterfaceItem;
+
 class MainMenu : public SceneObject
 {
 public:
@@ -27,19 +29,21 @@ public:
 
     void Update(int elapsed_time) override;
 
-//    bool HasChosen() const;
-//    MainMenuItem GetSelection() const;
+    void AddMenuItem(const UserInterfaceItem& item);
+    std::vector<UserInterfaceItem> GetMenuItems() const;
 
-//    void SelectionUp();
-//    void SelectionDown();
+    void SelectionUp();
+    void SelectionDown();
 //    void Choose();
 
-//private:
-//    const MainMenuItem FIRST_ITEM = MainMenuItem::StartGame;
-//    const MainMenuItem LAST_ITEM = MainMenuItem::Exit;
+//    bool HasChosen() const;
+    UserInterfaceItem GetSelection() const;
 
-//    MainMenuItem mSelection = FIRST_ITEM;
+private:
+    unsigned int mSelectionMarker = 0;
 //    bool mHasChosen = false;
+
+    std::vector<UserInterfaceItem> mItems;
 };
 
 #endif // MAIN_MENU_HPP

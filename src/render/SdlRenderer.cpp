@@ -1,4 +1,5 @@
 #include "SdlRenderer.hpp"
+#include "../game/UserInterface.hpp"
 #include "../game/MainMenu.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Scoreboard.hpp"
@@ -37,7 +38,13 @@ SdlRenderer::SdlRenderer(const Size res)
       throw "Cannot init SDL ttf feature.";
    }
 
-   mFont = TTF_OpenFont("VeraMono.ttf", 14);
+   mFont = TTF_OpenFont("res/font/VeraMono.ttf", 14);
+   if (!mFont) {
+      TTF_Quit();
+      throw "TTF_OpenFont() failed!";
+   }
+
+   mMenuFont = TTF_OpenFont("res/font/VeraMoBd.ttf", 64);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
@@ -48,6 +55,7 @@ SdlRenderer::SdlRenderer(const Size res)
 
 SdlRenderer::~SdlRenderer()
 {
+   TTF_CloseFont(mMenuFont);
    TTF_CloseFont(mFont);
    TTF_Quit();
 }
@@ -68,24 +76,32 @@ void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
    const auto frame = mResCache->GetMenuResource(id).GetFrame();
    Render(mainmenu, frame);
 
-//   const auto pos = mainmenu->GetPosition();
-//   const auto selection = mainmenu->GetSelection();
+   const auto pos = mainmenu->GetPosition();
+   const auto items = mainmenu->GetMenuItems();
+   const auto selection = mainmenu->GetSelection();
 
-//   const auto menu_item_cnt = static_cast<int>(MainMenuItem::Exit) + 1;
-//   const auto selected_item = static_cast<int>(selection);
-//   for (int i = 0; i < menu_item_cnt; i++)
-//   {
-//      int item_color = 0xc0c0c0;
-//      if (selected_item == i) {
-//         item_color = 0x804000;
-//      }
+   for (size_t i = 0; i < items.size(); i++)
+   {
+      auto surface = TTF_RenderText_Blended(mMenuFont,
+                                            items[i].text.c_str(),
+                                            { 0xff, 0xff, 0xff, 0 });
+      SDL_Rect txt_rect = { static_cast<Sint16>(pos.X + 128),
+                            static_cast<Sint16>(pos.Y + 96 + (96 * i)),
+                            0,
+                            0 };
 
-//      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + 70),
-//                             static_cast<Sint16>(pos.Y + 55 + (55 * i)),
-//                             static_cast<Uint16>(20),
-//                             static_cast<Uint16>(20) };
-//      SDL_FillRect(mScreen, &item_rect, item_color);
-//   }
+      SDL_BlitSurface(surface, NULL, mScreen, &txt_rect);
+      SDL_FreeSurface(surface);
+
+      if (selection.id == items[i].id)
+      {
+         SDL_Rect sel_rect = { static_cast<Sint16>(pos.X + 64),
+                               static_cast<Sint16>(pos.Y + 110 + (96 * i)),
+                               static_cast<Uint16>(48),
+                               static_cast<Uint16>(48) };
+         SDL_FillRect(mScreen, &sel_rect, 0xffff00);
+      }
+   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
