@@ -135,16 +135,16 @@ void Logic::Update(const int app_time, const int elapsed_time)
 
 void Logic::Play(const std::shared_ptr<Audio>& audio)
 {
-   switch (mCurrentState)
-   {
-      case GameState::MainMenu:
-         break;
-      case GameState::Running:
-         audio->Play(mMatch);
-         break;
-      case GameState::Exit:
-         break;
-   }
+//   switch (mCurrentState)
+//   {
+//      case GameState::MainMenu:
+//         break;
+//      case GameState::Running:
+//         audio->Play(mMatch);
+//         break;
+//      case GameState::Exit:
+//         break;
+//   }
 }
 
 void Logic::Render(const std::shared_ptr<Renderer>& renderer)

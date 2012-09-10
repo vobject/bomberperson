@@ -86,44 +86,44 @@ Audio::~Audio()
 
 void Audio::Play(const std::shared_ptr<Match> &match)
 {
-   for (const auto& cell : match->GetArena()->GetCells())
-   {
-      if (cell->HasBomb() && (SoundId::None != cell->GetBomb()->GetSound()))
-      {
-         if( Mix_PlayChannel( -1, plant, 0 ) == -1 ) {
-            throw "Sound play failed.";
-         }
-      }
+//   for (const auto& cell : match->GetArena()->GetCells())
+//   {
+//      if (cell->HasBomb() && (SoundId::None != cell->GetBomb()->GetSound()))
+//      {
+//         if( Mix_PlayChannel( -1, plant, 0 ) == -1 ) {
+//            throw "Sound play failed.";
+//         }
+//      }
 
-      if (cell->HasExplosion() && (SoundId::None != cell->GetExplosion()->GetSound()))
-      {
-         if( Mix_PlayChannel( -1, explosion, 0 ) == -1 ) {
-            throw "Sound play failed.";
-         }
-      }
-   }
+//      if (cell->HasExplosion() && (SoundId::None != cell->GetExplosion()->GetSound()))
+//      {
+//         if( Mix_PlayChannel( -1, explosion, 0 ) == -1 ) {
+//            throw "Sound play failed.";
+//         }
+//      }
+//   }
 
-   for (const auto& player : match->GetPlayers())
-   {
-      const auto s = player->GetSound();
-      if (SoundId::None == s) {
-         continue;
-      }
+//   for (const auto& player : match->GetPlayers())
+//   {
+//      const auto s = player->GetSound();
+//      if (SoundId::None == s) {
+//         continue;
+//      }
 
-      if (SoundId::PlayerPicksUpExtra == s)
-      {
-         if( Mix_PlayChannel( -1, extra, 0 ) == -1 ) {
-            throw "Sound play failed.";
-         }
-      }
+//      if (SoundId::PlayerPicksUpExtra == s)
+//      {
+//         if( Mix_PlayChannel( -1, extra, 0 ) == -1 ) {
+//            throw "Sound play failed.";
+//         }
+//      }
 
-      if (SoundId::PlayerDies == s)
-      {
-         if( Mix_PlayChannel( -1, death, 0 ) == -1 ) {
-            throw "Sound play failed.";
-         }
-      }
-   }
+//      if (SoundId::PlayerDies == s)
+//      {
+//         if( Mix_PlayChannel( -1, death, 0 ) == -1 ) {
+//            throw "Sound play failed.";
+//         }
+//      }
+//   }
 }
 
 void Audio::PlayMusic(MusicId id)
