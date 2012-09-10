@@ -1,4 +1,5 @@
 #include "MainMenu.hpp"
+#include "UserInterface.hpp"
 
 MainMenu::MainMenu()
    : SceneObject(EntityId::MainMenu)
@@ -13,40 +14,50 @@ MainMenu::~MainMenu()
 
 void MainMenu::Update(const int elapsed_time)
 {
-
+   // TODO: Animate the selection marker.
 }
 
-bool MainMenu::HasChosen() const
+void MainMenu::AddMenuItem(const UserInterfaceItem& item)
 {
-   return mHasChosen;
+   mItems.push_back(item);
 }
 
-MainMenuItem MainMenu::GetSelection() const
+std::vector<UserInterfaceItem> MainMenu::GetMenuItems() const
 {
-   return mSelection;
+   return mItems;
 }
 
 void MainMenu::SelectionUp()
 {
-   if (FIRST_ITEM == mSelection) {
-      mSelection = LAST_ITEM;
+   if (0 == mSelectionMarker) {
+      mSelectionMarker = mItems.size() - 1;
       return;
    }
 
-   mSelection = static_cast<MainMenuItem>(static_cast<int>(mSelection) - 1);
+   mSelectionMarker--;
 }
 
 void MainMenu::SelectionDown()
 {
-   if (LAST_ITEM == mSelection) {
-      mSelection = FIRST_ITEM;
+   if ((mItems.size() - 1) == mSelectionMarker) {
+      mSelectionMarker = 0;
       return;
    }
 
-   mSelection = static_cast<MainMenuItem>(static_cast<int>(mSelection) + 1);
+   mSelectionMarker++;
 }
 
-void MainMenu::Choose()
+//void MainMenu::Choose()
+//{
+//   mHasChosen = true;
+//}
+
+//bool MainMenu::HasChosen() const
+//{
+//   return mHasChosen;
+//}
+
+UserInterfaceItem MainMenu::GetSelection() const
 {
-   mHasChosen = true;
+   return mItems.at(mSelectionMarker);
 }

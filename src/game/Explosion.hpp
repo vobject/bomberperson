@@ -2,19 +2,7 @@
 #define EXPLOSION_HPP
 
 #include "SceneObject.hpp"
-#include "Animation.hpp"
 #include "../utils/Utils.hpp"
-
-//enum class ExplosionType
-//{
-//   Crossway,
-//   Vertical,
-//   VerticalLeftEnd,
-//   VerticalRightEnd,
-//   Horizontal,
-//   HorizontalLeftEnd,
-//   HorizontalRightEnd
-//};
 
 class Explosion : public SceneObject
 {
@@ -27,15 +15,12 @@ public:
 
    void Update(int elapsed_time) override;
 
-   int GetAnimationFrame() const;
+   int GetAnimationTime() const;
 
 private:
    static const int DEFAULT_LIFETIME = 1000_ms;
 
-   int mLifeTime = 0;
-
-   Animation mAnimation;
-
+   int mLifeTime = 0_ms;
    bool mSoundProcessed = false;
 };
 

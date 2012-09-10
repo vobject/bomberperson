@@ -7,14 +7,16 @@
 #include <string>
 #include <vector>
 
-enum class MainMenuItem
-{
-   StartGame,
-//   SetupGame,
-//   Options,
-//   Credits,
-   Exit
-};
+//enum class MainMenuItem
+//{
+//   StartGame,
+////   SetupGame,
+////   Options,
+////   Credits,
+//   Exit
+//};
+
+class UserInterfaceItem;
 
 class MainMenu : public SceneObject
 {
@@ -27,19 +29,21 @@ public:
 
     void Update(int elapsed_time) override;
 
-    bool HasChosen() const;
-    MainMenuItem GetSelection() const;
+    void AddMenuItem(const UserInterfaceItem& item);
+    std::vector<UserInterfaceItem> GetMenuItems() const;
 
     void SelectionUp();
     void SelectionDown();
-    void Choose();
+//    void Choose();
+
+//    bool HasChosen() const;
+    UserInterfaceItem GetSelection() const;
 
 private:
-    const MainMenuItem FIRST_ITEM = MainMenuItem::StartGame;
-    const MainMenuItem LAST_ITEM = MainMenuItem::Exit;
+    unsigned int mSelectionMarker = 0;
+//    bool mHasChosen = false;
 
-    MainMenuItem mSelection = FIRST_ITEM;
-    bool mHasChosen = false;
+    std::vector<UserInterfaceItem> mItems;
 };
 
 #endif // MAIN_MENU_HPP

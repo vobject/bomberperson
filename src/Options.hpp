@@ -9,8 +9,8 @@
 
 struct DefaultSize
 {
-   static const int SCREEN_WIDTH            = 640_px;
-   static const int SCREEN_HEIGHT           = 480_px;
+   static const int SCREEN_WIDTH            = 800_px;
+   static const int SCREEN_HEIGHT           = 600_px;
 
    static const int ARENA_POS_X             = 0_px;
    static const int ARENA_POS_Y             = 0_px;

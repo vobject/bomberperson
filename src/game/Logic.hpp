@@ -8,23 +8,23 @@ struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
 
-class MainMenu;
 class Audio;
+class UserInterface;
 class Renderer;
 class ArenaGenerator;
 class KeyboardInput;
 class MouseInput;
 class Match;
 
-enum class GameState
-{
-   MainMenu,
-//   GameSetup,
-   Running,
-//   Options,
-//   Credits,
-   Exit
-};
+//enum class GameState
+//{
+//   MainMenu,
+////   GameSetup,
+//   Active,
+////   Options,
+////   Credits,
+//   Exit
+//};
 
 class Logic
 {
@@ -47,21 +47,31 @@ public:
    bool Done() const;
 
 private:
-   void ProcessInputMainMenuState(const SDL_KeyboardEvent& ev);
-   void ProcessInputRunningState(const SDL_KeyboardEvent& ev);
+   void NewGame();
+//   void ReturnToGame();
+//   void GameOver();
 
-   void UpdateMainMenuState(int elapsed_time);
-   void UpdateRunningState(int elapsed_time);
+//   void ProcessInputMainMenuState(const SDL_KeyboardEvent& ev);
+//   void ProcessInputRunningState(const SDL_KeyboardEvent& ev);
 
-   void ShowMainMenu();
-   void ShowGame();
+//   void UpdateMainMenuState(int elapsed_time);
+//   void UpdateRunningState(int elapsed_time);
 
-   GameState mCurrentState = GameState::MainMenu;
+//   void ShowMainMenu();
+//   void ShowGame();
 
-   std::shared_ptr<MainMenu> mMainMenu;
-   std::shared_ptr<KeyboardInput> mKeyboard_1;
-   std::shared_ptr<KeyboardInput> mKeyboard_2;
-   std::shared_ptr<MouseInput> mMouse_1;
+   // TODO:
+   // class MatchSettings{ nplayers, player:inputdev };
+   // std::shared_ptr<UserInterface> mUserInterface;
+   // std::shared_ptr<Match> mMatch;
+   // mMatch = std::make_shared<Match>(mUserInterface->GetMatchSettings());
+
+//   GameState mCurrentState = GameState::MainMenu;
+
+//   std::shared_ptr<MainMenu> mMainMenu;
+
+   bool mDone = false;
+   std::shared_ptr<UserInterface> mUserInterface;
    std::shared_ptr<Match> mMatch;
 };
 

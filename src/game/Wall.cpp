@@ -3,7 +3,7 @@
 Wall::Wall(const EntityId wall_id)
    : SceneObject(wall_id)
 {
-
+   SetZOrder(ZOrder::Layer_3);
 }
 
 Wall::~Wall()

@@ -1,6 +1,6 @@
 #include "SdlRenderer.hpp"
+#include "../game/UserInterface.hpp"
 #include "../game/MainMenu.hpp"
-#include "../game/Match.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Scoreboard.hpp"
 #include "../game/Cell.hpp"
@@ -38,7 +38,13 @@ SdlRenderer::SdlRenderer(const Size res)
       throw "Cannot init SDL ttf feature.";
    }
 
-   mFont = TTF_OpenFont("VeraMono.ttf", 16);
+   mFont = TTF_OpenFont("res/font/VeraMono.ttf", 14);
+   if (!mFont) {
+      TTF_Quit();
+      throw "TTF_OpenFont() failed!";
+   }
+
+   mMenuFont = TTF_OpenFont("res/font/VeraMoBd.ttf", 64);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
@@ -49,6 +55,7 @@ SdlRenderer::SdlRenderer(const Size res)
 
 SdlRenderer::~SdlRenderer()
 {
+   TTF_CloseFont(mMenuFont);
    TTF_CloseFont(mFont);
    TTF_Quit();
 }
@@ -66,56 +73,42 @@ void SdlRenderer::PostRender()
 void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
 {
    const auto id = mainmenu->GetId();
-   const auto frame = mResCache->GetMenuResource(id).GetFrame(0);
+   const auto frame = mResCache->GetMenuResource(id).GetFrame();
    Render(mainmenu, frame);
 
    const auto pos = mainmenu->GetPosition();
+   const auto items = mainmenu->GetMenuItems();
    const auto selection = mainmenu->GetSelection();
 
-   const auto menu_item_cnt = static_cast<int>(MainMenuItem::Exit) + 1;
-   const auto selected_item = static_cast<int>(selection);
-   for (int i = 0; i < menu_item_cnt; i++)
+   for (size_t i = 0; i < items.size(); i++)
    {
-      int item_color = 0xc0c0c0;
-      if (selected_item == i) {
-         item_color = 0x804000;
+      auto surface = TTF_RenderText_Blended(mMenuFont,
+                                            items[i].text.c_str(),
+                                            { 0xff, 0xff, 0xff, 0 });
+      SDL_Rect txt_rect = { static_cast<Sint16>(pos.X + 128),
+                            static_cast<Sint16>(pos.Y + 96 + (96 * i)),
+                            0,
+                            0 };
+
+      SDL_BlitSurface(surface, NULL, mScreen, &txt_rect);
+      SDL_FreeSurface(surface);
+
+      if (selection.id == items[i].id)
+      {
+         SDL_Rect sel_rect = { static_cast<Sint16>(pos.X + 64),
+                               static_cast<Sint16>(pos.Y + 110 + (96 * i)),
+                               static_cast<Uint16>(48),
+                               static_cast<Uint16>(48) };
+         SDL_FillRect(mScreen, &sel_rect, 0xffff00);
       }
-
-      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + 70),
-                             static_cast<Sint16>(pos.Y + 55 + (55 * i)),
-                             static_cast<Uint16>(20),
-                             static_cast<Uint16>(20) };
-      SDL_FillRect(mScreen, &item_rect, item_color);
-   }
-}
-
-void SdlRenderer::Render(const std::shared_ptr<Match>& match)
-{
-   // FIXME: Match is not a SceneObject! Is that a design problem?
-   // Who should orchestrate the rendering of the various objects?
-   // Currently the renderer is responsible for it.
-
-   // TODO: Get Match statistics and render them to the screen.
-
-   Render(match->GetArena());
-   Render(match->GetScoreboard());
-
-   for (const auto& player : match->GetPlayers())
-   {
-      Render(player);
    }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
    const auto id = arena->GetId();
-   const auto frame = mResCache->GetArenaResource(id).GetFrame(0);
+   const auto frame = mResCache->GetArenaResource(id).GetFrame();
    Render(arena, frame);
-
-   for (const auto& cell : arena->GetCells())
-   {
-      Render(cell);
-   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
@@ -132,7 +125,7 @@ void SdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
    const auto line_dist = 20;
    const auto lines = scoreboard->GetScore();
 
-   for (int i = 0; i < lines.size(); i++)
+   for (size_t i = 0; i < lines.size(); i++)
    {
       auto surface = TTF_RenderText_Blended(mFont, lines[i].c_str(), { 0xff,
                                                                        0xff,
@@ -146,81 +139,51 @@ void SdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
       SDL_BlitSurface(surface, NULL, mScreen, &txt_rect);
       SDL_FreeSurface(surface);
    }
-
-//   for (const auto& line : scoreboard->GetScore()) {
-//      LOG(logDEBUG) << line;
-//   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Cell>& cell)
 {
-   if (cell->HasWall())
-   {
-      Render(cell->GetWall());
-      return;
-   }
-
-   if (cell->HasExtra())
-   {
-      Render(cell->GetExtra());
-   }
-
-   if (cell->HasBomb())
-   {
-      Render(cell->GetBomb());
-   }
-
-   if (cell->HasExplosion())
-   {
-      Render(cell->GetExplosion());
-   }
+   (void) cell;
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Wall>& wall)
 {
    const auto id = wall->GetId();
-   const auto frame = mResCache->GetWallResource(id).GetFrame(0);
+   const auto frame = mResCache->GetWallResource(id).GetFrame();
    Render(wall, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Extra>& extra)
 {
    const auto id = extra->GetId();
-   const auto frame = mResCache->GetExtraResource(id).GetFrame(0);
+   const auto frame = mResCache->GetExtraResource(id).GetFrame();
    Render(extra, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Bomb>& bomb)
 {
    const auto id = bomb->GetId();
-   const auto index = bomb->GetAnimationFrame();
-   const auto frame = mResCache->GetBombResource(id).GetFrame(index);
+   const auto anim_time = bomb->GetAnimationTime();
+   const auto frame = mResCache->GetBombResource(id).GetFrame(anim_time);
    Render(bomb, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 {
    const auto id = explosion->GetId();
-   const auto index = explosion->GetAnimationFrame();
-   const auto frame = mResCache->GetExplosionResource(id).GetFrame(index);
+   const auto anim_time = explosion->GetAnimationTime();
+   const auto frame = mResCache->GetExplosionResource(id).GetFrame(anim_time);
    Render(explosion, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 {
    const auto id = player->GetId();
-   const auto state = player->GetState();
-   const auto state_time = player->GetStateTime();
-   const auto speed = player->GetSpeed();
+   const auto data = player->GetData();
 
    const auto res = mResCache->GetPlayerResource(id);
-   const auto frame = res.GetFrame(state, state_time, speed);
+   const auto frame = res.GetFrame(data.anim, data.anim_time, data.speed);
    Render(player, frame);
-}
-
-void SdlRenderer::Render(const std::shared_ptr<SceneObject>& obj)
-{
-   LOG(logDEBUG) << "SdlRenderer::Render(SceneObject) not implemented!";
 }
 
 void SdlRenderer::Render(

@@ -9,7 +9,7 @@ struct SDL_Surface;
 class SimpleGlRenderer : public Renderer
 {
 public:
-   explicit SimpleGlRenderer(Size res);
+   SimpleGlRenderer(Size res);
    virtual ~SimpleGlRenderer();
 
    SimpleGlRenderer(const SimpleGlRenderer&) = delete;
@@ -19,7 +19,6 @@ public:
    void PostRender() override;
 
    void Render(const std::shared_ptr<MainMenu>& mainmenu) override;
-   void Render(const std::shared_ptr<Match>& match) override;
    void Render(const std::shared_ptr<Arena>& arena) override;
    void Render(const std::shared_ptr<Scoreboard>& scoreboard) override;
    void Render(const std::shared_ptr<Cell>& cell) override;
@@ -28,7 +27,6 @@ public:
    void Render(const std::shared_ptr<Bomb>& bomb) override;
    void Render(const std::shared_ptr<Explosion>& explosion) override;
    void Render(const std::shared_ptr<Player>& player) override;
-   void Render(const std::shared_ptr<SceneObject>& obj) override;
 
 private:
    SDL_Surface* mScreen = nullptr;

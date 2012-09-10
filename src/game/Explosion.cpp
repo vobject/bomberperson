@@ -3,9 +3,7 @@
 Explosion::Explosion()
    : SceneObject(EntityId::Explosion)
 {
-   mAnimation.SetFrameCount(4);
-   mAnimation.SetLength(DEFAULT_LIFETIME);
-   mAnimation.SetLooping(false);
+   SetZOrder(ZOrder::Layer_6);
 }
 
 Explosion::~Explosion()
@@ -23,15 +21,13 @@ void Explosion::Update(const int elapsed_time)
 
    if (mLifeTime >= DEFAULT_LIFETIME)
    {
+      // The explosion has burned out.
       SetAlive(false);
    }
-
-   mAnimation.Update(elapsed_time);
-
    mSoundProcessed = true;
 }
 
-int Explosion::GetAnimationFrame() const
+int Explosion::GetAnimationTime() const
 {
-   return mAnimation.GetCurrentFrame();
+   return mLifeTime;
 }

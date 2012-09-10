@@ -2,18 +2,18 @@
 #define BOMB_HPP
 
 #include "SceneObject.hpp"
-#include "Animation.hpp"
 //#include "Sound.hpp"
 #include "../utils/Utils.hpp"
 
 #include <memory>
 
+class EntityManager;
 class Cell;
 
 class Bomb : public SceneObject
 {
 public:
-   Bomb(const std::shared_ptr<Cell>& cell);
+   Bomb(EntityManager& entity_factory, const std::shared_ptr<Cell>& cell);
    virtual ~Bomb();
 
    Bomb(const Bomb&) = delete;
@@ -21,7 +21,7 @@ public:
 
    void Update(int elapsed_time) override;
 
-   int GetAnimationFrame() const;
+   int GetAnimationTime() const;
    bool WasPlantedSound() const;
 
    int GetRange() const;
@@ -30,16 +30,19 @@ public:
    void Detonate();
 
 private:
+   // TODO: Keep this in sync with the animation length
+   //  specified in the resource cache.
    static const int DEFAULT_LIFETIME = 2500_ms;
 
    void PlantCenterExplosion() const;
    void PlantRangeExplosion(Direction dir) const;
 
-   const std::shared_ptr<Cell> mParentCell;
-   int mLifeTime = 0;
+   EntityManager& mEntityFactory;
+
+   std::shared_ptr<Cell> mParentCell;
+   int mLifeTime = 0_ms;
    int mRange = 1;
 
-   Animation mAnimation;
    mutable bool mPlantedSound;
 //   Sound mPlantedSound;
 };

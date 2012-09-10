@@ -7,59 +7,57 @@
 #include "../utils/Utils.hpp"
 
 Cell::Cell(
-   const int field_pos_x,
-   const int field_pos_y,
-   const std::shared_ptr<Arena>& field
+   const std::shared_ptr<Arena>& arena,
+   const int arena_pos_x,
+   const int arena_pos_y
 )
    : SceneObject(EntityId::Cell)
-   , mFieldPosX(field_pos_x)
-   , mFieldPosY(field_pos_y)
-   , mField(field) // Do not use inside the ctor - object is not ready yet.
+   , mArenaPosX(arena_pos_x)
+   , mArenaPosY(arena_pos_y)
+   , mArena(arena) // Do not use inside the ctor because
+                   //  object itself is not fully constructed yet.
 {
-
+   SetZOrder(ZOrder::Layer_3);
 }
 
 Cell::~Cell()
 {
+   // When a cell object is destroyed make sure everything
+   //  that is present on the cell also dies.
 
+   if (mWall) {
+      mWall->SetAlive(false);
+   }
+
+   if (mExtra) {
+      mExtra->SetAlive(false);
+   }
+
+   if (mBomb) {
+      mBomb->SetAlive(false);
+   }
+
+   if (mExplosion) {
+      mExplosion->SetAlive(false);
+   }
 }
 
 void Cell::Update(const int elapsed_time)
 {
-   if (mWall)
-   {
-      mWall->Update(elapsed_time);
-
-      if (!mWall->IsAlive()) {
+   if (mWall && !mWall->IsAlive()) {
          mWall = nullptr;
-      }
    }
 
-   if (mExtra)
-   {
-      mExtra->Update(elapsed_time);
-
-      if (!mExtra->IsAlive()) {
-         mExtra = nullptr;
-      }
+   if (mExtra && !mExtra->IsAlive()) {
+      mExtra = nullptr;
    }
 
-   if (mBomb)
-   {
-      mBomb->Update(elapsed_time);
-
-      if (!mBomb->IsAlive()) {
-         mBomb = nullptr;
-      }
+   if (mBomb && !mBomb->IsAlive()) {
+      mBomb = nullptr;
    }
 
-   if (mExplosion)
-   {
-      mExplosion->Update(elapsed_time);
-
-      if (!mExplosion->IsAlive()) {
-         mExplosion = nullptr;
-      }
+   if (mExplosion && !mExplosion->IsAlive()) {
+      mExplosion = nullptr;
    }
 }
 
@@ -103,16 +101,6 @@ void Cell::DestroyExtra()
    mExtra->SetAlive(false);
 }
 
-std::shared_ptr<Extra> Cell::CollectExtra()
-{
-   // Return the current extra item and remove it from the cell.
-   // Do not use DestroyExtra() as the item is not destroyed, it will
-   //  just be transfered from the cell to the caller (probably the player).
-   const auto extra = mExtra;
-   mExtra = nullptr;
-   return extra;
-}
-
 bool Cell::HasBomb() const
 {
    return (mBomb != nullptr);
@@ -153,13 +141,13 @@ std::shared_ptr<Cell> Cell::GetNeighborCell(const Direction dir) const
    switch (dir)
    {
       case Direction::Up:
-         return mField->GetCellAboveOf(mFieldPosX, mFieldPosY);
+         return mArena->GetCellAboveOf(mArenaPosX, mArenaPosY);
       case Direction::Down:
-         return mField->GetCellBelowOf(mFieldPosX, mFieldPosY);
+         return mArena->GetCellBelowOf(mArenaPosX, mArenaPosY);
       case Direction::Left:
-         return mField->GetCellLeftOf(mFieldPosX, mFieldPosY);
+         return mArena->GetCellLeftOf(mArenaPosX, mArenaPosY);
       case Direction::Right:
-         return mField->GetCellRightOf(mFieldPosX, mFieldPosY);
+         return mArena->GetCellRightOf(mArenaPosX, mArenaPosY);
    }
    return nullptr;
 }

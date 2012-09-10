@@ -6,14 +6,19 @@
 
 #include <string>
 
-//enum class ZOrder
-//{
-//   zo_Background,
-//   zo_Layer_1,
-//   zo_Layer_2,
-//   zo_Layer_3,
-//   zo_Messagebox
-//};
+enum class ZOrder
+{
+   Background, // Nothing atm
+   Layer_1,    // Arena, Scoreboard
+   Layer_2,    // Extras
+   Layer_3,    // Cells, Walls
+   Layer_4,    // Bombs
+   Layer_5,    // Players
+   Layer_6,    // Explosions
+   MainMenu,
+   OverlayMenu,
+   Messagebox
+};
 
 enum class SoundId
 {
@@ -39,7 +44,7 @@ public:
    SceneObject(EntityId id);
    virtual ~SceneObject();
 
-//   virtual bool operator<(const SceneObject& other);
+   bool operator<(const SceneObject& other) const;
 
    virtual void Update(int elapsed_time) = 0;
 //   virtual void Restore() = 0;
@@ -52,8 +57,8 @@ public:
    Size GetSize() const;
    void SetSize(const Size& size);
 
-//   ZOrder GetZOrder() const;
-//   void SetZOrder(ZOrder order);
+   ZOrder GetZOrder() const;
+   void SetZOrder(ZOrder order);
 
 //   bool IsVisible() const;
 //   void SetVisible(bool visible);
@@ -72,10 +77,15 @@ private:
    EntityId mId;
    Point mPos;
    Size mSize;
-//   ZOrder mZOrder;
+   ZOrder mZOrder;
 //   bool mIsVisible;
    bool mIsAlive;
    SoundId mSoundId = SoundId::None;
+
+   // Do we really need Size in Gamelogic? Isnt a simple point enough?
+   // RenderInfo -> could also contain animation info
+   // SoundInfo
+   // Create Render and Audio objects out of this gamelogic objects.
 };
 
 #endif // SCENE_OBJECT_HPP

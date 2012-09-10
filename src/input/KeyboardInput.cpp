@@ -24,36 +24,6 @@ KeyboardInput::~KeyboardInput()
 
 }
 
-bool KeyboardInput::TestUp() const
-{
-   return mUpKeyPressed;
-}
-
-bool KeyboardInput::TestDown() const
-{
-   return mDownKeyPressed;
-}
-
-bool KeyboardInput::TestLeft() const
-{
-   return mLeftKeyPressed;
-}
-
-bool KeyboardInput::TestRight() const
-{
-   return mRightKeyPressed;
-}
-
-bool KeyboardInput::TestAction1() const
-{
-   return mAction1KeyPressed;
-}
-
-bool KeyboardInput::TestAction2() const
-{
-   return mAction2KeyPressed;
-}
-
 void KeyboardInput::Press(const SDLKey key)
 {
    if (key == mUpKey)
@@ -108,4 +78,34 @@ void KeyboardInput::Release(const SDLKey key)
    {
       mAction2KeyPressed = false;
    }
+}
+
+bool KeyboardInput::TestUp() const
+{
+   return mUpKeyPressed;
+}
+
+bool KeyboardInput::TestDown() const
+{
+   return mDownKeyPressed;
+}
+
+bool KeyboardInput::TestLeft() const
+{
+   return mLeftKeyPressed;
+}
+
+bool KeyboardInput::TestRight() const
+{
+   return mRightKeyPressed;
+}
+
+bool KeyboardInput::TestAction1() const
+{
+   return mAction1KeyPressed;
+}
+
+bool KeyboardInput::TestAction2() const
+{
+   return mAction2KeyPressed;
 }

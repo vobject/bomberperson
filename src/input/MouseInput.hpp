@@ -10,16 +10,17 @@ public:
    MouseInput(Point center, int action1_keycode, int action2_keycode);
    virtual ~MouseInput();
 
+   void Press(int button);
+   void Release(int button);
+   void Move(Point pt);
+
+protected:
    bool TestUp() const override;
    bool TestDown() const override;
    bool TestLeft() const override;
    bool TestRight() const override;
    bool TestAction1() const override;
    bool TestAction2() const override;
-
-   void Press(int button);
-   void Release(int button);
-   void Move(Point pt);
 
 private:
    const Point mCenter;
