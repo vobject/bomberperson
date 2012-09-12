@@ -2,6 +2,8 @@
 #define RESOURCE_CACHE_HPP
 
 #include "SpriteResource.hpp"
+#include "WallResource.hpp"
+#include "ExtraResource.hpp"
 #include "PlayerResource.hpp"
 #include "../utils/Utils.hpp"
 
@@ -11,6 +13,7 @@
 
 struct SDL_Surface;
 enum class EntityId;
+enum class PlayerType;
 
 class ResourceCache
 {
@@ -26,11 +29,11 @@ public:
 
    SpriteResource GetMenuResource(EntityId id) const;
    SpriteResource GetArenaResource(EntityId id) const;
-   SpriteResource GetWallResource(EntityId id) const;
-   SpriteResource GetExtraResource(EntityId id) const;
+   WallResource GetWallResource(WallType type) const;
+   ExtraResource GetExtraResource(ExtraType type) const;
    SpriteResource GetBombResource(EntityId id) const;
    SpriteResource GetExplosionResource(EntityId id) const;
-   PlayerResource GetPlayerResource(EntityId id) const;
+   PlayerResource GetPlayerResource(PlayerType type) const;
 
 //   Texture GetPlayer(const Kinect& kinect);
    // std::shared_ptr<...> GetAudioSample(const std::string& id);
@@ -52,11 +55,11 @@ private:
    std::string mResDir;
    std::map<EntityId, SpriteResource> mMenuRes;
    std::map<EntityId, SpriteResource> mArenaRes;
-   std::map<EntityId, SpriteResource> mWallRes;
-   std::map<EntityId, SpriteResource> mExtraRes;
+   std::map<WallType, WallResource> mWallRes;
+   std::map<ExtraType, ExtraResource> mExtraRes;
    std::map<EntityId, SpriteResource> mBombRes;
    std::map<EntityId, SpriteResource> mExplosionRes;
-   std::map<EntityId, PlayerResource> mPlayerRes;
+   std::map<PlayerType, PlayerResource> mPlayerRes;
    std::vector<SDL_Surface*> mSurfaceCache;
 };
 

@@ -20,7 +20,7 @@ Match::Match(const MatchSettings& settings)
 
    for (const auto& p2i : mSettings.players)
    {
-      const auto player = CreatePlayerFromPlayerId(p2i.first, mArena);
+      const auto player = CreatePlayerFromPlayerId(p2i.first);
       const auto input = CreateInputFromInputId(p2i.second);
 
       scoreboard->KeepTrackOf(player);
@@ -44,30 +44,46 @@ void Match::Input(const SDL_KeyboardEvent& key)
 
    if (SDL_KEYDOWN == key.type)
    {
-      mKeyboard_1->Press(key.keysym.sym);
-      mKeyboard_2->Press(key.keysym.sym);
+      if (mKeyboard_1) {
+         mKeyboard_1->Press(key.keysym.sym);
+      }
+
+      if (mKeyboard_2) {
+         mKeyboard_2->Press(key.keysym.sym);
+      }
    }
    else if (SDL_KEYUP == key.type)
    {
-      mKeyboard_1->Release(key.keysym.sym);
-      mKeyboard_2->Release(key.keysym.sym);
+      if (mKeyboard_1) {
+         mKeyboard_1->Release(key.keysym.sym);
+      }
+
+      if (mKeyboard_2) {
+         mKeyboard_2->Release(key.keysym.sym);
+      }
    }
 }
 
 void Match::Input(const SDL_MouseMotionEvent& motion)
 {
-   mMouse_1->Move({ motion.x, motion.y });
+   if (mMouse_1) {
+      mMouse_1->Move({ motion.x, motion.y });
+   }
 }
 
 void Match::Input(const SDL_MouseButtonEvent& button)
 {
    if (SDL_MOUSEBUTTONDOWN == button.type)
    {
-      mMouse_1->Press(button.button);
+      if (mMouse_1) {
+         mMouse_1->Press(button.button);
+      }
    }
    else if (SDL_MOUSEBUTTONUP == button.type)
    {
-      mMouse_1->Release(button.button);
+      if (mMouse_1) {
+         mMouse_1->Release(button.button);
+      }
    }
 }
 
@@ -85,14 +101,13 @@ void Match::Update(const int elapsed_time)
    for (const auto& player_input : mPlayerInputPair)
    {
       player_input.first->SetInputCommands(player_input.second->GetCommands());
-      player_input.first->SetParentCell(GetCellFromObject(player_input.first));
 
-      if (player_input.first->IsAlive()) {
+      if (player_input.first->IsValid()) {
          active_player_count++;
       }
    }
 
-   mIsGameOver = (active_player_count <= 1) ? true : false;
+//   mIsGameOver = (active_player_count <= 0) ? true : false;
 }
 
 bool Match::Pause() const
@@ -115,10 +130,7 @@ EntitySet Match::GetEntities() const
    return mEntityManager.GetEntities();
 }
 
-std::shared_ptr<Player> Match::CreatePlayerFromPlayerId(
-   const PlayerId id,
-   const std::shared_ptr<Arena> arena
-)
+std::shared_ptr<Player> Match::CreatePlayerFromPlayerId(const PlayerId id)
 {
    // Translate PlayerIds (which are option values) to EntityIds (used to
    //  identify Entities which may need resources and appear on the screen).
@@ -126,13 +138,13 @@ std::shared_ptr<Player> Match::CreatePlayerFromPlayerId(
    switch (id)
    {
       case PlayerId::Player_1:
-         return mEntityManager.CreatePlayer(EntityId::Player_1, arena);
+         return mEntityManager.CreatePlayer(PlayerType::Player_1);
       case PlayerId::Player_2:
-         return mEntityManager.CreatePlayer(EntityId::Player_2, arena);
+         return mEntityManager.CreatePlayer(PlayerType::Player_2);
       case PlayerId::Player_3:
-         return mEntityManager.CreatePlayer(EntityId::Player_3, arena);
+         return mEntityManager.CreatePlayer(PlayerType::Player_3);
       case PlayerId::Player_4:
-         return mEntityManager.CreatePlayer(EntityId::Player_4, arena);
+         return mEntityManager.CreatePlayer(PlayerType::Player_4);
    }
    return nullptr;
 }
@@ -171,14 +183,4 @@ std::shared_ptr<InputDevice> Match::CreateInputFromInputId(const InputId id)
       }
    }
    return nullptr;
-}
-
-std::shared_ptr<Cell> Match::GetCellFromObject(
-   const std::shared_ptr<SceneObject>& obj
-) const
-{
-   // The objects position is its center.
-   const Point pos = { obj->GetPosition().X + (obj->GetSize().Width / 2),
-                       obj->GetPosition().Y + (obj->GetSize().Height / 2) };
-   return mArena->GetCellFromPosition(pos);
 }

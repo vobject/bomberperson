@@ -1,153 +1,155 @@
 #include "Cell.hpp"
-#include "Arena.hpp"
-#include "Wall.hpp"
-#include "Extra.hpp"
-#include "Bomb.hpp"
-#include "Explosion.hpp"
-#include "../utils/Utils.hpp"
+//#include "Arena.hpp"
+//#include "Wall.hpp"
+//#include "Extra.hpp"
+//#include "Bomb.hpp"
+//#include "Explosion.hpp"
+//#include "../utils/Utils.hpp"
 
-Cell::Cell(
-   const std::shared_ptr<Arena>& arena,
-   const int arena_pos_x,
-   const int arena_pos_y
-)
-   : SceneObject(EntityId::Cell)
-   , mArenaPosX(arena_pos_x)
-   , mArenaPosY(arena_pos_y)
-   , mArena(arena) // Do not use inside the ctor because
-                   //  object itself is not fully constructed yet.
-{
-   SetZOrder(ZOrder::Layer_3);
-}
+//Cell::Cell(
+//   const std::shared_ptr<Arena>& arena,
+//   const int arena_pos_x,
+//   const int arena_pos_y
+//)
+//   : ArenaObject(EntityId::Cell, ZOrder::Layer_3, arena, nullptr)
+//   , mXCell(arena_pos_x)
+//   , mYCell(arena_pos_y)
+//{
 
-Cell::~Cell()
-{
-   // When a cell object is destroyed make sure everything
-   //  that is present on the cell also dies.
+//}
 
-   if (mWall) {
-      mWall->SetAlive(false);
-   }
+//Cell::~Cell()
+//{
+//   // When a cell object is destroyed make sure everything
+//   //  that is present on the cell is no longer valid.
 
-   if (mExtra) {
-      mExtra->SetAlive(false);
-   }
+//   if (mWall) {
+//      mWall->Invalidate();
+//   }
 
-   if (mBomb) {
-      mBomb->SetAlive(false);
-   }
+//   if (mExtra) {
+//      mExtra->Invalidate();
+//   }
 
-   if (mExplosion) {
-      mExplosion->SetAlive(false);
-   }
-}
+//   if (mBomb) {
+//      mBomb->Invalidate();
+//   }
 
-void Cell::Update(const int elapsed_time)
-{
-   if (mWall && !mWall->IsAlive()) {
-         mWall = nullptr;
-   }
+//   if (mExplosion) {
+//      mExplosion->Invalidate();
+//   }
+//}
 
-   if (mExtra && !mExtra->IsAlive()) {
-      mExtra = nullptr;
-   }
+//void Cell::Update(const int elapsed_time)
+//{
+//   (void) elapsed_time;
 
-   if (mBomb && !mBomb->IsAlive()) {
-      mBomb = nullptr;
-   }
+//   // Cleanup the objects on this cell where necessary.
 
-   if (mExplosion && !mExplosion->IsAlive()) {
-      mExplosion = nullptr;
-   }
-}
+//   if (mWall && !mWall->IsValid()) {
+//         mWall = nullptr;
+//   }
 
-bool Cell::HasWall() const
-{
-   return (mWall != nullptr);
-}
+//   if (mExtra && !mExtra->IsValid()) {
+//      mExtra = nullptr;
+//   }
 
-std::shared_ptr<Wall> Cell::GetWall() const
-{
-   return mWall;
-}
+//   if (mBomb && !mBomb->IsValid()) {
+//      mBomb = nullptr;
+//   }
 
-void Cell::SetWall(const std::shared_ptr<Wall>& wall)
-{
-   mWall = wall;
-}
+//   if (mExplosion && !mExplosion->IsValid()) {
+//      mExplosion = nullptr;
+//   }
+//}
 
-void Cell::DestroyWall()
-{
-   mWall->SetAlive(false);
-}
+//bool Cell::HasWall() const
+//{
+//   return (mWall != nullptr);
+//}
 
-bool Cell::HasExtra() const
-{
-   return (mExtra != nullptr);
-}
+//std::shared_ptr<Wall> Cell::GetWall() const
+//{
+//   return mWall;
+//}
 
-std::shared_ptr<Extra> Cell::GetExtra() const
-{
-   return mExtra;
-}
+//void Cell::SetWall(const std::shared_ptr<Wall>& wall)
+//{
+//   mWall = wall;
+//}
 
-void Cell::SetExtra(const std::shared_ptr<Extra>& extra)
-{
-   mExtra = extra;
-}
+//void Cell::DestroyWall()
+//{
+//   mWall->Invalidate();
+//}
 
-void Cell::DestroyExtra()
-{
-   mExtra->SetAlive(false);
-}
+//bool Cell::HasExtra() const
+//{
+//   return (mExtra != nullptr);
+//}
 
-bool Cell::HasBomb() const
-{
-   return (mBomb != nullptr);
-}
+//std::shared_ptr<Extra> Cell::GetExtra() const
+//{
+//   return mExtra;
+//}
 
-std::shared_ptr<Bomb> Cell::GetBomb() const
-{
-   return mBomb;
-}
+//void Cell::SetExtra(const std::shared_ptr<Extra>& extra)
+//{
+//   mExtra = extra;
+//}
 
-void Cell::SetBomb(const std::shared_ptr<Bomb>& bomb)
-{
-   mBomb = bomb;
-}
+//void Cell::DestroyExtra()
+//{
+//   mExtra->Invalidate();
+//}
 
-void Cell::DetonateBomb()
-{
-   mBomb->Detonate();
-}
+//bool Cell::HasBomb() const
+//{
+//   return (mBomb != nullptr);
+//}
 
-bool Cell::HasExplosion() const
-{
-   return (mExplosion != nullptr);
-}
+//std::shared_ptr<Bomb> Cell::GetBomb() const
+//{
+//   return mBomb;
+//}
 
-std::shared_ptr<Explosion> Cell::GetExplosion() const
-{
-   return mExplosion;
-}
+//void Cell::SetBomb(const std::shared_ptr<Bomb>& bomb)
+//{
+//   mBomb = bomb;
+//}
 
-void Cell::SetExplosion(const std::shared_ptr<Explosion>& explosion)
-{
-   mExplosion = explosion;
-}
+//void Cell::DetonateBomb()
+//{
+//   mBomb->Detonate();
+//}
 
-std::shared_ptr<Cell> Cell::GetNeighborCell(const Direction dir) const
-{
-   switch (dir)
-   {
-      case Direction::Up:
-         return mArena->GetCellAboveOf(mArenaPosX, mArenaPosY);
-      case Direction::Down:
-         return mArena->GetCellBelowOf(mArenaPosX, mArenaPosY);
-      case Direction::Left:
-         return mArena->GetCellLeftOf(mArenaPosX, mArenaPosY);
-      case Direction::Right:
-         return mArena->GetCellRightOf(mArenaPosX, mArenaPosY);
-   }
-   return nullptr;
-}
+//bool Cell::HasExplosion() const
+//{
+//   return (mExplosion != nullptr);
+//}
+
+//std::shared_ptr<Explosion> Cell::GetExplosion() const
+//{
+//   return mExplosion;
+//}
+
+//void Cell::SetExplosion(const std::shared_ptr<Explosion>& explosion)
+//{
+//   mExplosion = explosion;
+//}
+
+//std::shared_ptr<Cell> Cell::GetNeighborCell(const Direction dir) const
+//{
+//   switch (dir)
+//   {
+//      case Direction::Up:
+//         return mArena->GetCellAboveOf(mXCell, mYCell);
+//      case Direction::Down:
+//         return mArena->GetCellBelowOf(mXCell, mYCell);
+//      case Direction::Left:
+//         return mArena->GetCellLeftOf(mXCell, mYCell);
+//      case Direction::Right:
+//         return mArena->GetCellRightOf(mXCell, mYCell);
+//   }
+//   return nullptr;
+//}

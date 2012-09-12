@@ -4,17 +4,39 @@
 #include "SceneObject.hpp"
 
 #include <memory>
-#include <tuple>
 #include <vector>
 
-class Cell;
+class ArenaObject;
+class Wall;
+class Extra;
+class Bomb;
+class Explosion;
 struct Point;
 struct Size;
+
+//enum class ArenaType
+//{
+
+//};
+
+//enum class ArenaMusic
+//{
+
+//};
+
+struct Cell
+{
+   constexpr Cell(const int x, const int y) : X(x), Y(y) { }
+
+   int X;
+   int Y;
+};
 
 class Arena : public SceneObject
 {
 public:
-   Arena();
+   Arena(const Point& pos, const Size& size, const Size& borders,
+         int cells_x, int cells_y);
    virtual ~Arena();
 
    Arena(const Arena&) = delete;
@@ -22,28 +44,62 @@ public:
 
    void Update(int elapsed_time) override;
 
-   void SetBorderSize(const Size& borders);
-   void SetDimensions(int cells_x, int cells_y);
+   // TODO?
+   // GetBorderSize();
+   // GetDimensions();
 
-   std::vector<std::shared_ptr<Cell>> GetCells() const;
-   void SetCells(const std::vector<std::shared_ptr<Cell>>& cells);
+   void SetObjectPosition(ArenaObject& obj, const Cell& cell) const;
+   void SetObjectSize(ArenaObject& obj) const;
 
-   std::shared_ptr<Cell> GetCellFromPosition(const Point& pos) const;
-   std::shared_ptr<Cell> GetCellFromCoordinates(int cell_x, int cell_y) const;
+   Size GetCellSize() const;
+   Point GetCellPosition(const Cell& cell) const;
 
-   std::shared_ptr<Cell> GetCellAboveOf(int cell_x, int cell_y) const;
-   std::shared_ptr<Cell> GetCellBelowOf(int cell_x, int cell_y) const;
-   std::shared_ptr<Cell> GetCellLeftOf(int cell_x, int cell_y) const;
-   std::shared_ptr<Cell> GetCellRightOf(int cell_x, int cell_y) const;
+   Cell GetCellFromObject(const ArenaObject& obj) const;
+   Cell GetCellFromPosition(const Point& pos) const;
+   Cell GetCellFromCoordinates(int cell_x, int cell_y) const;
+
+   Cell GetNeighborCell(const Cell& cell, Direction dir) const;
+
+   bool HasWall(const Cell& cell) const;
+   std::shared_ptr<Wall> GetWall(const Cell& cell) const;
+   void SetWall(const Cell& cell, const std::shared_ptr<Wall>& wall);
+   void DestroyWall(const Cell& cell);
+
+   bool HasExtra(const Cell& cell) const;
+   std::shared_ptr<Extra> GetExtra(const Cell& cell) const;
+   void SetExtra(const Cell& cell, const std::shared_ptr<Extra>& extra);
+   void DestroyExtra(const Cell& cell);
+
+   bool HasBomb(const Cell& cell) const;
+   std::shared_ptr<Bomb> GetBomb(const Cell& cell) const;
+   void SetBomb(const Cell& cell, const std::shared_ptr<Bomb>& bomb);
+   void DetonateBomb(const Cell& cell);
+
+   bool HasExplosion(const Cell& cell) const;
+   std::shared_ptr<Explosion> GetExplosion(const Cell& cell) const;
+   void SetExplosion(const Cell& cell, const std::shared_ptr<Explosion>& explosion);
 
 private:
-   std::tuple<int, int> IndexToArenaPos(int index) const;
-   int ArenaPosToIndex(int cell_x, int cell_y) const;
+   struct CellContent
+   {
+//      CellContent() {}
+      std::shared_ptr<Wall> wall;
+      std::shared_ptr<Extra> extra;
+      std::shared_ptr<Bomb> bomb;
+      std::shared_ptr<Explosion> explosion;
+//      std::vector<std::shared_ptr<Player>> players;
+   };
 
-   Size mBorders = { 0, 0 };
-   int mXCells = 0;
-   int mYCells = 0;
-   std::vector<std::shared_ptr<Cell>> mCells;
+   Cell GetCellAboveOf(int cell_x, int cell_y) const;
+   Cell GetCellBelowOf(int cell_x, int cell_y) const;
+   Cell GetCellLeftOf(int cell_x, int cell_y) const;
+   Cell GetCellRightOf(int cell_x, int cell_y) const;
+
+   const int mXCells; // Number of horizontal cells.
+   const int mYCells; // Number of vertical cells.
+   const Size mBorders; // Size of the arenas borders in pixel.
+   const Size mCellSize;
+   std::vector<std::vector<std::pair<Cell, CellContent>>> mCells;
 };
 
 #endif // ARENA_HPP

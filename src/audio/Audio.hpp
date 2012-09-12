@@ -9,7 +9,7 @@
 //#include <string>
 #include <memory>
 
-class Match;
+class SceneObject;
 enum class SoundId;
 
 enum class MusicId
@@ -40,14 +40,14 @@ public:
    Audio();
    ~Audio();
 
-   void Play(const std::shared_ptr<Match>& match);
+   void Play(const std::shared_ptr<SceneObject>& ent);
 
    // louder/softer
-   void PlayMusic(MusicId id);
-   void PlaySound(SoundId id);
+//   void PlayMusic(MusicId id);
+//   void PlaySound(SoundId id);
 
 private:
-   std::unique_ptr<AudioCache> mCache = nullptr;
+//   std::unique_ptr<AudioCache> mCache;
 };
 
 #endif // AUDIO_HPP

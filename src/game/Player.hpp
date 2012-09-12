@@ -1,7 +1,7 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "SceneObject.hpp"
+#include "ArenaObject.hpp"
 #include "Sound.hpp"
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
@@ -10,12 +10,21 @@
 #include <vector>
 
 class EntityManager;
-class Cell;
 class Bomb;
+
+enum class PlayerType
+{
+   Player_1,
+   Player_2,
+   Player_3,
+   Player_4
+};
 
 enum class PlayerSound
 {
-
+   Pickup,
+   Die,
+   Win
 };
 
 // TODO: Should belong to some sort of RenderInfo data structure.
@@ -65,10 +74,12 @@ struct PlayerData
    int wins;
 };
 
-class Player : public SceneObject
+class Player : public ArenaObject
 {
 public:
-   Player(EntityId player_id, EntityManager& entity_factory);
+   Player(const std::shared_ptr<Arena>& arena,
+          PlayerType type,
+          EntityManager& entity_factory);
    virtual ~Player();
 
    Player(const Player&) = delete;
@@ -76,9 +87,10 @@ public:
 
    void Update(int elapsed_time) override;
 
-   void SetParentCell(const std::shared_ptr<Cell>& cell);
+//   void SetParentCell(const std::shared_ptr<Cell>& cell);
    void SetInputCommands(InputCommands cmds);
 
+   PlayerType GetType() const;
    PlayerData GetData() const;
 
 private:
@@ -99,9 +111,12 @@ private:
    void IncreaseSpeed();
    PlayerAnimation GetStopWalkingState(PlayerAnimation anim) const;
 
+   PlayerType mType;
+   PlayerData mData;
+
    EntityManager& mEntityFactory;
 
-   std::shared_ptr<Cell> mParentCell;
+//   std::shared_ptr<Cell> mParentCell;
    InputCommands mCurrentCommands;
 
    int mMoveIdleTime = 0_ms;
@@ -110,8 +125,6 @@ private:
    // Move this into the PlayerData object if we choose to make
    //  it alterable from the outside (game logic).
    int mPlantingSpeed = MIN_PLANTING_SPEED;
-
-   PlayerData mData;
    std::vector<std::shared_ptr<Bomb>> mPlantedBombs;
 };
 

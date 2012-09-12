@@ -1,9 +1,10 @@
 #include "Wall.hpp"
 
-Wall::Wall(const EntityId wall_id)
-   : SceneObject(wall_id)
+Wall::Wall(const std::shared_ptr<Arena>& arena, const WallType type)
+   : ArenaObject(EntityId::Wall, ZOrder::Layer_3, arena)
+   , mType(type)
 {
-   SetZOrder(ZOrder::Layer_3);
+
 }
 
 Wall::~Wall()
@@ -13,18 +14,22 @@ Wall::~Wall()
 
 void Wall::Update(const int elapsed_time)
 {
+   (void) elapsed_time;
+}
 
+WallType Wall::GetType() const
+{
+   return mType;
 }
 
 bool Wall::IsDestructible() const
 {
-   switch (GetId())
+   switch (mType)
    {
-      case EntityId::IndestructibleWall:
+      case WallType::Indestructible:
          return false;
-      case EntityId::DestructibleWall:
+      case WallType::Destructible:
          return true;
-      default:
-         return false;
    }
+   return false;
 }

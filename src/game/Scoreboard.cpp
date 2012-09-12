@@ -4,9 +4,9 @@
 #include <sstream>
 
 Scoreboard::Scoreboard()
-   : SceneObject(EntityId::Scoreboard)
+   : SceneObject(EntityId::Scoreboard, ZOrder::Layer_1)
 {
-   SetZOrder(ZOrder::Layer_1);
+
 }
 
 Scoreboard::~Scoreboard()

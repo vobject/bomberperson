@@ -4,16 +4,20 @@
 #include <memory>
 #include <set>
 
-enum class EntityId;
 class SceneObject;
 class Arena;
 class Scoreboard;
-class Cell;
 class Wall;
 class Extra;
 class Bomb;
 class Explosion;
 class Player;
+struct Cell;
+
+enum class EntityId;
+enum class WallType;
+enum class ExtraType;
+enum class PlayerType;
 
 template<class T>
 struct Sort_Dereferenced_SharedPtr
@@ -33,14 +37,17 @@ public:
    EntityManager();
    ~EntityManager();
 
+   // A valid arena object should be created before any other ArenaObject
+   //  derivatives (wall, extra, explosion, player) are created because
+   //  they will use the reference to arena object.
    std::shared_ptr<Arena> CreateArena(int player_count);
    std::shared_ptr<Scoreboard> CreateScoreboard();
-   std::shared_ptr<Cell> CreateCell(const std::shared_ptr<Arena>& arena, int x, int y);
-   std::shared_ptr<Wall> CreateWall(EntityId id, const std::shared_ptr<Cell>& cell);
-   std::shared_ptr<Extra> CreateExtra(EntityId id, const std::shared_ptr<Cell>& cell);
-   std::shared_ptr<Bomb> CreateBomb(const std::shared_ptr<Cell>& cell);
-   std::shared_ptr<Explosion> CreateExplosion(const std::shared_ptr<Cell>& cell);
-   std::shared_ptr<Player> CreatePlayer(EntityId id, const std::shared_ptr<Arena>& arena);
+
+   std::shared_ptr<Wall> CreateWall(const Cell& cell, WallType type);
+   std::shared_ptr<Extra> CreateExtra(const Cell& cell, ExtraType type);
+   std::shared_ptr<Bomb> CreateBomb(const Cell& cell);
+   std::shared_ptr<Explosion> CreateExplosion(const Cell& cell);
+   std::shared_ptr<Player> CreatePlayer(PlayerType type);
 
    EntitySet GetEntities() const;
 
@@ -48,6 +55,7 @@ public:
    void Reset();
 
 private:
+   std::shared_ptr<Arena> mArena;
    EntitySet mEntities;
 };
 

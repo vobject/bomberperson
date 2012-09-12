@@ -1,16 +1,22 @@
 #include "Player.hpp"
 #include "EntityManager.hpp"
-#include "Cell.hpp"
+#include "Arena.hpp"
 #include "Extra.hpp"
 #include "Bomb.hpp"
+#include "Explosion.hpp"
 #include "../utils/Utils.hpp"
 
-Player::Player(const EntityId player_id, EntityManager& entity_factory)
-   : SceneObject(player_id)
-   , mEntityFactory(entity_factory)
+Player::Player(
+   const std::shared_ptr<Arena>& arena,
+   const PlayerType type,
+   EntityManager& entity_factory
+)
+   : ArenaObject(EntityId::Player, ZOrder::Layer_5, arena)
+   , mType(type)
    , mData(PlayerAnimation::StandDown, 0_ms, MIN_SPEED, 1, 1, 1, 0)
+   , mEntityFactory(entity_factory)
 {
-   SetZOrder(ZOrder::Layer_5);
+
 }
 
 Player::~Player()
@@ -20,32 +26,35 @@ Player::~Player()
 
 void Player::Update(const int elapsed_time)
 {
-   SetSound(SoundId::None);
+//   SetSound(SoundId::None);
 
    const auto old_anim = mData.anim;
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
 
-   if (mParentCell->HasExplosion())
+   LOG(logDEBUG) << "Cell(X=" << parent_cell.X << ",Y=" << parent_cell.Y << ")";
+
+   if (GetArena()->HasExplosion(parent_cell))
    {
       // Explosions kill the player instantly.
-      SetSound(SoundId::PlayerDies);
-      SetAlive(false);
+//      SetSound(SoundId::PlayerDies);
+      Invalidate();
       return;
    }
 
-   if (mParentCell->HasExtra() && mParentCell->GetExtra()->IsAlive())
+   if (GetArena()->HasExtra(parent_cell))
    {
-      switch (mParentCell->GetExtra()->GetId())
+      switch (GetArena()->GetExtra(parent_cell)->GetType())
       {
-         case EntityId::SpeedExtra:
+         case ExtraType::Speed:
             IncreaseSpeed();
             break;
-         case EntityId::BombsExtra:
+         case ExtraType::Bombs:
             mData.bombs = std::min(mData.bombs + 1, 99);
             break;
-         case EntityId::RangeExtra:
+         case ExtraType::Range:
             mData.range = std::min(mData.range + 1, 99);
             break;
-         case EntityId::GoldRangeExtra:
+         case ExtraType::InfiniteRange:
             mData.range = 99;
             break;
          default:
@@ -53,9 +62,9 @@ void Player::Update(const int elapsed_time)
       }
       // An extra should no longer exist after it was picked
       //  up by a player.
-      mParentCell->DestroyExtra();
+      GetArena()->DestroyExtra(parent_cell);
 
-      SetSound(SoundId::PlayerPicksUpExtra);
+//      SetSound(SoundId::PlayerPicksUpExtra);
    }
 
    UpdateMovement(elapsed_time);
@@ -69,14 +78,19 @@ void Player::Update(const int elapsed_time)
    }
 }
 
-void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
-{
-   mParentCell = cell;
-}
+//void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
+//{
+//   mParentCell = cell;
+//}
 
 void Player::SetInputCommands(const InputCommands cmds)
 {
    mCurrentCommands = cmds;
+}
+
+PlayerType Player::GetType() const
+{
+   return mType;
 }
 
 PlayerData Player::GetData() const
@@ -159,7 +173,9 @@ void Player::UpdateBombing(const int elapsed_time)
 
    // TODO: Use Action2 input to detonate remote controlled bombs etc.
 
-   if (mParentCell->HasBomb()) {
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+
+   if (GetArena()->HasBomb(parent_cell)) {
       // Only one bomb allowed per cell.
       return;
    }
@@ -169,11 +185,11 @@ void Player::UpdateBombing(const int elapsed_time)
       return;
    }
 
-   auto bomb = mEntityFactory.CreateBomb(mParentCell);
+   auto bomb = mEntityFactory.CreateBomb(parent_cell);
    bomb->SetRange(mData.range);
 //   bomb->SetOwner(GetId());
-   bomb->SetSound(SoundId::BombPlanted);
-   mParentCell->SetBomb(bomb);
+//   bomb->SetSound(SoundId::BombPlanted);
+   GetArena()->SetBomb(parent_cell, bomb);
 
    mPlantedBombs.push_back(bomb);
    mBombIdleTime = 0_ms;
@@ -181,8 +197,9 @@ void Player::UpdateBombing(const int elapsed_time)
 
 bool Player::CanMove(const Direction dir, const int distance) const
 {
-   const Point cell_pos = mParentCell->GetPosition();
-   const Size cell_size = mParentCell->GetSize();
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+   const auto cell_size = GetArena()->GetCellSize();
+   const auto cell_pos = GetArena()->GetCellPosition(parent_cell);
 
    // Check for movement inside the current cell.
    // Movement inside the current cell is always ok.
@@ -207,10 +224,11 @@ bool Player::CanMove(const Direction dir, const int distance) const
    }
 
    // Player wants to walk to another cell - check if that is allowed.
-   const auto neighbor_cell = mParentCell->GetNeighborCell(dir);
-   if (neighbor_cell &&
-       !neighbor_cell->HasWall() &&
-       !neighbor_cell->HasBomb())
+   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
+   if ((-1 != neighbor_cell.X) &&
+       (-1 != neighbor_cell.Y) &&
+       !GetArena()->HasWall(neighbor_cell) &&
+       !GetArena()->HasBomb(neighbor_cell))
    {
       // A cell exists and does not block the player.
       return true;
@@ -224,7 +242,7 @@ bool Player::CanPlantBomb()
    int bombs_alive = 0;
    for (const auto& bomb : mPlantedBombs)
    {
-      if (bomb->IsAlive())
+      if (bomb->IsValid())
       {
          bombs_alive++;
       }

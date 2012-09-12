@@ -121,7 +121,7 @@ void Logic::Update(const int app_time, const int elapsed_time)
          // TODO: Why not put this into Match::Update().
          for (auto& ent : mMatch->GetEntities())
          {
-            if (!ent->IsAlive()) {
+            if (!ent->IsValid()) {
                continue;
             }
             ent->Update(elapsed_time);
@@ -133,7 +133,7 @@ void Logic::Update(const int app_time, const int elapsed_time)
    }
 }
 
-void Logic::Play(const std::shared_ptr<Audio>& audio)
+void Logic::Sound(const std::shared_ptr<Audio>& audio)
 {
 //   switch (mCurrentState)
 //   {
@@ -145,6 +145,21 @@ void Logic::Play(const std::shared_ptr<Audio>& audio)
 //      case GameState::Exit:
 //         break;
 //   }
+
+   if (mUserInterface->IsActive())
+   {
+
+   }
+   else
+   {
+      for (const auto& ent : mMatch->GetEntities())
+      {
+         if (!ent->IsValid()) {
+            continue;
+         }
+         audio->Play(ent);
+      }
+   }
 }
 
 void Logic::Render(const std::shared_ptr<Renderer>& renderer)
@@ -155,7 +170,7 @@ void Logic::Render(const std::shared_ptr<Renderer>& renderer)
    {
       for (const auto& ent : mUserInterface->GetEntities())
       {
-         if (!ent->IsAlive()) {
+         if (!ent->IsValid()) {
             continue;
          }
          renderer->Render(ent);
@@ -165,7 +180,7 @@ void Logic::Render(const std::shared_ptr<Renderer>& renderer)
    {
       for (const auto& ent : mMatch->GetEntities())
       {
-         if (!ent->IsAlive()) {
+         if (!ent->IsValid()) {
             continue;
          }
          renderer->Render(ent);

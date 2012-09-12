@@ -1,5 +1,7 @@
 #include "ResourceCache.hpp"
 #include "../game/EntityId.hpp"
+#include "../game/Wall.hpp"
+#include "../game/Extra.hpp"
 #include "../game/Player.hpp"
 #include "../utils/Utils.hpp"
 #include "../Options.hpp"
@@ -9,7 +11,7 @@
 #include <SDL_rotozoom.h>
 
 ResourceCache::ResourceCache()
-   : mResDir("res")
+   : mResDir("res_q1")
 {
    if (0 == IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG)) {
        throw "Failed to initialize SDL_image";
@@ -50,18 +52,18 @@ SpriteResource ResourceCache::GetArenaResource(const EntityId id) const
    return iter->second;
 }
 
-SpriteResource ResourceCache::GetWallResource(const EntityId id) const
+WallResource ResourceCache::GetWallResource(const WallType type) const
 {
-   const auto iter = mWallRes.find(id);
+   const auto iter = mWallRes.find(type);
    if (iter == mWallRes.end()) {
       throw "Trying to access non-existing resource";
    }
    return iter->second;
 }
 
-SpriteResource ResourceCache::GetExtraResource(const EntityId id) const
+ExtraResource ResourceCache::GetExtraResource(const ExtraType type) const
 {
-   const auto iter = mExtraRes.find(id);
+   const auto iter = mExtraRes.find(type);
    if (iter == mExtraRes.end()) {
       throw "Trying to access non-existing resource";
    }
@@ -86,9 +88,9 @@ SpriteResource ResourceCache::GetExplosionResource(const EntityId id) const
    return iter->second;
 }
 
-PlayerResource ResourceCache::GetPlayerResource(const EntityId id) const
+PlayerResource ResourceCache::GetPlayerResource(const PlayerType type) const
 {
-   const auto iter = mPlayerRes.find(id);
+   const auto iter = mPlayerRes.find(type);
    if (iter == mPlayerRes.end()) {
       throw "Trying to access non-existing resource";
    }
@@ -97,7 +99,7 @@ PlayerResource ResourceCache::GetPlayerResource(const EntityId id) const
 
 void ResourceCache::LoadMenuResources()
 {
-   const auto id = EntityId::MainMenu;
+   const auto id = EntityId::Menu;
    const Size size = { DefaultSize::SCREEN_WIDTH,
                        DefaultSize::SCREEN_HEIGHT };
 
@@ -115,8 +117,8 @@ void ResourceCache::LoadArenaResources()
 
 void ResourceCache::LoadWallResources()
 {
-   const auto id1 = EntityId::IndestructibleWall;
-   const auto id2 = EntityId::DestructibleWall;
+   const auto id1 = WallType::Indestructible;
+   const auto id2 = WallType::Destructible;
    const Size size = { DefaultSize::WALL_WIDTH,
                        DefaultSize::WALL_HEIGHT };
 
@@ -126,10 +128,10 @@ void ResourceCache::LoadWallResources()
 
 void ResourceCache::LoadExtraResources()
 {
-   const auto id1 = EntityId::SpeedExtra;
-   const auto id2 = EntityId::BombsExtra;
-   const auto id3 = EntityId::RangeExtra;
-   const auto id4 = EntityId::GoldRangeExtra;
+   const auto id1 = ExtraType::Speed;
+   const auto id2 = ExtraType::Bombs;
+   const auto id3 = ExtraType::Range;
+   const auto id4 = ExtraType::InfiniteRange;
    const Size size = { DefaultSize::EXTRA_WIDTH,
                        DefaultSize::EXTRA_HEIGHT };
 
@@ -184,7 +186,7 @@ void ResourceCache::LoadPlayerResources()
                        DefaultSize::PLAYER_HEIGHT };
 
    // TODO: align player speed and animation speed!!
-   PlayerResource player_1(EntityId::Player_1, 2000_ms);
+   PlayerResource player_1(PlayerType::Player_1, 2000_ms);
    player_1.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_1_up.png", size) });
    player_1.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_1_down.png", size) });
    player_1.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_1_left.png", size) });
@@ -193,9 +195,9 @@ void ResourceCache::LoadPlayerResources()
    player_1.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_1_down_1.png", size), LoadTexture("sprite/player_1_down_2.png", size) });
    player_1.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_1_left_1.png", size), LoadTexture("sprite/player_1_left_2.png", size) });
    player_1.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_1_right_1.png", size), LoadTexture("sprite/player_1_right_2.png", size) });
-   mPlayerRes.insert({ player_1.GetId(), player_1 });
+   mPlayerRes.insert({ player_1.GetType(), player_1 });
 
-   PlayerResource player_2(EntityId::Player_2, 2000_ms);
+   PlayerResource player_2(PlayerType::Player_2, 2000_ms);
    player_2.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_2_up.png", size) });
    player_2.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_2_down.png", size) });
    player_2.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_2_left.png", size) });
@@ -204,9 +206,9 @@ void ResourceCache::LoadPlayerResources()
    player_2.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_2_down_1.png", size), LoadTexture("sprite/player_2_down_2.png", size) });
    player_2.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_2_left_1.png", size), LoadTexture("sprite/player_2_left_2.png", size) });
    player_2.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_2_right_1.png", size), LoadTexture("sprite/player_2_right_2.png", size) });
-   mPlayerRes.insert({ player_2.GetId(), player_2 });
+   mPlayerRes.insert({ player_2.GetType(), player_2 });
 
-   PlayerResource player_3(EntityId::Player_3, 2000_ms);
+   PlayerResource player_3(PlayerType::Player_3, 2000_ms);
    player_3.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_3_up.png", size) });
    player_3.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_3_down.png", size) });
    player_3.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_3_left.png", size) });
@@ -215,9 +217,9 @@ void ResourceCache::LoadPlayerResources()
    player_3.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_3_down_1.png", size), LoadTexture("sprite/player_3_down_2.png", size) });
    player_3.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_3_left_1.png", size), LoadTexture("sprite/player_3_left_2.png", size) });
    player_3.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_3_right_1.png", size), LoadTexture("sprite/player_3_right_2.png", size) });
-   mPlayerRes.insert({ player_3.GetId(), player_3 });
+   mPlayerRes.insert({ player_3.GetType(), player_3 });
 
-   PlayerResource player_4(EntityId::Player_4, 2000_ms);
+   PlayerResource player_4(PlayerType::Player_4, 2000_ms);
    player_4.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_4_up.png", size) });
    player_4.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_4_down.png", size) });
    player_4.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_4_left.png", size) });
@@ -226,7 +228,7 @@ void ResourceCache::LoadPlayerResources()
    player_4.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_4_down_1.png", size), LoadTexture("sprite/player_4_down_2.png", size) });
    player_4.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_4_left_1.png", size), LoadTexture("sprite/player_4_left_2.png", size) });
    player_4.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_4_right_1.png", size), LoadTexture("sprite/player_4_right_2.png", size) });
-   mPlayerRes.insert({ player_4.GetId(), player_4 });
+   mPlayerRes.insert({ player_4.GetType(), player_4 });
 }
 
 SDL_Surface* ResourceCache::LoadTexture(const std::string& file, const Size& size)

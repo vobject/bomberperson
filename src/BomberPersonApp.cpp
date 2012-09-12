@@ -141,7 +141,7 @@ void BomberPersonApp::ProcessInput()
 void BomberPersonApp::UpdateScene(const int app_time, const int elapsed_time)
 {
    mLogic->Update(app_time, elapsed_time);
-   mLogic->Play(mAudio);
+   mLogic->Sound(mAudio);
    mWndFrame->UpdateDone();
 }
 

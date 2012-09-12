@@ -1,18 +1,36 @@
 #ifndef EXTRA_HPP
 #define EXTRA_HPP
 
-#include "SceneObject.hpp"
+#include "ArenaObject.hpp"
 
-class Extra : public SceneObject
+enum class ExtraType
+{
+   Speed,
+   Bombs,
+   Range,
+   InfiniteRange
+};
+
+enum class ExtraSound
+{
+
+};
+
+class Extra : public ArenaObject
 {
 public:
-   Extra(EntityId extra_id);
+   Extra(const std::shared_ptr<Arena>& arena, ExtraType type);
    virtual ~Extra();
 
    Extra(const Extra&) = delete;
    Extra& operator=(const Extra&) = delete;
 
    void Update(int elapsed_time) override;
+
+   ExtraType GetType() const;
+
+private:
+   const ExtraType mType;
 };
 
 #endif // EXTRA_HPP

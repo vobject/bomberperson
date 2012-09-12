@@ -1,12 +1,8 @@
 #include "SceneObject.hpp"
 
-SceneObject::SceneObject(const EntityId id)
+SceneObject::SceneObject(const EntityId id, const ZOrder zorder)
    : mId(id)
-   , mPos(0, 0)
-   , mSize(0, 0)
-   , mZOrder(ZOrder::Layer_1)
-//   , mIsVisible(true)
-   , mIsAlive(true)
+   , mZOrder(zorder)
 {
 
 }
@@ -21,9 +17,19 @@ bool SceneObject::operator<(const SceneObject& other) const
    return mZOrder < other.mZOrder;
 }
 
+bool SceneObject::IsValid() const
+{
+   return mIsValid;
+}
+
 EntityId SceneObject::GetId() const
 {
    return mId;
+}
+
+ZOrder SceneObject::GetZOrder() const
+{
+   return mZOrder;
 }
 
 Point SceneObject::GetPosition() const
@@ -46,42 +52,17 @@ void SceneObject::SetSize(const Size& size)
    mSize = size;
 }
 
-ZOrder SceneObject::GetZOrder() const
+void SceneObject::Invalidate()
 {
-   return mZOrder;
+   mIsValid = false;
 }
 
-void SceneObject::SetZOrder(const ZOrder order)
-{
-   mZOrder = order;
-}
-
-//bool SceneObject::IsVisible() const
+//SoundId SceneObject::GetSound() const
 //{
-//   return mIsVisible;
-//}
-//
-//void SceneObject::SetVisible(const bool visible)
-//{
-//   mIsVisible = visible;
+//   return mSoundId;
 //}
 
-bool SceneObject::IsAlive() const
-{
-   return mIsAlive;
-}
-
-void SceneObject::SetAlive(const bool alive)
-{
-   mIsAlive = alive;
-}
-
-SoundId SceneObject::GetSound() const
-{
-   return mSoundId;
-}
-
-void SceneObject::SetSound(SoundId id)
-{
-   mSoundId = id;
-}
+//void SceneObject::SetSound(SoundId id)
+//{
+//   mSoundId = id;
+//}

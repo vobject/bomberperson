@@ -9,7 +9,6 @@
 #include <vector>
 
 class Arena;
-class Cell;
 
 class EntityManager;
 
@@ -28,13 +27,13 @@ public:
    void SetArenaBorderSize(const Size& size);
 
 //   std::shared_ptr<Field> FromLevel(const std::string& name) const;
-   std::shared_ptr<Arena> GetDefaultArena(int cells_x, int cells_y, int players) const;
+   std::shared_ptr<Arena> GetDefaultArena(int cells_x, int cells_y) const;
+   void CreateDefaultWalls(int cells_x, int cells_y, Arena& arena) const;
+   void CreateDefaultExtras(int cells_x, int cells_y, Arena& arena) const;
+   void CreateDefaultSpawnAreas(int cells_x, int cells_y, int players, Arena& arena) const;
 
 private:
-   std::vector<std::shared_ptr<Cell>> CreateDefaultCells(int cells_x,
-         int cells_y, const std::shared_ptr<Arena>& arena) const;
 
-   Size GetCellSize(int cells_x, int cells_y) const;
    bool ShouldCreateItem() const;
 
    EntityManager& mEntityFactory;

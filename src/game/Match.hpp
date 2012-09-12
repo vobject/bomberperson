@@ -19,7 +19,6 @@ class MouseInput;
 class Arena;
 class Player;
 class Scoreboard;
-class Cell;
 
 class Match
 {
@@ -45,10 +44,8 @@ public:
    EntitySet GetEntities() const;
 
 private:
-   std::shared_ptr<Player> CreatePlayerFromPlayerId(PlayerId id, const std::shared_ptr<Arena> arena);
+   std::shared_ptr<Player> CreatePlayerFromPlayerId(PlayerId id);
    std::shared_ptr<InputDevice> CreateInputFromInputId(InputId id);
-
-   std::shared_ptr<Cell> GetCellFromObject(const std::shared_ptr<SceneObject>& obj) const;
 
    const MatchSettings mSettings;
    EntityManager mEntityManager;

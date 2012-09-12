@@ -7,9 +7,9 @@ UserInterface::UserInterface()
 {
     mSettings = {
        {
-          { PlayerId::Player_1, InputId::Keyboard_1 },
-          { PlayerId::Player_2, InputId::Keyboard_2 },
-          { PlayerId::Player_3, InputId::Mouse_1 }
+          { PlayerId::Player_1, InputId::Keyboard_1 }
+//          { PlayerId::Player_2, InputId::Keyboard_2 }
+//          { PlayerId::Player_3, InputId::Mouse_1 }
        }
     };
 }

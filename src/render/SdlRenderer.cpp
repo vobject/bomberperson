@@ -38,13 +38,15 @@ SdlRenderer::SdlRenderer(const Size res)
       throw "Cannot init SDL ttf feature.";
    }
 
-   mFont = TTF_OpenFont("res/font/VeraMono.ttf", 14);
+   // TODO: Load fonts from ResCache.
+
+   mFont = TTF_OpenFont("res_q1/font/scoreboard.ttf", 16);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
 
-   mMenuFont = TTF_OpenFont("res/font/VeraMoBd.ttf", 64);
+   mMenuFont = TTF_OpenFont("res_q1/font/menu.ttf", 64);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
@@ -148,15 +150,15 @@ void SdlRenderer::Render(const std::shared_ptr<Cell>& cell)
 
 void SdlRenderer::Render(const std::shared_ptr<Wall>& wall)
 {
-   const auto id = wall->GetId();
-   const auto frame = mResCache->GetWallResource(id).GetFrame();
+   const auto type = wall->GetType();
+   const auto frame = mResCache->GetWallResource(type).GetFrame();
    Render(wall, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Extra>& extra)
 {
-   const auto id = extra->GetId();
-   const auto frame = mResCache->GetExtraResource(id).GetFrame();
+   const auto type = extra->GetType();
+   const auto frame = mResCache->GetExtraResource(type).GetFrame();
    Render(extra, frame);
 }
 
@@ -178,10 +180,10 @@ void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 
 void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 {
-   const auto id = player->GetId();
+   const auto type = player->GetType();
    const auto data = player->GetData();
 
-   const auto res = mResCache->GetPlayerResource(id);
+   const auto res = mResCache->GetPlayerResource(type);
    const auto frame = res.GetFrame(data.anim, data.anim_time, data.speed);
    Render(player, frame);
 }

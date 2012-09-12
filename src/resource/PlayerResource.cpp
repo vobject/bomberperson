@@ -1,9 +1,13 @@
 #include "PlayerResource.hpp"
+#include "../game/Player.hpp"
 
 #include <SDL.h>
 
-PlayerResource::PlayerResource(const EntityId id, const int animation_length /*=0_ms*/)
-   : mId(id)
+PlayerResource::PlayerResource(
+   const PlayerType type,
+   const int animation_length /*=0_ms*/
+)
+   : mType(type)
    , mAnimationLength(animation_length)
 {
 
@@ -14,9 +18,9 @@ PlayerResource::~PlayerResource()
 
 }
 
-EntityId PlayerResource::GetId() const
+PlayerType PlayerResource::GetType() const
 {
-   return mId;
+   return mType;
 }
 
 //void PlayerResource::SetWalkFrames(
@@ -88,11 +92,11 @@ void PlayerResource::SetFrames(
 //}
 
 SDL_Surface* PlayerResource::GetFrame(
-   const PlayerAnimation state,
+   const PlayerAnimation anim,
    const int anim_time,
    const int speed) const
 {
-   const auto iter = mFrames.find(state);
+   const auto iter = mFrames.find(anim);
    if (iter == mFrames.end()) {
       throw "Trying to access non-existing frame";
    }

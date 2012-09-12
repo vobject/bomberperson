@@ -19,10 +19,10 @@ public:
                   const std::vector<SDL_Surface*>& textures,
                   int animation_length = 0_ms,
                   bool looping = false);
-   virtual ~SpriteResource();
+   ~SpriteResource();
 
    SpriteResource(const SpriteResource&) = default;
-   SpriteResource& operator=(const SpriteResource&) = default;
+   SpriteResource& operator=(const SpriteResource&) = delete;
 
    EntityId GetId() const;
 

@@ -3,7 +3,6 @@
 #include "Arena.hpp"
 #include "ArenaGenerator.hpp"
 #include "Scoreboard.hpp"
-#include "Cell.hpp"
 #include "Wall.hpp"
 #include "Extra.hpp"
 #include "Bomb.hpp"
@@ -27,10 +26,16 @@ std::shared_ptr<Arena> EntityManager::CreateArena(const int player_count)
    arena_gen.SetArenaPosition({ DefaultSize::ARENA_POS_X, DefaultSize::ARENA_POS_Y });
    arena_gen.SetArenaSize({ DefaultSize::ARENA_WIDTH, DefaultSize::ARENA_HEIGHT });
    arena_gen.SetArenaBorderSize({ DefaultSize::ARENA_BORDER_WIDTH, DefaultSize::ARENA_BORDER_HEIGHT });
-   auto arena = arena_gen.GetDefaultArena(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, player_count);
 
-   mEntities.insert(arena);
-   return arena;
+   // The arena object will be used internally to create every other
+   //  ArenaObject derived class.
+   mArena = arena_gen.GetDefaultArena(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y);
+   arena_gen.CreateDefaultWalls(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, *mArena);
+   arena_gen.CreateDefaultExtras(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, *mArena);
+   arena_gen.CreateDefaultSpawnAreas(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, player_count, *mArena);
+
+   mEntities.insert(mArena);
+   return mArena;
 }
 
 std::shared_ptr<Scoreboard> EntityManager::CreateScoreboard()
@@ -43,97 +48,75 @@ std::shared_ptr<Scoreboard> EntityManager::CreateScoreboard()
    return scoreboard;
 }
 
-std::shared_ptr<Cell> EntityManager::CreateCell(
-   const std::shared_ptr<Arena>& arena,
-   const int x,
-   const int y
-)
-{
-   auto cell = std::make_shared<Cell>(arena, x, y);
-
-   mEntities.insert(cell);
-   return cell;
-}
-
 std::shared_ptr<Wall> EntityManager::CreateWall(
-   const EntityId id,
-   const std::shared_ptr<Cell>& cell
+   const Cell& cell,
+   const WallType type
 )
 {
-   auto wall = std::make_shared<Wall>(id);
-   wall->SetPosition(cell->GetPosition());
-   wall->SetSize(cell->GetSize());
+   auto wall = std::make_shared<Wall>(mArena, type);
+   mArena->SetObjectPosition(*wall, cell);
+   mArena->SetObjectSize(*wall);
 
    mEntities.insert(wall);
    return wall;
 }
 
 std::shared_ptr<Extra> EntityManager::CreateExtra(
-   const EntityId id,
-   const std::shared_ptr<Cell>& cell
+   const Cell& cell,
+   const ExtraType type
 )
 {
-   auto extra = std::make_shared<Extra>(id);
-   extra->SetPosition(cell->GetPosition());
-   extra->SetSize(cell->GetSize());
+   auto extra = std::make_shared<Extra>(mArena, type);
+   mArena->SetObjectPosition(*extra, cell);
+   mArena->SetObjectSize(*extra);
 
    mEntities.insert(extra);
    return extra;
 }
 
-std::shared_ptr<Bomb> EntityManager::CreateBomb(const std::shared_ptr<Cell>& cell)
+std::shared_ptr<Bomb> EntityManager::CreateBomb(const Cell& cell)
 {
-   auto bomb = std::make_shared<Bomb>(*this, cell);
-   bomb->SetPosition(cell->GetPosition());
-   bomb->SetSize(cell->GetSize());
+   auto bomb = std::make_shared<Bomb>(mArena, *this);
+   mArena->SetObjectPosition(*bomb, cell);
+   mArena->SetObjectSize(*bomb);
 
    mEntities.insert(bomb);
    return bomb;
 }
 
-std::shared_ptr<Explosion> EntityManager::CreateExplosion(const std::shared_ptr<Cell>& cell)
+std::shared_ptr<Explosion> EntityManager::CreateExplosion(const Cell& cell)
 {
-   auto explosion = std::make_shared<Explosion>();
-   explosion->SetPosition(cell->GetPosition());
-   explosion->SetSize(cell->GetSize());
+   auto explosion = std::make_shared<Explosion>(mArena);
+   mArena->SetObjectPosition(*explosion, cell);
+   mArena->SetObjectSize(*explosion);
 
    mEntities.insert(explosion);
    return explosion;
 }
 
-std::shared_ptr<Player> EntityManager::CreatePlayer(
-   const EntityId id,
-   const std::shared_ptr<Arena>& arena
-)
+std::shared_ptr<Player> EntityManager::CreatePlayer(const PlayerType type)
 {
-   std::shared_ptr<Player> player;
-   std::shared_ptr<Cell> parent_cell;
+   std::shared_ptr<Player> player = std::make_shared<Player>(mArena,
+                                                             type,
+                                                             *this);
+   Cell parent_cell = { -1, -1 };
 
-   switch (id)
+   switch (type)
    {
-      case EntityId::Player_1:
-         player = std::make_shared<Player>(id, *this);
-         parent_cell = arena->GetCellFromCoordinates(DefaultSize::PLAYER_1_CELL_X, DefaultSize::PLAYER_1_CELL_Y);
+      case PlayerType::Player_1:
+         parent_cell = mArena->GetCellFromCoordinates(DefaultSize::PLAYER_1_CELL_X, DefaultSize::PLAYER_1_CELL_Y);
          break;
-      case EntityId::Player_2:
-         player = std::make_shared<Player>(id, *this);
-         parent_cell = arena->GetCellFromCoordinates(DefaultSize::PLAYER_2_CELL_X, DefaultSize::PLAYER_2_CELL_Y);
+      case PlayerType::Player_2:
+         parent_cell = mArena->GetCellFromCoordinates(DefaultSize::PLAYER_2_CELL_X, DefaultSize::PLAYER_2_CELL_Y);
          break;
-      case EntityId::Player_3:
-         player = std::make_shared<Player>(id, *this);
-         parent_cell = arena->GetCellFromCoordinates(DefaultSize::PLAYER_3_CELL_X, DefaultSize::PLAYER_3_CELL_Y);
+      case PlayerType::Player_3:
+         parent_cell = mArena->GetCellFromCoordinates(DefaultSize::PLAYER_3_CELL_X, DefaultSize::PLAYER_3_CELL_Y);
          break;
-      case EntityId::Player_4:
-         player = std::make_shared<Player>(id, *this);
-         parent_cell = arena->GetCellFromCoordinates(DefaultSize::PLAYER_4_CELL_X, DefaultSize::PLAYER_4_CELL_Y);
+      case PlayerType::Player_4:
+         parent_cell = mArena->GetCellFromCoordinates(DefaultSize::PLAYER_4_CELL_X, DefaultSize::PLAYER_4_CELL_Y);
          break;
-      default:
-         LOG(logERROR) << "Trying to create an unknown player.";
-         return nullptr;
    }
-
-   player->SetParentCell(parent_cell);
-   player->SetPosition(parent_cell->GetPosition());
+   mArena->SetObjectPosition(*player, parent_cell);
    player->SetSize({ DefaultSize::PLAYER_WIDTH, DefaultSize::PLAYER_HEIGHT });
 
    mEntities.insert(player);
@@ -150,7 +133,7 @@ void EntityManager::Cleanup()
    auto entity = std::begin(mEntities);
    while (entity != std::end(mEntities))
    {
-      if ((*entity)->IsAlive())
+      if ((*entity)->IsValid())
       {
          entity++;
       }
@@ -164,4 +147,5 @@ void EntityManager::Cleanup()
 void EntityManager::Reset()
 {
    mEntities.clear();
+   mArena = nullptr;
 }

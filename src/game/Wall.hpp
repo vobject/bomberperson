@@ -1,7 +1,7 @@
 #ifndef WALL_HPP
 #define WALL_HPP
 
-#include "SceneObject.hpp"
+#include "ArenaObject.hpp"
 
 //enum class WallType
 //{
@@ -21,10 +21,21 @@
 //   Destructible
 //};
 
-class Wall : public SceneObject
+enum class WallType
+{
+   Indestructible,
+   Destructible
+};
+
+enum class WallSound
+{
+
+};
+
+class Wall : public ArenaObject
 {
 public:
-   Wall(EntityId wall_id);
+   Wall(const std::shared_ptr<Arena>& arena, WallType type);
    virtual ~Wall();
 
    Wall(const Wall&) = delete;
@@ -32,7 +43,11 @@ public:
 
    void Update(int elapsed_time) override;
 
+   WallType GetType() const;
    bool IsDestructible() const;
+
+private:
+   const WallType mType;
 };
 
 #endif // WALL_HPP

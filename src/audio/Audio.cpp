@@ -1,5 +1,6 @@
 #include "Audio.hpp"
 #include "../game/Match.hpp"
+#include "../game/MainMenu.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Scoreboard.hpp"
 #include "../game/Cell.hpp"
@@ -49,10 +50,10 @@ Audio::Audio()
 //   }
 
    //Load the sound effects
-   explosion = Mix_LoadWAV( "explosion.wav" );
-   death = Mix_LoadWAV( "d.wav" );
-   extra = Mix_LoadWAV( "extra.wav" );
-   plant = Mix_LoadWAV( "plant.wav" );
+   explosion = Mix_LoadWAV( "res_q1/audio/explosion.wav" );
+   death = Mix_LoadWAV( "res_q1/audio/death.wav" );
+   extra = Mix_LoadWAV( "res_q1/audio/extra.wav" );
+   plant = Mix_LoadWAV( "res_q1/audio/plant.wav" );
 
    //If there was a problem loading the sound effects
    if( ( explosion == NULL ) || ( death == NULL ) || (extra == NULL) || (plant == NULL))
@@ -84,8 +85,73 @@ Audio::~Audio()
    Mix_CloseAudio();
 }
 
-void Audio::Play(const std::shared_ptr<Match> &match)
+void Audio::Play(const std::shared_ptr<SceneObject>& ent)
 {
+   if (!ent->IsValid()) {
+      return;
+   }
+
+   if (const auto ptr = std::dynamic_pointer_cast<MainMenu>(ent))
+   {
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Arena>(ent))
+   {
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Scoreboard>(ent))
+   {
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Cell>(ent))
+   {
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Wall>(ent))
+   {
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Bomb>(ent))
+   {
+//      if (SoundId::None != ptr->GetSound())
+//      {
+//         if( Mix_PlayChannel( -1, plant, 0 ) == -1 ) {
+//            throw "Sound play failed.";
+//         }
+//      }
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Explosion>(ent))
+   {
+//      if (SoundId::None != ptr->GetSound())
+//      {
+//         if( Mix_PlayChannel( -1, explosion, 0 ) == -1 ) {
+//            throw "Sound play failed.";
+//         }
+//      }
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Extra>(ent))
+   {
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Player>(ent))
+   {
+//      const auto s = ptr->GetSound();
+//      if (SoundId::None == s) {
+//         return;
+//      }
+
+//      if (SoundId::PlayerPicksUpExtra == s)
+//      {
+//         if( Mix_PlayChannel( -1, extra, 0 ) == -1 ) {
+//            throw "Sound play failed.";
+//         }
+//      }
+
+//      if (SoundId::PlayerDies == s)
+//      {
+//         if( Mix_PlayChannel( -1, death, 0 ) == -1 ) {
+//            throw "Sound play failed.";
+//         }
+//      }
+   }
+   else {
+      LOG(logERROR) << "Audio::Play(SceneObject) Unknown object!";
+   }
+
 //   for (const auto& cell : match->GetArena()->GetCells())
 //   {
 //      if (cell->HasBomb() && (SoundId::None != cell->GetBomb()->GetSound()))
@@ -126,15 +192,15 @@ void Audio::Play(const std::shared_ptr<Match> &match)
 //   }
 }
 
-void Audio::PlayMusic(MusicId id)
-{
+//void Audio::PlayMusic(MusicId id)
+//{
 
-}
+//}
 
-void Audio::PlaySound(SoundId id)
-{
+//void Audio::PlaySound(SoundId id)
+//{
 
-}
+//}
 
 //void WindowFrame::UpdateDone()
 //{

@@ -3,7 +3,6 @@
 #include "../game/MainMenu.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Scoreboard.hpp"
-#include "../game/Cell.hpp"
 #include "../game/Wall.hpp"
 #include "../game/Extra.hpp"
 #include "../game/Bomb.hpp"
@@ -144,18 +143,18 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<Extra>& extra)
 
    int color = 0;
 
-   switch (extra->GetId())
+   switch (extra->GetType())
    {
-      case EntityId::SpeedExtra:
+      case ExtraType::Speed:
          color = 0xff0000;
          break;
-      case EntityId::RangeExtra:
+      case ExtraType::Range:
          color = 0x00ff00;
          break;
-      case EntityId::BombsExtra:
+      case ExtraType::Bombs:
          color = 0x0000ff;
          break;
-      case EntityId::GoldRangeExtra:
+      case ExtraType::InfiniteRange:
          color = 0xff1fff;
          break;
       default:

@@ -1,17 +1,15 @@
 #include "Bomb.hpp"
+#include "Arena.hpp"
 #include "EntityManager.hpp"
 #include "Cell.hpp"
 #include "Wall.hpp"
 #include "Explosion.hpp"
 
-Bomb::Bomb(EntityManager& entity_factory, const std::shared_ptr<Cell>& cell)
-   : SceneObject(EntityId::Bomb)
+Bomb::Bomb(const std::shared_ptr<Arena>& arena, EntityManager& entity_factory)
+   : ArenaObject(EntityId::Bomb, ZOrder::Layer_4, arena)
    , mEntityFactory(entity_factory)
-   , mParentCell(cell)
 {
-   SetZOrder(ZOrder::Layer_4);
 
-   mPlantedSound = true;
 }
 
 Bomb::~Bomb()
@@ -21,14 +19,14 @@ Bomb::~Bomb()
 
 void Bomb::Update(const int elapsed_time)
 {
-   SetSound(SoundId::None);
+//   SetSound(SoundId::None);
 
    mLifeTime += elapsed_time;
 
-   if (IsAlive() && (mLifeTime >= DEFAULT_LIFETIME))
+   if (IsValid() && (mLifeTime >= DEFAULT_LIFETIME))
    {
       // Lifetime of this bomb object ended...
-      SetAlive(false);
+      Invalidate();
 
       // ... instead it creates some explosions around it.
       PlantCenterExplosion();
@@ -70,55 +68,61 @@ void Bomb::Detonate()
 
 void Bomb::PlantCenterExplosion() const
 {
-   auto explosion = mEntityFactory.CreateExplosion(mParentCell);
-   explosion->SetSound(SoundId::Explosion);
-   mParentCell->SetExplosion(explosion);
+   const auto parent = GetArena()->GetCellFromObject(*this);
+   auto explosion = mEntityFactory.CreateExplosion(parent);
+//   explosion->SetSound(SoundId::Explosion);
+   GetArena()->SetExplosion(parent, explosion);
 }
 
 void Bomb::PlantRangeExplosion(Direction dir) const
 {
-   auto range_cell = mParentCell->GetNeighborCell(dir);
+   const auto parent = GetArena()->GetCellFromObject(*this);
+   auto range_cell = GetArena()->GetNeighborCell(parent, dir);
    auto range_to_go = GetRange();
 
-   while (range_cell && range_to_go)
+   while ((-1 != range_cell.X) && (-1 != range_cell.Y) && range_to_go)
    {
-      if (range_cell->HasWall() && !range_cell->GetWall()->IsDestructible()) {
+      if (GetArena()->HasWall(range_cell) &&
+          !GetArena()->GetWall(range_cell)->IsDestructible())
+      {
          // A wall that is not destructible is, well ... indestructible.
          // Do not spread the explosion in this direction any further.
          break;
       }
 
-      if (range_cell->HasBomb()) {
+      if (GetArena()->HasBomb(range_cell))
+      {
          // A bombs explosion range ends if it hits another bomb it its way.
          // But it causes the other bomb to explode.
-         range_cell->DetonateBomb();
+         GetArena()->DetonateBomb(range_cell);
          break;
       }
 
       // TODO: Select the right ExplosionType (horizontal, vertical, etc).
       auto range_exp = mEntityFactory.CreateExplosion(range_cell);
-      range_cell->SetExplosion(range_exp);
+      GetArena()->SetExplosion(range_cell, range_exp);
 
-      if (range_cell->HasWall() && range_cell->GetWall()->IsDestructible())
+      if (GetArena()->HasWall(range_cell) &&
+          GetArena()->GetWall(range_cell)->IsDestructible())
       {
          // FIXME: This has a problem: when the exploding bomb destroys
          //  a wall and triggers another bomb with a greater range,
          //  the wall behind the first wall would also be destroyed
          //  at the same time.
          // Maybe this could be avoided by introducing an ExplodingWall type.
-         range_cell->DestroyWall();
+         GetArena()->DestroyWall(range_cell);
          break;
       }
 
-      if (range_cell->HasExtra())
+      if (GetArena()->HasExtra(range_cell))
       {
          // The explosion can destroy an extra item but it will be stopped
          //  when doing so.
-         range_cell->DestroyExtra();
+         GetArena()->DestroyExtra(range_cell);
          break;
       }
 
-      range_cell = range_cell->GetNeighborCell(dir);
+      range_cell = GetArena()->GetNeighborCell(range_cell, dir);
       range_to_go--;
    }
 }

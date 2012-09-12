@@ -1,19 +1,26 @@
 #ifndef BOMB_HPP
 #define BOMB_HPP
 
-#include "SceneObject.hpp"
-//#include "Sound.hpp"
+#include "ArenaObject.hpp"
 #include "../utils/Utils.hpp"
 
-#include <memory>
-
 class EntityManager;
-class Cell;
 
-class Bomb : public SceneObject
+//enum class BombType
+//{
+
+//};
+
+//enum class BombSound
+//{
+//   None,
+//   Planted
+//};
+
+class Bomb : public ArenaObject
 {
 public:
-   Bomb(EntityManager& entity_factory, const std::shared_ptr<Cell>& cell);
+   Bomb(const std::shared_ptr<Arena>& arena, EntityManager& entity_factory);
    virtual ~Bomb();
 
    Bomb(const Bomb&) = delete;
@@ -39,11 +46,10 @@ private:
 
    EntityManager& mEntityFactory;
 
-   std::shared_ptr<Cell> mParentCell;
    int mLifeTime = 0_ms;
    int mRange = 1;
 
-   mutable bool mPlantedSound;
+   mutable bool mPlantedSound = true;
 //   Sound mPlantedSound;
 };
 

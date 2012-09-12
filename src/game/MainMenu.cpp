@@ -2,7 +2,7 @@
 #include "UserInterface.hpp"
 
 MainMenu::MainMenu()
-   : SceneObject(EntityId::MainMenu)
+   : SceneObject(EntityId::Menu, ZOrder::MainMenu)
 {
 
 }

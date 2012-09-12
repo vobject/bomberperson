@@ -1,13 +1,23 @@
 #ifndef EXPLOSION_HPP
 #define EXPLOSION_HPP
 
-#include "SceneObject.hpp"
+#include "ArenaObject.hpp"
 #include "../utils/Utils.hpp"
 
-class Explosion : public SceneObject
+//enum class ExplosionType
+//{
+
+//};
+
+//enum class ExplosionSound
+//{
+
+//};
+
+class Explosion : public ArenaObject
 {
 public:
-   Explosion();
+   Explosion(const std::shared_ptr<Arena>& arena);
    virtual ~Explosion();
 
    Explosion(const Explosion&) = delete;
@@ -21,7 +31,7 @@ private:
    static const int DEFAULT_LIFETIME = 1000_ms;
 
    int mLifeTime = 0_ms;
-   bool mSoundProcessed = false;
+//   bool mSoundProcessed = false;
 };
 
 #endif // EXPLOSION_HPP
