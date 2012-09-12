@@ -12,30 +12,29 @@ class Extra;
 class Bomb;
 class Explosion;
 class Player;
+class AudioCache;
 
-enum class SoundId;
+//enum class MusicId
+//{
+//   MainMenu,
+////   GameSetup,
+//   Running
+//};
 
-enum class MusicId
-{
-   MainMenu,
-//   GameSetup,
-   Running
-};
+//class SampleResource
+//{
 
-class SampleResource
-{
+//};
 
-};
+//class MusicResource
+//{
 
-class MusicResource
-{
+//};
 
-};
+//class AudioCache
+//{
 
-class AudioCache
-{
-
-};
+//};
 
 class Audio
 {
@@ -57,12 +56,13 @@ public:
    void Play(const std::shared_ptr<Explosion>& explosion);
    void Play(const std::shared_ptr<Player>& player);
 
-   // louder/softer
-//   void PlayMusic(MusicId id);
-//   void PlaySound(SoundId id);
+   // TODO: louder/softer
 
 private:
-//   std::unique_ptr<AudioCache> mCache;
+   bool mPlayingMenuMusic = false;
+   bool mPlayingGameMusic = false;
+
+   std::unique_ptr<AudioCache> mCache;
 };
 
 #endif // AUDIO_HPP

@@ -27,10 +27,10 @@ enum class WallType
    Destructible
 };
 
-enum class WallSound
-{
+//enum class WallSound
+//{
 
-};
+//};
 
 class Wall : public ArenaObject
 {

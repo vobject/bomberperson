@@ -7,9 +7,9 @@
 #include "PlayerResource.hpp"
 #include "../utils/Utils.hpp"
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 struct SDL_Surface;
 enum class EntityId;

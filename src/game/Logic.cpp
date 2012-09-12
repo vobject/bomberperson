@@ -148,7 +148,13 @@ void Logic::Sound(const std::shared_ptr<Audio>& audio)
 
    if (mUserInterface->IsActive())
    {
-
+      for (const auto& ent : mUserInterface->GetEntities())
+      {
+         if (!ent->IsValid()) {
+            continue;
+         }
+         audio->Play(ent);
+      }
    }
    else
    {

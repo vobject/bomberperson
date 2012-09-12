@@ -19,6 +19,7 @@ enum class MenuMusic
 
 enum class MenuSound
 {
+   None,
    Switch,
    Choose,
    Invalid
@@ -51,15 +52,14 @@ public:
 
     void SelectionUp();
     void SelectionDown();
-//    void Choose();
+    void Choose();
 
-//    bool HasChosen() const;
-    UserInterfaceItem GetSelection() const;
+    UserInterfaceItem GetSelection();
+    MenuSound GetSound(bool reset);
 
 private:
     unsigned int mSelectionMarker = 0;
-//    bool mHasChosen = false;
-
+    MenuSound mSound = MenuSound::None;
     std::vector<UserInterfaceItem> mItems;
 };
 

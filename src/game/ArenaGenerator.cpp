@@ -150,6 +150,16 @@ void ArenaGenerator::CreateDefaultSpawnAreas(
       arena.GetWall({ 0, 0 })->Invalidate();
       arena.GetWall({ 0, 1 })->Invalidate();
       arena.GetWall({ 1, 0 })->Invalidate();
+
+      if (arena.HasExtra({ 0, 0 })) {
+          arena.GetExtra({ 0, 0 })->Invalidate();
+      }
+      if (arena.HasExtra({ 0, 1 })) {
+          arena.GetExtra({ 0, 1 })->Invalidate();
+      }
+      if (arena.HasExtra({ 1, 0 })) {
+          arena.GetExtra({ 1, 0 })->Invalidate();
+      }
    }
 
    if (players >= 2)
@@ -157,6 +167,16 @@ void ArenaGenerator::CreateDefaultSpawnAreas(
       arena.GetWall({ cells_x - 1, cells_y - 1 })->Invalidate();
       arena.GetWall({ cells_x - 1, cells_y - 2 })->Invalidate();
       arena.GetWall({ cells_x - 2, cells_y - 1 })->Invalidate();
+
+      if (arena.HasExtra({ cells_x - 1, cells_y - 1 })) {
+          arena.GetExtra({ cells_x - 1, cells_y - 1 })->Invalidate();
+      }
+      if (arena.HasExtra({ cells_x - 1, cells_y - 2 })) {
+          arena.GetExtra({ cells_x - 1, cells_y - 2 })->Invalidate();
+      }
+      if (arena.HasExtra({ cells_x - 2, cells_y - 1 })) {
+          arena.GetExtra({ cells_x - 2, cells_y - 1 })->Invalidate();
+      }
    }
 
    if (players >= 3)
@@ -164,6 +184,16 @@ void ArenaGenerator::CreateDefaultSpawnAreas(
       arena.GetWall({ 0, cells_y - 2 })->Invalidate();
       arena.GetWall({ 0, cells_y - 1 })->Invalidate();
       arena.GetWall({ 1, cells_y - 1 })->Invalidate();
+
+      if (arena.HasExtra({ 0, cells_y - 2 })) {
+          arena.GetExtra({ 0, cells_y - 2 })->Invalidate();
+      }
+      if (arena.HasExtra({ 0, cells_y - 1 })) {
+          arena.GetExtra({ 0, cells_y - 1 })->Invalidate();
+      }
+      if (arena.HasExtra({ 1, cells_y - 1 })) {
+          arena.GetExtra({ 1, cells_y - 1 })->Invalidate();
+      }
    }
 
    if (players >= 4)
@@ -171,6 +201,16 @@ void ArenaGenerator::CreateDefaultSpawnAreas(
       arena.GetWall({ cells_x - 2, 0 })->Invalidate();
       arena.GetWall({ cells_x - 1, 0 })->Invalidate();
       arena.GetWall({ cells_x - 1, 1 })->Invalidate();
+
+      if (arena.HasExtra({ cells_x - 2, 0 })) {
+          arena.GetExtra({ cells_x - 2, 0 })->Invalidate();
+      }
+      if (arena.HasExtra({ cells_x - 1, 0 })) {
+          arena.GetExtra({ cells_x - 1, 0 })->Invalidate();
+      }
+      if (arena.HasExtra({ cells_x - 1, 1 })) {
+          arena.GetExtra({ cells_x - 1, 1 })->Invalidate();
+      }
    }
 }
 

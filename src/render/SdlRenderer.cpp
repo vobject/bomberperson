@@ -45,13 +45,13 @@ SdlRenderer::SdlRenderer(const Size res)
       throw "TTF_OpenFont() failed!";
    }
 
-   mMenuFont = TTF_OpenFont("res_q1/font/menu.ttf", 64);
+   mMenuFont = TTF_OpenFont("res_q1/font/menu.ttf", 72);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
 
-   mResCache = std::make_shared<ResourceCache>();
+   mResCache = make_unique<ResourceCache>();
 }
 
 SdlRenderer::~SdlRenderer()
@@ -85,22 +85,31 @@ void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
    {
       auto surface = TTF_RenderText_Blended(mMenuFont,
                                             items[i].text.c_str(),
-                                            { 0xff, 0xff, 0xff, 0 });
-      SDL_Rect txt_rect = { static_cast<Sint16>(pos.X + 128),
-                            static_cast<Sint16>(pos.Y + 96 + (96 * i)),
+                                            { 0xC0, 0xC0, 0xC0, 0 });
+      SDL_Rect txt_rect = { static_cast<Sint16>(pos.X + 224),
+                            static_cast<Sint16>(pos.Y + 164 + (96 * i)),
                             0,
                             0 };
-
       SDL_BlitSurface(surface, NULL, mScreen, &txt_rect);
       SDL_FreeSurface(surface);
 
       if (selection.id == items[i].id)
       {
-         SDL_Rect sel_rect = { static_cast<Sint16>(pos.X + 64),
-                               static_cast<Sint16>(pos.Y + 110 + (96 * i)),
-                               static_cast<Uint16>(48),
-                               static_cast<Uint16>(48) };
-         SDL_FillRect(mScreen, &sel_rect, 0xffff00);
+//         SDL_Rect sel_rect = { static_cast<Sint16>(pos.X + 64),
+//                               static_cast<Sint16>(pos.Y + 110 + (96 * i)),
+//                               static_cast<Uint16>(48),
+//                               static_cast<Uint16>(48) };
+//         SDL_FillRect(mScreen, &sel_rect, 0xffff00);
+
+         auto sel_icon = TTF_RenderText_Blended(mMenuFont,
+                                                "Q",
+                                                { 0x70, 0x70, 0x70, 0 });
+         SDL_Rect ico_rect = { static_cast<Sint16>(pos.X + 144),
+                               static_cast<Sint16>(pos.Y + 158 + (96 * i)),
+                               0,
+                               0 };
+         SDL_BlitSurface(sel_icon, NULL, mScreen, &ico_rect);
+         SDL_FreeSurface(sel_icon);
       }
    }
 }

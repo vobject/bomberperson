@@ -34,6 +34,7 @@ void UserInterface::Input(const SDL_KeyboardEvent& key)
          mMainMenu->SelectionDown();
          break;
       case SDLK_RETURN:
+         mMainMenu->Choose();
          mSelection = mMainMenu->GetSelection().id;
          mDone = true;
          break;
@@ -85,7 +86,9 @@ void UserInterface::ShowMainMenu(const bool game_paused)
       mMainMenu->AddMenuItem({ UserInterfaceItemId::MainMenu_Exit, "Exit", true });
 
       if (!game_paused) {
+         // HACK
          mMainMenu->SelectionDown();
+         mMainMenu->GetSound(true);
       }
    }
 

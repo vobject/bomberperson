@@ -19,10 +19,11 @@ struct Size;
 
 //};
 
-//enum class ArenaMusic
-//{
-
-//};
+enum class ArenaMusic
+{
+   None,
+   DefaultTrack
+};
 
 struct Cell
 {

@@ -11,10 +11,10 @@ enum class ExtraType
    InfiniteRange
 };
 
-enum class ExtraSound
-{
+//enum class ExtraSound
+//{
 
-};
+//};
 
 class Extra : public ArenaObject
 {

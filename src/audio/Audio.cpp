@@ -8,79 +8,34 @@
 #include "../game/Bomb.hpp"
 #include "../game/Explosion.hpp"
 #include "../game/Player.hpp"
+#include "AudioCache.hpp"
 
 #include <SDL.h>
 #include <SDL_mixer.h>
 
-//The music that will be played
-Mix_Music *music = NULL;
-
-Mix_Chunk *explosion = NULL;
-Mix_Chunk *plant = NULL;
-Mix_Chunk *extra = NULL;
-Mix_Chunk *death = NULL;
-
 Audio::Audio()
 {
-
-   // SOUND TEST
-
    if(0 > SDL_Init(SDL_INIT_AUDIO)) {
       throw "Cannot init SDL audio subsystem.";
    }
    atexit(SDL_Quit);
 
-   if(0 > Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096)) {
+   if(0 > Mix_OpenAudio(MIX_DEFAULT_FREQUENCY,
+                        MIX_DEFAULT_FORMAT,
+                        MIX_DEFAULT_CHANNELS,
+                        4096))
+   {
       throw "Cannot init SDL audio subsystem.";
    }
 
-//   //The sound effects that will be used
-//   Mix_Chunk *scratch = NULL;
-//   Mix_Chunk *high = NULL;
-//   Mix_Chunk *med = NULL;
-//   Mix_Chunk *low = NULL;
+   Mix_Volume(-1, MIX_MAX_VOLUME / 4);
+   Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
 
-//   //Load the music
-//   music = Mix_LoadMUS( "sound4.mp3" );
-
-//   //If there was a problem loading the music
-//   if( music == NULL ) {
-//      throw "Music load failed.";
-//   }
-
-   //Load the sound effects
-   explosion = Mix_LoadWAV( "res_q1/audio/explosion.wav" );
-   death = Mix_LoadWAV( "res_q1/audio/death.wav" );
-   extra = Mix_LoadWAV( "res_q1/audio/extra.wav" );
-   plant = Mix_LoadWAV( "res_q1/audio/plant.wav" );
-
-   //If there was a problem loading the sound effects
-   if( ( explosion == NULL ) || ( death == NULL ) || (extra == NULL) || (plant == NULL))
-   {
-      throw "Sound load failed.";
-   }
-
-//   //If there is no music playing
-//   if( Mix_PlayingMusic() == 0 )
-//   {
-//      //Play the music
-//      if( Mix_PlayMusic( music, -1 ) == -1 ) {
-//         throw "Music play failed.";
-//      }
-//   }
+   mCache = make_unique<AudioCache>();
 }
 
 Audio::~Audio()
 {
-   //Free the music
-//   Mix_FreeMusic( music );
-
-   Mix_FreeChunk( death );
-   Mix_FreeChunk( extra );
-   Mix_FreeChunk( explosion );
-   Mix_FreeChunk( plant );
-
-   //Quit SDL_mixer
    Mix_CloseAudio();
 }
 
@@ -117,102 +72,100 @@ void Audio::Play(const std::shared_ptr<SceneObject>& ent)
 
 void Audio::Play(const std::shared_ptr<MainMenu>& mainmenu)
 {
+   // Take care of the menu music effects first.
+
+   if (mPlayingGameMusic)
+   {
+      // We just switched from the game screen to the mainmenu.
+      Mix_HaltMusic();
+      mPlayingGameMusic = false;
+   }
+
+   if (!Mix_PlayingMusic())
+   {
+      // Play mainmenu music if it is not already running.
+      if (Mix_PlayMusic(mCache->GetMusic(MenuMusic::MainmenuTrack), -1) == -1) {
+         throw "Sound music failed.";
+      }
+      mPlayingMenuMusic = true;
+   }
+
+   // Now handle the menu sound effects.
+
+   const auto sound = mainmenu->GetSound(true);
+   if (MenuSound::None != sound)
+   {
+      if (0 > Mix_PlayChannel( -1, mCache->GetSound(sound), 0 )) {
+         throw "Sound play failed.";
+      }
+   }
 }
 
 void Audio::Play(const std::shared_ptr<Arena>& arena)
 {
+   if (mPlayingMenuMusic)
+   {
+      Mix_HaltMusic();
+      mPlayingMenuMusic = false;
+   }
+
+   if (Mix_PlayingMusic()) {
+      return;
+   }
+
+   if (Mix_PlayMusic(mCache->GetMusic(ArenaMusic::DefaultTrack), -1) == -1) {
+      throw "Sound music failed.";
+   }
+   mPlayingGameMusic = true;
 }
 
 void Audio::Play(const std::shared_ptr<Scoreboard>& scoreboard)
 {
+   (void) scoreboard;
 }
 
 void Audio::Play(const std::shared_ptr<Wall>& wall)
 {
+   (void) wall;
 }
 
 void Audio::Play(const std::shared_ptr<Extra>& extra)
 {
-//      if (SoundId::None != ptr->GetSound())
-//      {
-//         if( Mix_PlayChannel( -1, plant, 0 ) == -1 ) {
-//            throw "Sound play failed.";
-//         }
-//      }
+   (void) extra;
 }
 
 void Audio::Play(const std::shared_ptr<Bomb>& bomb)
 {
-   // TODO: Load sample from Sound ResCache and play it back.
+   const auto sound = bomb->GetSound(true);
+   if (BombSound::None == sound) {
+      return;
+   }
 
-   switch (bomb->GetSound(true))
-   {
-      case BombSound::Planted:
-         {
-            if( Mix_PlayChannel( -1, plant, 0 ) == -1 ) {
-               throw "Sound play failed.";
-            }
-         }
-         break;
-      default:
-         break;
+   if (0 > Mix_PlayChannel( -1, mCache->GetSound(sound), 0 )) {
+      throw "Sound play failed.";
    }
 }
 
 void Audio::Play(const std::shared_ptr<Explosion>& explosion)
 {
-   switch (explosion->GetSound(true))
-   {
-      case ExplosionSound::Booom:
-         {
-            if( Mix_PlayChannel( -1, ::explosion, 0 ) == -1 ) {
-               throw "Sound play failed.";
-            }
-         }
-         break;
-      default:
-         break;
+   const auto sound = explosion->GetSound(true);
+   if (ExplosionSound::None == sound) {
+      return;
+   }
+
+   if (0 > Mix_PlayChannel( -1, mCache->GetSound(sound), 0 )) {
+      throw "Sound play failed.";
    }
 }
 
 void Audio::Play(const std::shared_ptr<Player>& player)
 {
-//      const auto s = ptr->GetSound();
-//      if (SoundId::None == s) {
-//         return;
-//      }
+   const auto sound = player->GetSound(true);
+   if (PlayerSound::None == sound) {
+      return;
+   }
 
-//      if (SoundId::PlayerPicksUpExtra == s)
-//      {
-//         if( Mix_PlayChannel( -1, extra, 0 ) == -1 ) {
-//            throw "Sound play failed.";
-//         }
-//      }
-
-//      if (SoundId::PlayerDies == s)
-//      {
-//         if( Mix_PlayChannel( -1, death, 0 ) == -1 ) {
-//            throw "Sound play failed.";
-//         }
-//      }
+   if (0 > Mix_PlayChannel( -1, mCache->GetSound(sound), 0 )) {
+      throw "Sound play failed.";
+   }
 }
-
-//void Audio::PlayMusic(MusicId id)
-//{
-
-//}
-
-//void Audio::PlaySound(SoundId id)
-//{
-
-//}
-
-//void WindowFrame::UpdateDone()
-//{
-//   mUpdateCount++;
-//}
-//
-//void WindowFrame::FrameDone()
-//{
-//   mFrameCount++;
-//}

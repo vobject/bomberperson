@@ -2,7 +2,6 @@
 #define PLAYER_HPP
 
 #include "ArenaObject.hpp"
-#include "Sound.hpp"
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
@@ -22,9 +21,13 @@ enum class PlayerType
 
 enum class PlayerSound
 {
-   Pickup,
-   Die,
-   Win
+   None,
+   Collect_Speed,
+   Collect_Bombs,
+   Collect_Range,
+   Collect_InfiniteRange,
+   Die
+//   Win
 };
 
 // TODO: Should belong to some sort of RenderInfo data structure.
@@ -92,6 +95,7 @@ public:
 
    PlayerType GetType() const;
    PlayerData GetData() const;
+   PlayerSound GetSound(bool reset);
 
 private:
    // Number of milliseconds the player has to wait to move another pixel.
@@ -113,6 +117,7 @@ private:
 
    PlayerType mType;
    PlayerData mData;
+   PlayerSound mSound;
 
    EntityManager& mEntityFactory;
 

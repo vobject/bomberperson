@@ -44,7 +44,7 @@ private:
    TTF_Font* mMenuFont = nullptr;
 
    // Must be initialized after the video system has been set up.
-   std::shared_ptr<ResourceCache> mResCache;
+   std::unique_ptr<ResourceCache> mResCache;
 };
 
 #endif // SDL_RENDERER_HPP

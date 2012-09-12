@@ -7,6 +7,8 @@
 
 #include <string>
 
+static const std::string RESOURCE_DIR = "res_q1";
+
 struct DefaultSize
 {
    static const int SCREEN_WIDTH            = 800_px;

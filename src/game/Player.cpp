@@ -14,6 +14,7 @@ Player::Player(
    : ArenaObject(EntityId::Player, ZOrder::Layer_5, arena)
    , mType(type)
    , mData(PlayerAnimation::StandDown, 0_ms, MIN_SPEED, 1, 1, 1, 0)
+   , mSound(PlayerSound::None)
    , mEntityFactory(entity_factory)
 {
 
@@ -26,15 +27,15 @@ Player::~Player()
 
 void Player::Update(const int elapsed_time)
 {
-//   SetSound(SoundId::None);
-
    const auto old_anim = mData.anim;
    const auto parent_cell = GetArena()->GetCellFromObject(*this);
 
    if (GetArena()->HasExplosion(parent_cell))
    {
+      // TODO: Initiate player death.
+//      mSound = PlayerSound::Die;
+
       // Explosions kill the player instantly.
-//      SetSound(SoundId::PlayerDies);
       Invalidate();
       return;
    }
@@ -45,15 +46,19 @@ void Player::Update(const int elapsed_time)
       {
          case ExtraType::Speed:
             IncreaseSpeed();
+            mSound = PlayerSound::Collect_Speed;
             break;
          case ExtraType::Bombs:
             mData.bombs = std::min(mData.bombs + 1, 99);
+            mSound = PlayerSound::Collect_Bombs;
             break;
          case ExtraType::Range:
             mData.range = std::min(mData.range + 1, 99);
+            mSound = PlayerSound::Collect_Range;
             break;
          case ExtraType::InfiniteRange:
             mData.range = 99;
+            mSound = PlayerSound::Collect_InfiniteRange;
             break;
          default:
             break;
@@ -61,8 +66,6 @@ void Player::Update(const int elapsed_time)
       // An extra should no longer exist after it was picked
       //  up by a player.
       GetArena()->DestroyExtra(parent_cell);
-
-//      SetSound(SoundId::PlayerPicksUpExtra);
    }
 
    UpdateMovement(elapsed_time);
@@ -94,6 +97,16 @@ PlayerType Player::GetType() const
 PlayerData Player::GetData() const
 {
    return mData;
+}
+
+PlayerSound Player::GetSound(const bool reset)
+{
+   const auto ret = mSound;
+
+   if (reset) {
+      mSound = PlayerSound::None;
+   }
+   return ret;
 }
 
 void Player::UpdateMovement(const int elapsed_time)

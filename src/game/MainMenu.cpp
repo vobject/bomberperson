@@ -29,6 +29,8 @@ std::vector<UserInterfaceItem> MainMenu::GetMenuItems() const
 
 void MainMenu::SelectionUp()
 {
+   mSound = MenuSound::Switch;
+
    if (0 == mSelectionMarker) {
       mSelectionMarker = mItems.size() - 1;
       return;
@@ -39,6 +41,8 @@ void MainMenu::SelectionUp()
 
 void MainMenu::SelectionDown()
 {
+   mSound = MenuSound::Switch;
+
    if ((mItems.size() - 1) == mSelectionMarker) {
       mSelectionMarker = 0;
       return;
@@ -47,17 +51,22 @@ void MainMenu::SelectionDown()
    mSelectionMarker++;
 }
 
-//void MainMenu::Choose()
-//{
-//   mHasChosen = true;
-//}
+void MainMenu::Choose()
+{
+   mSound = MenuSound::Choose;
+}
 
-//bool MainMenu::HasChosen() const
-//{
-//   return mHasChosen;
-//}
-
-UserInterfaceItem MainMenu::GetSelection() const
+UserInterfaceItem MainMenu::GetSelection()
 {
    return mItems.at(mSelectionMarker);
+}
+
+MenuSound MainMenu::GetSound(const bool reset)
+{
+   const auto ret = mSound;
+
+   if (reset) {
+      mSound = MenuSound::None;
+   }
+   return ret;
 }
