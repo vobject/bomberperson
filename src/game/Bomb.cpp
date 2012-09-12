@@ -1,7 +1,6 @@
 #include "Bomb.hpp"
 #include "Arena.hpp"
 #include "EntityManager.hpp"
-#include "Cell.hpp"
 #include "Wall.hpp"
 #include "Explosion.hpp"
 

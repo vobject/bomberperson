@@ -1,7 +1,6 @@
 #include "Match.hpp"
 #include "Arena.hpp"
 #include "ArenaGenerator.hpp"
-#include "Cell.hpp"
 #include "Player.hpp"
 #include "Scoreboard.hpp"
 #include "../input/KeyboardInput.hpp"

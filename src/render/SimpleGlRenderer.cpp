@@ -2,7 +2,6 @@
 #include "../game/MainMenu.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Scoreboard.hpp"
-#include "../game/Cell.hpp"
 #include "../game/Wall.hpp"
 #include "../game/Extra.hpp"
 #include "../game/Bomb.hpp"
