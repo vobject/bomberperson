@@ -7,6 +7,23 @@
 #include <string>
 #include <vector>
 
+enum class MenuType
+{
+   Mainmenu
+};
+
+enum class MenuMusic
+{
+   MainmenuTrack
+};
+
+enum class MenuSound
+{
+   Switch,
+   Choose,
+   Invalid
+};
+
 //enum class MainMenuItem
 //{
 //   StartGame,

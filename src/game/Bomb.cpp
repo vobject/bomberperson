@@ -8,7 +8,7 @@ Bomb::Bomb(const std::shared_ptr<Arena>& arena, EntityManager& entity_factory)
    : ArenaObject(EntityId::Bomb, ZOrder::Layer_4, arena)
    , mEntityFactory(entity_factory)
 {
-
+   mSound = BombSound::Planted;
 }
 
 Bomb::~Bomb()
@@ -41,13 +41,14 @@ int Bomb::GetAnimationTime() const
    return mLifeTime;
 }
 
-bool Bomb::WasPlantedSound() const
+BombSound Bomb::GetSound(const bool reset)
 {
-   if (mPlantedSound) {
-      mPlantedSound = false;
-      return true;
+   const auto ret = mSound;
+
+   if (reset) {
+      mSound = BombSound::None;
    }
-   return false;
+   return ret;
 }
 
 int Bomb::GetRange() const
@@ -69,7 +70,7 @@ void Bomb::PlantCenterExplosion() const
 {
    const auto parent = GetArena()->GetCellFromObject(*this);
    auto explosion = mEntityFactory.CreateExplosion(parent);
-//   explosion->SetSound(SoundId::Explosion);
+   explosion->SetSound();
    GetArena()->SetExplosion(parent, explosion);
 }
 

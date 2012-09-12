@@ -10,6 +10,11 @@
 
 class Player;
 
+enum class ScoreboardType
+{
+
+};
+
 class Scoreboard : public SceneObject
 {
 public:

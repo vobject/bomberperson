@@ -13,10 +13,6 @@ Explosion::~Explosion()
 
 void Explosion::Update(const int elapsed_time)
 {
-//   if (mSoundProcessed) {
-//      SetSound(SoundId::None);
-//   }
-
    mLifeTime += elapsed_time;
 
    if (mLifeTime >= DEFAULT_LIFETIME)
@@ -24,10 +20,24 @@ void Explosion::Update(const int elapsed_time)
       // The explosion has burned out.
       Invalidate();
    }
-//   mSoundProcessed = true;
 }
 
 int Explosion::GetAnimationTime() const
 {
    return mLifeTime;
+}
+
+ExplosionSound Explosion::GetSound(const bool reset)
+{
+   const auto ret = mSound;
+
+   if (reset) {
+      mSound = ExplosionSound::None;
+   }
+   return ret;
+}
+
+void Explosion::SetSound()
+{
+   mSound = ExplosionSound::Booom;
 }

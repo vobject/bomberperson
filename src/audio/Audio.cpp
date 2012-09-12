@@ -86,48 +86,97 @@ Audio::~Audio()
 
 void Audio::Play(const std::shared_ptr<SceneObject>& ent)
 {
-   if (!ent->IsValid()) {
-      return;
+   if (const auto ptr = std::dynamic_pointer_cast<MainMenu>(ent)) {
+      Play(ptr);
    }
+   else if (const auto ptr = std::dynamic_pointer_cast<Arena>(ent)) {
+      Play(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Scoreboard>(ent)) {
+      Play(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Wall>(ent)) {
+      Play(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Bomb>(ent)) {
+      Play(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Explosion>(ent)) {
+      Play(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Extra>(ent)) {
+      Play(ptr);
+   }
+   else if (const auto ptr = std::dynamic_pointer_cast<Player>(ent)) {
+      Play(ptr);
+   }
+   else {
+      LOG(logERROR) << "Audio::Play(SceneObject) Unknown object!";
+   }
+}
 
-   if (const auto ptr = std::dynamic_pointer_cast<MainMenu>(ent))
-   {
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Arena>(ent))
-   {
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Scoreboard>(ent))
-   {
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Cell>(ent))
-   {
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Wall>(ent))
-   {
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Bomb>(ent))
-   {
+void Audio::Play(const std::shared_ptr<MainMenu>& mainmenu)
+{
+}
+
+void Audio::Play(const std::shared_ptr<Arena>& arena)
+{
+}
+
+void Audio::Play(const std::shared_ptr<Scoreboard>& scoreboard)
+{
+}
+
+void Audio::Play(const std::shared_ptr<Wall>& wall)
+{
+}
+
+void Audio::Play(const std::shared_ptr<Extra>& extra)
+{
 //      if (SoundId::None != ptr->GetSound())
 //      {
 //         if( Mix_PlayChannel( -1, plant, 0 ) == -1 ) {
 //            throw "Sound play failed.";
 //         }
 //      }
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<Explosion>(ent))
+}
+
+void Audio::Play(const std::shared_ptr<Bomb>& bomb)
+{
+   // TODO: Load sample from Sound ResCache and play it back.
+
+   switch (bomb->GetSound(true))
    {
-//      if (SoundId::None != ptr->GetSound())
-//      {
-//         if( Mix_PlayChannel( -1, explosion, 0 ) == -1 ) {
-//            throw "Sound play failed.";
-//         }
-//      }
+      case BombSound::Planted:
+         {
+            if( Mix_PlayChannel( -1, plant, 0 ) == -1 ) {
+               throw "Sound play failed.";
+            }
+         }
+         break;
+      default:
+         break;
    }
-   else if (const auto ptr = std::dynamic_pointer_cast<Extra>(ent))
+}
+
+void Audio::Play(const std::shared_ptr<Explosion>& explosion)
+{
+   switch (explosion->GetSound(true))
    {
+      case ExplosionSound::Booom:
+         {
+            if( Mix_PlayChannel( -1, ::explosion, 0 ) == -1 ) {
+               throw "Sound play failed.";
+            }
+         }
+         break;
+      default:
+         break;
    }
-   else if (const auto ptr = std::dynamic_pointer_cast<Player>(ent))
-   {
+}
+
+void Audio::Play(const std::shared_ptr<Player>& player)
+{
 //      const auto s = ptr->GetSound();
 //      if (SoundId::None == s) {
 //         return;
@@ -146,49 +195,6 @@ void Audio::Play(const std::shared_ptr<SceneObject>& ent)
 //            throw "Sound play failed.";
 //         }
 //      }
-   }
-   else {
-      LOG(logERROR) << "Audio::Play(SceneObject) Unknown object!";
-   }
-
-//   for (const auto& cell : match->GetArena()->GetCells())
-//   {
-//      if (cell->HasBomb() && (SoundId::None != cell->GetBomb()->GetSound()))
-//      {
-//         if( Mix_PlayChannel( -1, plant, 0 ) == -1 ) {
-//            throw "Sound play failed.";
-//         }
-//      }
-
-//      if (cell->HasExplosion() && (SoundId::None != cell->GetExplosion()->GetSound()))
-//      {
-//         if( Mix_PlayChannel( -1, explosion, 0 ) == -1 ) {
-//            throw "Sound play failed.";
-//         }
-//      }
-//   }
-
-//   for (const auto& player : match->GetPlayers())
-//   {
-//      const auto s = player->GetSound();
-//      if (SoundId::None == s) {
-//         continue;
-//      }
-
-//      if (SoundId::PlayerPicksUpExtra == s)
-//      {
-//         if( Mix_PlayChannel( -1, extra, 0 ) == -1 ) {
-//            throw "Sound play failed.";
-//         }
-//      }
-
-//      if (SoundId::PlayerDies == s)
-//      {
-//         if( Mix_PlayChannel( -1, death, 0 ) == -1 ) {
-//            throw "Sound play failed.";
-//         }
-//      }
-//   }
 }
 
 //void Audio::PlayMusic(MusicId id)

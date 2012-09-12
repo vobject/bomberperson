@@ -15,28 +15,6 @@ enum class EntityId
    Player
 };
 
-enum class MenuType
-{
-   Mainmenu
-};
-
-enum class MenuMusic
-{
-   MainmenuTrack
-};
-
-enum class MenuSound
-{
-   Switch,
-   Choose,
-   Invalid
-};
-
-enum class ScoreboardType
-{
-
-};
-
 // All types of game assets.
 // Will be used as a bridge between game objects (SceneObject)
 //  and resource management (ResCache).

@@ -77,11 +77,6 @@ void SimpleGlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
    // TODO: Implement Me!
 }
 
-void SimpleGlRenderer::Render(const std::shared_ptr<Cell>& cell)
-{
-   // TODO: Implement Me!
-}
-
 void SimpleGlRenderer::Render(const std::shared_ptr<Wall>& wall)
 {
    // TODO: Implement Me!

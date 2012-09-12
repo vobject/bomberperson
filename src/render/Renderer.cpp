@@ -45,9 +45,6 @@ void Renderer::Render(const std::shared_ptr<SceneObject>& obj)
    else if (const auto ptr = std::dynamic_pointer_cast<Scoreboard>(obj)) {
       Render(ptr);
    }
-   else if (const auto ptr = std::dynamic_pointer_cast<Cell>(obj)) {
-      Render(ptr);
-   }
    else if (const auto ptr = std::dynamic_pointer_cast<Wall>(obj)) {
       Render(ptr);
    }

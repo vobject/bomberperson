@@ -142,11 +142,6 @@ void SdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
    }
 }
 
-void SdlRenderer::Render(const std::shared_ptr<Cell>& cell)
-{
-   (void) cell;
-}
-
 void SdlRenderer::Render(const std::shared_ptr<Wall>& wall)
 {
    const auto type = wall->GetType();

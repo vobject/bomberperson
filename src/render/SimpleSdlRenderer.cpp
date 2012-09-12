@@ -102,11 +102,6 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
    // No font resource available to render.
 }
 
-void SimpleSdlRenderer::Render(const std::shared_ptr<Cell>& cell)
-{
-   (void) cell;
-}
-
 void SimpleSdlRenderer::Render(const std::shared_ptr<Wall>& wall)
 {
    const auto pos = wall->GetPosition();

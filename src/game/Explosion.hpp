@@ -9,10 +9,11 @@
 
 //};
 
-//enum class ExplosionSound
-//{
-
-//};
+enum class ExplosionSound
+{
+   None,
+   Booom
+};
 
 class Explosion : public ArenaObject
 {
@@ -26,12 +27,18 @@ public:
    void Update(int elapsed_time) override;
 
    int GetAnimationTime() const;
+   ExplosionSound GetSound(bool reset);
+
+   // FIXME: Introduce different ExplosionTypes and only make a sound
+   //  the CenterType of the explosion!
+   // For now we work around this.
+   void SetSound();
 
 private:
    static const int DEFAULT_LIFETIME = 1000_ms;
 
    int mLifeTime = 0_ms;
-//   bool mSoundProcessed = false;
+   ExplosionSound mSound = ExplosionSound::None;
 };
 
 #endif // EXPLOSION_HPP

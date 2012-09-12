@@ -11,11 +11,11 @@ class EntityManager;
 
 //};
 
-//enum class BombSound
-//{
-//   None,
-//   Planted
-//};
+enum class BombSound
+{
+   None,
+   Planted
+};
 
 class Bomb : public ArenaObject
 {
@@ -29,7 +29,7 @@ public:
    void Update(int elapsed_time) override;
 
    int GetAnimationTime() const;
-   bool WasPlantedSound() const;
+   BombSound GetSound(bool reset);
 
    int GetRange() const;
    void SetRange(int range);
@@ -47,10 +47,9 @@ private:
    EntityManager& mEntityFactory;
 
    int mLifeTime = 0_ms;
+   BombSound mSound = BombSound::None;
    int mRange = 1;
 
-   mutable bool mPlantedSound = true;
-//   Sound mPlantedSound;
 };
 
 #endif // BOMB_HPP

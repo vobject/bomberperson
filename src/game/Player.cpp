@@ -31,8 +31,6 @@ void Player::Update(const int elapsed_time)
    const auto old_anim = mData.anim;
    const auto parent_cell = GetArena()->GetCellFromObject(*this);
 
-   LOG(logDEBUG) << "Cell(X=" << parent_cell.X << ",Y=" << parent_cell.Y << ")";
-
    if (GetArena()->HasExplosion(parent_cell))
    {
       // Explosions kill the player instantly.

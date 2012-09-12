@@ -7,7 +7,6 @@ class SceneObject;
 class MainMenu;
 class Arena;
 class Scoreboard;
-class Cell;
 class Wall;
 class Extra;
 class Bomb;
@@ -27,7 +26,6 @@ public:
    virtual void Render(const std::shared_ptr<MainMenu>& mainmenu) = 0;
    virtual void Render(const std::shared_ptr<Arena>& arena) = 0;
    virtual void Render(const std::shared_ptr<Scoreboard>& scoreboard) = 0;
-   virtual void Render(const std::shared_ptr<Cell>& cell) = 0;
    virtual void Render(const std::shared_ptr<Wall>& wall) = 0;
    virtual void Render(const std::shared_ptr<Extra>& extra) = 0;
    virtual void Render(const std::shared_ptr<Bomb>& bomb) = 0;
