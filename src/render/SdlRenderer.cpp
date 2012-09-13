@@ -10,6 +10,7 @@
 #include "../game/Player.hpp"
 #include "../resource/ResourceCache.hpp"
 #include "../utils/Utils.hpp"
+#include "../Options.hpp"
 
 #include <SDL.h>
 
@@ -188,7 +189,18 @@ void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 
    const auto res = mResCache->GetPlayerResource(type);
    const auto frame = res.GetFrame(data.anim, data.anim_time, data.speed);
-   Render(player, frame);
+
+   auto pos = player->GetPosition();
+   const auto size = player->GetSize();
+
+   pos.X -= (DefaultSize::PLAYER_WIDTH - DefaultSize::CELL_WIDTH) / 2;
+   pos.Y -= (DefaultSize::PLAYER_HEIGHT - DefaultSize::CELL_HEIGHT);
+
+   SDL_Rect rect = { static_cast<Sint16>(pos.X),
+                     static_cast<Sint16>(pos.Y),
+                     static_cast<Uint16>(size.Width),
+                     static_cast<Uint16>(size.Height) };
+   SDL_BlitSurface(frame, NULL, mScreen, &rect);
 }
 
 void SdlRenderer::Render(

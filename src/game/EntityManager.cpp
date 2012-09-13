@@ -117,7 +117,7 @@ std::shared_ptr<Player> EntityManager::CreatePlayer(const PlayerType type)
          break;
    }
    mArena->SetObjectPosition(*player, parent_cell);
-   player->SetSize({ DefaultSize::PLAYER_WIDTH, DefaultSize::PLAYER_HEIGHT });
+   player->SetSize({ DefaultSize::CELL_WIDTH, DefaultSize::CELL_HEIGHT });
 
    mEntities.insert(player);
    return player;

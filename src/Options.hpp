@@ -43,8 +43,8 @@ struct DefaultSize
    static const int EXPLOSION_WIDTH         = CELL_WIDTH;
    static const int EXPLOSION_HEIGHT        = CELL_HEIGHT;
 
-   static const int PLAYER_WIDTH            = CELL_WIDTH * .7f;
-   static const int PLAYER_HEIGHT           = CELL_HEIGHT * .7f;
+   static const int PLAYER_WIDTH            = CELL_WIDTH * 1.75f;
+   static const int PLAYER_HEIGHT           = CELL_HEIGHT * 1.75f;
    static const int PLAYER_1_CELL_X         = 0;
    static const int PLAYER_1_CELL_Y         = 0;
    static const int PLAYER_2_CELL_X         = 14;

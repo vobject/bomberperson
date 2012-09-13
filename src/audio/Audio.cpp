@@ -28,8 +28,8 @@ Audio::Audio()
       throw "Cannot init SDL audio subsystem.";
    }
 
-   Mix_Volume(-1, MIX_MAX_VOLUME / 4);
-   Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
+   Mix_Volume(-1, MIX_MAX_VOLUME / 8);
+   Mix_VolumeMusic(MIX_MAX_VOLUME / 8);
 
    mCache = make_unique<AudioCache>();
 }
