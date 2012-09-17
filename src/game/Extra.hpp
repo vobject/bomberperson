@@ -8,7 +8,10 @@ enum class ExtraType
    Speed,
    Bombs,
    Range,
-   InfiniteRange
+   InfiniteRange,
+   Kick,
+   RemoteBombs,
+   Slow
 };
 
 //enum class ExtraSound

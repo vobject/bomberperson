@@ -38,30 +38,7 @@ SDL_Surface* SpriteResource::GetFrame(const int anim_time /*=0_ms*/) const
       // The sprite has no animation but only one texture.
       return mFrames.at(0);
    }
-   else
-   {
-      const int current_frame_index = anim_time / mMsPerFrame;
-      return mFrames.at(current_frame_index % mFrames.size());
-   }
+
+   const int current_frame_index = anim_time / mMsPerFrame;
+   return mFrames.at(current_frame_index % mFrames.size());
 }
-
-//int SpriteResource::GetFrameCount() const
-//{
-//   return mFrames.size();
-//}
-
-//SDL_Surface* SpriteResource::GetFrame(const int n) const
-//{
-//   return mFrames.at(n);
-//}
-
-//void SpriteResource::SetAnimationLength(const int ms)
-//{
-//   mAnimationLength = ms;
-//   mMsPerFrame = mAnimationLength / mFrames.size();
-//}
-
-//void SpriteResource::SetLooping(const bool looping)
-//{
-//   mLooping = looping;
-//}

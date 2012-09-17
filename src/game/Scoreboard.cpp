@@ -40,7 +40,7 @@ std::vector<std::string> Scoreboard::GetScore() const
 
       const auto data = player->GetData();
 
-      os << "Player " << static_cast<int>(player->GetId()) << ":";
+      os << "Player " << static_cast<int>(player->GetType()) + 1 << ":";
       lines.push_back(os.str());
       os.clear();
       os.str("");
@@ -56,6 +56,11 @@ std::vector<std::string> Scoreboard::GetScore() const
       os.str("");
 
       os << "  Range: " << data.range;
+      lines.push_back(os.str());
+      os.clear();
+      os.str("");
+
+      os << "  Kills: " << data.kills;
       lines.push_back(os.str());
       os.clear();
       os.str("");

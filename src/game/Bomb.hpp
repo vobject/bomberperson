@@ -6,10 +6,11 @@
 
 class EntityManager;
 
-//enum class BombType
-//{
-
-//};
+enum class BombType
+{
+   Countdown,
+   Remote
+};
 
 enum class BombSound
 {
@@ -20,7 +21,9 @@ enum class BombSound
 class Bomb : public ArenaObject
 {
 public:
-   Bomb(const std::shared_ptr<Arena>& arena, EntityManager& entity_factory);
+   Bomb(const std::shared_ptr<Arena>& arena,
+        BombType type,
+        EntityManager& entity_factory);
    virtual ~Bomb();
 
    Bomb(const Bomb&) = delete;
@@ -28,6 +31,7 @@ public:
 
    void Update(int elapsed_time) override;
 
+   BombType GetType() const;
    BombSound GetSound(bool reset);
 
    int GetRange() const;
@@ -39,10 +43,12 @@ private:
    void PlantCenterExplosion() const;
    void PlantRangeExplosion(Direction dir) const;
 
+   const BombType mType;
    EntityManager& mEntityFactory;
 
-   BombSound mSound = BombSound::None;
+   int mLifeTime = 0_ms;
    int mRange = 1;
+   BombSound mSound = BombSound::None;
 
 };
 

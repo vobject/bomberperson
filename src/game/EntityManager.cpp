@@ -74,9 +74,12 @@ std::shared_ptr<Extra> EntityManager::CreateExtra(
    return extra;
 }
 
-std::shared_ptr<Bomb> EntityManager::CreateBomb(const Cell& cell)
+std::shared_ptr<Bomb> EntityManager::CreateBomb(
+   const Cell& cell,
+   const BombType type
+)
 {
-   auto bomb = std::make_shared<Bomb>(mArena, *this);
+   auto bomb = std::make_shared<Bomb>(mArena, type, *this);
    mArena->SetObjectPosition(*bomb, cell);
    mArena->SetObjectSize(*bomb);
 

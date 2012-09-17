@@ -118,7 +118,7 @@ void ArenaGenerator::CreateDefaultExtras(
          }
          else
          {
-            switch (rand() % 3)
+            switch (rand() % 4)
             {
                case 0:
                   extra = mEntityFactory.CreateExtra(cell, ExtraType::Speed);
@@ -128,6 +128,9 @@ void ArenaGenerator::CreateDefaultExtras(
                   break;
                case 2:
                   extra = mEntityFactory.CreateExtra(cell, ExtraType::Range);
+                  break;
+               case 3:
+                  extra = mEntityFactory.CreateExtra(cell, ExtraType::RemoteBombs);
                   break;
             }
          }

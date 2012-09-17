@@ -4,6 +4,7 @@
 #include "SpriteResource.hpp"
 #include "WallResource.hpp"
 #include "ExtraResource.hpp"
+#include "BombResource.hpp"
 #include "PlayerResource.hpp"
 #include "../utils/Utils.hpp"
 
@@ -13,7 +14,6 @@
 
 struct SDL_Surface;
 enum class EntityId;
-enum class PlayerType;
 
 class ResourceCache
 {
@@ -31,7 +31,7 @@ public:
    SpriteResource GetArenaResource(EntityId id) const;
    WallResource GetWallResource(WallType type) const;
    ExtraResource GetExtraResource(ExtraType type) const;
-   SpriteResource GetBombResource(EntityId id) const;
+   BombResource GetBombResource(BombType type) const;
    SpriteResource GetExplosionResource(EntityId id) const;
    PlayerResource GetPlayerResource(PlayerType type) const;
 
@@ -57,7 +57,7 @@ private:
    std::map<EntityId, SpriteResource> mArenaRes;
    std::map<WallType, WallResource> mWallRes;
    std::map<ExtraType, ExtraResource> mExtraRes;
-   std::map<EntityId, SpriteResource> mBombRes;
+   std::map<BombType, BombResource> mBombRes;
    std::map<EntityId, SpriteResource> mExplosionRes;
    std::map<PlayerType, PlayerResource> mPlayerRes;
    std::vector<SDL_Surface*> mSurfaceCache;

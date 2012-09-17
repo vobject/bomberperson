@@ -14,7 +14,7 @@ Player::Player(
 )
    : ArenaObject(EntityId::Player, ZOrder::Layer_6, arena)
    , mType(type)
-   , mData(PlayerAnimation::StandDown, MIN_SPEED, 1, 1, 1, 0)
+   , mData(PlayerAnimation::StandDown, MIN_SPEED, 1)
    , mSound(PlayerSound::None)
    , mEntityFactory(entity_factory)
 {
@@ -76,6 +76,10 @@ void Player::Update(const int elapsed_time)
          case ExtraType::InfiniteRange:
             mData.range = 99;
             mSound = PlayerSound::Collect_InfiniteRange;
+            break;
+         case ExtraType::RemoteBombs:
+            mData.remote_bombs += 5;
+            mSound = PlayerSound::Collect_Bombs;
             break;
          default:
             break;
@@ -188,34 +192,42 @@ void Player::UpdateBombing(const int elapsed_time)
       return;
    }
 
-   if (!mCurrentCommands.action1 && !mCurrentCommands.action2)
-   {
-      // The user did not request to plant a bomb.
-      return;
-   }
-
-   // TODO: Use Action2 input to detonate remote controlled bombs etc.
-
    const auto parent_cell = GetArena()->GetCellFromObject(*this);
 
-   if (GetArena()->HasBomb(parent_cell)) {
-      // Only one bomb allowed per cell.
-      return;
+   if (mCurrentCommands.action1 && // User pressed the right button.
+       !GetArena()->HasBomb(parent_cell) && // No bomb in this cell yet.
+       CanPlantBomb()) // Player did not run out of bomb supply.
+   {
+      auto bomb_type = BombType::Countdown; // The default bomb type.
+
+      if (mData.remote_bombs)
+      {
+         // Always plant remote controlled bombs if the player has them.
+         bomb_type = BombType::Remote;
+         mData.remote_bombs--;
+      }
+
+      auto bomb = mEntityFactory.CreateBomb(parent_cell, bomb_type);
+      bomb->SetRange(mData.range);
+//      bomb->SetOwner(GetId());
+//      bomb->SetSound(SoundId::BombPlanted);
+      GetArena()->SetBomb(parent_cell, bomb);
+
+      mPlantedBombs.push_back(bomb);
+      mBombIdleTime = 0_ms;
    }
 
-   if (!CanPlantBomb()) {
-      // Out of bomb supply. Wait till an older bomb exploded.
-      return;
+   if (mCurrentCommands.action2)
+   {
+      // Detonate all remote controlled bombs that the player planted.
+      for (auto& bomb : mPlantedBombs)
+      {
+         if (bomb->IsValid() && (BombType::Remote == bomb->GetType()))
+         {
+            bomb->Detonate();
+         }
+      }
    }
-
-   auto bomb = mEntityFactory.CreateBomb(parent_cell);
-   bomb->SetRange(mData.range);
-//   bomb->SetOwner(GetId());
-//   bomb->SetSound(SoundId::BombPlanted);
-   GetArena()->SetBomb(parent_cell, bomb);
-
-   mPlantedBombs.push_back(bomb);
-   mBombIdleTime = 0_ms;
 }
 
 bool Player::CanMove(const Direction dir, const int distance) const

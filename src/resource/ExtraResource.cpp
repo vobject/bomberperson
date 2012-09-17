@@ -25,4 +25,3 @@ SDL_Surface *ExtraResource::GetFrame() const
 {
    return mFrames.at(0);
 }
-

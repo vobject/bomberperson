@@ -52,16 +52,15 @@ struct PlayerData
 {
    constexpr PlayerData(const PlayerAnimation anim,
                         const int speed,
-                        const int distance,
-                        const int bombs,
-                        const int range,
-                        const int wins)
-      : anim(PlayerAnimation::StandDown)
+                        const int distance)
+      : anim(anim)
       , speed(speed)
       , distance(distance)
-      , bombs(bombs)
-      , range(range)
-      , wins(wins)
+      , bombs(1)
+      , range(1)
+      , remote_bombs(0)
+      , kills(0)
+      , wins(0)
    { }
 
    PlayerAnimation anim;
@@ -70,7 +69,9 @@ struct PlayerData
    int distance;
    int bombs;
    int range;
+   int remote_bombs;
 
+   int kills;
    int wins;
 };
 

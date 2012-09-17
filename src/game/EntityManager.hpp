@@ -17,6 +17,7 @@ struct Cell;
 enum class EntityId;
 enum class WallType;
 enum class ExtraType;
+enum class BombType;
 enum class PlayerType;
 
 template<class T>
@@ -45,7 +46,7 @@ public:
 
    std::shared_ptr<Wall> CreateWall(const Cell& cell, WallType type);
    std::shared_ptr<Extra> CreateExtra(const Cell& cell, ExtraType type);
-   std::shared_ptr<Bomb> CreateBomb(const Cell& cell);
+   std::shared_ptr<Bomb> CreateBomb(const Cell& cell, BombType type);
    std::shared_ptr<Explosion> CreateExplosion(const Cell& cell);
    std::shared_ptr<Player> CreatePlayer(PlayerType type);
 

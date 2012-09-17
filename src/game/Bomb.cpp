@@ -5,8 +5,13 @@
 #include "Explosion.hpp"
 #include "../Options.hpp"
 
-Bomb::Bomb(const std::shared_ptr<Arena>& arena, EntityManager& entity_factory)
+Bomb::Bomb(
+   const std::shared_ptr<Arena>& arena,
+   const BombType type,
+   EntityManager& entity_factory
+)
    : ArenaObject(EntityId::Bomb, ZOrder::Layer_4, arena)
+   , mType(type)
    , mEntityFactory(entity_factory)
 {
    mSound = BombSound::Planted;
@@ -21,7 +26,12 @@ void Bomb::Update(const int elapsed_time)
 {
    SetAnimationTime(GetAnimationTime() + elapsed_time);
 
-   if (IsValid() && (GetAnimationTime() >= DefaultValue::BOMB_ANIM_LEN))
+   if (BombType::Remote != mType) {
+      // The lifetime of a remote controlled bomb does not decline over time.
+      mLifeTime += elapsed_time;
+   }
+
+   if (IsValid() && (mLifeTime >= DefaultValue::BOMB_ANIM_LEN))
    {
       // Lifetime of this bomb object ended...
       Invalidate();
@@ -33,6 +43,11 @@ void Bomb::Update(const int elapsed_time)
       PlantRangeExplosion(Direction::Left);
       PlantRangeExplosion(Direction::Right);
    }
+}
+
+BombType Bomb::GetType() const
+{
+   return mType;
 }
 
 BombSound Bomb::GetSound(const bool reset)
@@ -57,7 +72,7 @@ void Bomb::SetRange(const int range)
 
 void Bomb::Detonate()
 {
-   SetAnimationTime(DefaultValue::BOMB_ANIM_LEN);
+   mLifeTime = DefaultValue::BOMB_ANIM_LEN;
 }
 
 void Bomb::PlantCenterExplosion() const

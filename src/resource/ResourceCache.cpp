@@ -2,6 +2,7 @@
 #include "../game/EntityId.hpp"
 #include "../game/Wall.hpp"
 #include "../game/Extra.hpp"
+#include "../game/Bomb.hpp"
 #include "../game/Player.hpp"
 #include "../utils/Utils.hpp"
 #include "../Options.hpp"
@@ -70,9 +71,9 @@ ExtraResource ResourceCache::GetExtraResource(const ExtraType type) const
    return iter->second;
 }
 
-SpriteResource ResourceCache::GetBombResource(const EntityId id) const
+BombResource ResourceCache::GetBombResource(const BombType type) const
 {
-   const auto iter = mBombRes.find(id);
+   const auto iter = mBombRes.find(type);
    if (iter == mBombRes.end()) {
       throw "Trying to access non-existing resource";
    }
@@ -103,7 +104,7 @@ void ResourceCache::LoadMenuResources()
    const Size size = { DefaultValue::SCREEN_WIDTH,
                        DefaultValue::SCREEN_HEIGHT };
 
-   mMenuRes.insert({ id, {id, { LoadTexture("sprite/mainmenu.png", size) } } });
+   mMenuRes.insert({ id, { id, { LoadTexture("sprite/mainmenu.png", size) } } });
 }
 
 void ResourceCache::LoadArenaResources()
@@ -112,7 +113,7 @@ void ResourceCache::LoadArenaResources()
    const Size size = { DefaultValue::ARENA_WIDTH,
                        DefaultValue::ARENA_HEIGHT };
 
-   mArenaRes.insert({ id, {id, { LoadTexture("sprite/arena_1.png", size) } } });
+   mArenaRes.insert({ id, { id, { LoadTexture("sprite/arena_1.png", size) } } });
 }
 
 void ResourceCache::LoadWallResources()
@@ -122,8 +123,8 @@ void ResourceCache::LoadWallResources()
    const Size size = { DefaultValue::WALL_WIDTH,
                        DefaultValue::WALL_HEIGHT };
 
-   mWallRes.insert({ id1, {id1, { LoadTexture("sprite/wall_indestructible.png", size) } } });
-   mWallRes.insert({ id2, {id2, { LoadTexture("sprite/wall_destructible.png", size) } } });
+   mWallRes.insert({ id1, { id1, { LoadTexture("sprite/wall_indestructible.png", size) } } });
+   mWallRes.insert({ id2, { id2, { LoadTexture("sprite/wall_destructible.png", size) } } });
 }
 
 void ResourceCache::LoadExtraResources()
@@ -132,32 +133,27 @@ void ResourceCache::LoadExtraResources()
    const auto id2 = ExtraType::Bombs;
    const auto id3 = ExtraType::Range;
    const auto id4 = ExtraType::InfiniteRange;
+   const auto id5 = ExtraType::RemoteBombs;
    const Size size = { DefaultValue::EXTRA_WIDTH,
                        DefaultValue::EXTRA_HEIGHT };
 
-   mExtraRes.insert({ id1, {id1, { LoadTexture("sprite/extra_speed.png", size) } } });
-   mExtraRes.insert({ id2, {id2, { LoadTexture("sprite/extra_supply.png", size) } } });
-   mExtraRes.insert({ id3, {id3, { LoadTexture("sprite/extra_range.png", size) } } });
-   mExtraRes.insert({ id4, {id4, { LoadTexture("sprite/extra_range_gold.png", size) } } });
+   mExtraRes.insert({ id1, { id1, { LoadTexture("sprite/extra_speed.png", size) } } });
+   mExtraRes.insert({ id2, { id2, { LoadTexture("sprite/extra_supply.png", size) } } });
+   mExtraRes.insert({ id3, { id3, { LoadTexture("sprite/extra_range.png", size) } } });
+   mExtraRes.insert({ id4, { id4, { LoadTexture("sprite/extra_range_gold.png", size) } } });
+   mExtraRes.insert({ id5, { id5, { LoadTexture("sprite/extra_remotebombs.png", size) } } });
 }
 
 void ResourceCache::LoadBombResources()
 {
-   const auto id = EntityId::Bomb;
+   const auto id1 = BombType::Countdown;
+   const auto id2 = BombType::Remote;
    const Size size = { DefaultValue::BOMB_WIDTH,
                        DefaultValue::BOMB_HEIGHT };
 
    // TODO: Align animation speed and bomb lifetime.
-   mBombRes.insert({
-      id,
-      { id,
-        { LoadTexture("sprite/bomb_1.png", size),
-          LoadTexture("sprite/bomb_2.png", size),
-          LoadTexture("sprite/bomb_3.png", size) },
-         2500_ms,
-         false
-      }
-   });
+   mBombRes.insert({ id1, { id1, 2500_ms, { LoadTexture("sprite/bomb_1.png", size), LoadTexture("sprite/bomb_2.png", size), LoadTexture("sprite/bomb_3.png", size) } } });
+   mBombRes.insert({ id2, { id2, 1000_ms, { LoadTexture("sprite/bomb_remote_1.png", size), LoadTexture("sprite/bomb_remote_2.png", size) } } });
 }
 
 void ResourceCache::LoadExplosionResources()
