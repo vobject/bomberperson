@@ -3,6 +3,7 @@
 #include "../../game/Wall.hpp"
 #include "../../game/Extra.hpp"
 #include "../../game/Bomb.hpp"
+#include "../../game/Explosion.hpp"
 #include "../../game/Player.hpp"
 #include "../../utils/Utils.hpp"
 #include "../../Options.hpp"
@@ -80,9 +81,9 @@ BombResource ResourceCache::GetBombResource(const BombType type) const
    return iter->second;
 }
 
-SpriteResource ResourceCache::GetExplosionResource(const EntityId id) const
+ExplosionResource ResourceCache::GetExplosionResource(const ExplosionType type) const
 {
-   const auto iter = mExplosionRes.find(id);
+   const auto iter = mExplosionRes.find(type);
    if (iter == mExplosionRes.end()) {
       throw "Trying to access non-existing resource";
    }
@@ -158,22 +159,24 @@ void ResourceCache::LoadBombResources()
 
 void ResourceCache::LoadExplosionResources()
 {
-   const auto id = EntityId::Explosion;
+   const auto id1 = ExplosionType::Center;
+   const auto id2 = ExplosionType::Horizontal;
+   const auto id3 = ExplosionType::HorizontalLeftEnd;
+   const auto id4 = ExplosionType::HorizontalRightEnd;
+   const auto id5 = ExplosionType::Vertical;
+   const auto id6 = ExplosionType::VerticalUpEnd;
+   const auto id7 = ExplosionType::VerticalDownEnd;
    const Size size = { DefaultValue::EXPLOSION_WIDTH,
                        DefaultValue::EXPLOSION_HEIGHT };
 
    // TODO: Align animation speed and explosion lifetime.
-   mExplosionRes.insert({
-      id,
-      { id,
-        { LoadTexture("explosion_1.png", size),
-          LoadTexture("explosion_2.png", size),
-          LoadTexture("explosion_3.png", size),
-          LoadTexture("explosion_4.png", size) },
-         1000_ms,
-         false
-      }
-   });
+   mExplosionRes.insert({ id1, { id1, 750_ms, { LoadTexture("explosion_center_1.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_4.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_1.png", size) } } });
+   mExplosionRes.insert({ id2, { id2, 750_ms, { LoadTexture("explosion_horizontal_1.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_4.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_1.png", size) } } });
+   mExplosionRes.insert({ id3, { id3, 750_ms, { LoadTexture("explosion_horizontal_leftend_1.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_4.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_1.png", size) } } });
+   mExplosionRes.insert({ id4, { id4, 750_ms, { LoadTexture("explosion_horizontal_rightend_1.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_4.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_1.png", size) } } });
+   mExplosionRes.insert({ id5, { id5, 750_ms, { LoadTexture("explosion_vertical_1.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_4.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_1.png", size) } } });
+   mExplosionRes.insert({ id6, { id6, 750_ms, { LoadTexture("explosion_vertical_upend_1.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_4.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_1.png", size) } } });
+   mExplosionRes.insert({ id7, { id7, 750_ms, { LoadTexture("explosion_vertical_downend_1.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_4.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_1.png", size) } } });
 }
 
 void ResourceCache::LoadPlayerResources()

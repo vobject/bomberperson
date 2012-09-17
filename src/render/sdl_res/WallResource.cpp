@@ -7,7 +7,10 @@ WallResource::WallResource(
    : mType(type)
    , mFrames(textures)
 {
-
+   if (mFrames.empty()) {
+      // An animation must always consist of at least one frame.
+      throw "WallResource: Invalid sprite textures.";
+   }
 }
 
 WallResource::~WallResource()

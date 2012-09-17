@@ -176,9 +176,9 @@ void SdlRenderer::Render(const std::shared_ptr<Bomb>& bomb)
 
 void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
 {
-   const auto id = explosion->GetId();
+   const auto type = explosion->GetType();
    const auto anim_time = explosion->GetAnimationTime();
-   const auto frame = mResCache->GetExplosionResource(id).GetFrame(anim_time);
+   const auto frame = mResCache->GetExplosionResource(type).GetFrame(anim_time);
    Render(explosion, frame);
 }
 

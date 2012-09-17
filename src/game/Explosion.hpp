@@ -8,12 +8,12 @@ class Player;
 enum class ExplosionType
 {
    Center,
-   Vertical,
-   VerticalLeftEnd,
-   VerticalRightEnd,
    Horizontal,
-   HorizontalUpEnd,
-   HorizontalDownEnd
+   HorizontalLeftEnd,
+   HorizontalRightEnd,
+   Vertical,
+   VerticalUpEnd,
+   VerticalDownEnd
 };
 
 enum class ExplosionSound

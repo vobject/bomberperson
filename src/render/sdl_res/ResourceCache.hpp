@@ -5,6 +5,7 @@
 #include "WallResource.hpp"
 #include "ExtraResource.hpp"
 #include "BombResource.hpp"
+#include "ExplosionResource.hpp"
 #include "PlayerResource.hpp"
 #include "../../utils/Utils.hpp"
 
@@ -32,7 +33,7 @@ public:
    WallResource GetWallResource(WallType type) const;
    ExtraResource GetExtraResource(ExtraType type) const;
    BombResource GetBombResource(BombType type) const;
-   SpriteResource GetExplosionResource(EntityId id) const;
+   ExplosionResource GetExplosionResource(ExplosionType type) const;
    PlayerResource GetPlayerResource(PlayerType type) const;
 
 //   Texture GetPlayer(const Kinect& kinect);
@@ -58,7 +59,7 @@ private:
    std::map<WallType, WallResource> mWallRes;
    std::map<ExtraType, ExtraResource> mExtraRes;
    std::map<BombType, BombResource> mBombRes;
-   std::map<EntityId, SpriteResource> mExplosionRes;
+   std::map<ExplosionType, ExplosionResource> mExplosionRes;
    std::map<PlayerType, PlayerResource> mPlayerRes;
    std::vector<SDL_Surface*> mSurfaceCache;
 };

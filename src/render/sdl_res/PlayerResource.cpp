@@ -30,6 +30,11 @@ void PlayerResource::SetFrames(
       throw "The length of a player animation cannot be 0.";
    }
 
+   if (textures.empty()) {
+      // An animation must always consist of at least one frame.
+      throw "PlayerResource: Invalid sprite textures.";
+   }
+
    mFrames[state] = { textures, length };
 }
 

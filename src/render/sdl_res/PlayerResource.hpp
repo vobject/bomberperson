@@ -22,7 +22,9 @@ public:
    PlayerType GetType() const;
 
    SDL_Surface* GetFrame(PlayerAnimation state, int anim_time, int speed) const;
-   void SetFrames(PlayerAnimation state, int length, const std::vector<SDL_Surface*>& textures);
+   void SetFrames(PlayerAnimation state,
+                  int length,
+                  const std::vector<SDL_Surface*>& textures);
 
 private:
    const PlayerType mType;

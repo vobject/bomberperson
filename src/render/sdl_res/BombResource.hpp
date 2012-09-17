@@ -10,7 +10,9 @@ struct SDL_Surface;
 class BombResource
 {
 public:
-   BombResource(BombType type, int anim_length, const std::vector<SDL_Surface*>& textures);
+   BombResource(BombType type,
+                int anim_length,
+                const std::vector<SDL_Surface*>& textures);
    ~BombResource();
 
    BombResource(const BombResource&) = default;

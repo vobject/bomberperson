@@ -119,7 +119,7 @@ void Bomb::PlantRangeExplosion(const Direction dir) const
       if (GetArena()->HasWall(range_cell) &&
           GetArena()->GetWall(range_cell)->IsDestructible())
       {
-         // FIXME: This has a problem: when the exploding bomb destroys
+         // FIXME: This has a minor problem: when the exploding bomb destroys
          //  a wall and triggers another bomb with a greater range,
          //  the wall behind the first wall would also be destroyed
          //  at the same time.
@@ -146,13 +146,13 @@ ExplosionType Bomb::GetExplosionType(const Direction dir, const bool end) const
    switch (dir)
    {
       case Direction::Up:
-         return end ? ExplosionType::HorizontalUpEnd : ExplosionType::Horizontal;
+         return end ? ExplosionType::VerticalUpEnd : ExplosionType::Vertical;
       case Direction::Down:
-         return end ? ExplosionType::HorizontalDownEnd : ExplosionType::Horizontal;
+         return end ? ExplosionType::VerticalDownEnd : ExplosionType::Vertical;
       case Direction::Left:
-         return end ? ExplosionType::VerticalLeftEnd : ExplosionType::Vertical;
+         return end ? ExplosionType::HorizontalLeftEnd : ExplosionType::Horizontal;
       case Direction::Right:
-         return end ? ExplosionType::VerticalRightEnd : ExplosionType::Vertical;
+         return end ? ExplosionType::HorizontalRightEnd : ExplosionType::Horizontal;
    }
 
    throw "Could not find the correct explosion type";
