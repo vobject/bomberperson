@@ -80,12 +80,13 @@ void Bomb::Detonate()
 void Bomb::PlantCenterExplosion() const
 {
    const auto parent = GetArena()->GetCellFromObject(*this);
-   auto explosion = mEntityFactory.CreateExplosion(parent, mOwner);
-   explosion->SetSound();
+   auto explosion = mEntityFactory.CreateExplosion(parent,
+                                                   ExplosionType::Center,
+                                                   mOwner);
    GetArena()->SetExplosion(parent, explosion);
 }
 
-void Bomb::PlantRangeExplosion(Direction dir) const
+void Bomb::PlantRangeExplosion(const Direction dir) const
 {
    const auto parent = GetArena()->GetCellFromObject(*this);
    auto range_cell = GetArena()->GetNeighborCell(parent, dir);
@@ -109,8 +110,10 @@ void Bomb::PlantRangeExplosion(Direction dir) const
          break;
       }
 
-      // TODO: Select the right ExplosionType (horizontal, vertical, etc).
-      auto range_exp = mEntityFactory.CreateExplosion(range_cell, mOwner);
+      const auto exp_type = GetExplosionType(dir, (range_to_go == 1));
+      auto range_exp = mEntityFactory.CreateExplosion(range_cell,
+                                                      exp_type,
+                                                      mOwner);
       GetArena()->SetExplosion(range_cell, range_exp);
 
       if (GetArena()->HasWall(range_cell) &&
@@ -136,4 +139,21 @@ void Bomb::PlantRangeExplosion(Direction dir) const
       range_cell = GetArena()->GetNeighborCell(range_cell, dir);
       range_to_go--;
    }
+}
+
+ExplosionType Bomb::GetExplosionType(const Direction dir, const bool end) const
+{
+   switch (dir)
+   {
+      case Direction::Up:
+         return end ? ExplosionType::HorizontalUpEnd : ExplosionType::Horizontal;
+      case Direction::Down:
+         return end ? ExplosionType::HorizontalDownEnd : ExplosionType::Horizontal;
+      case Direction::Left:
+         return end ? ExplosionType::VerticalLeftEnd : ExplosionType::Vertical;
+      case Direction::Right:
+         return end ? ExplosionType::VerticalRightEnd : ExplosionType::Vertical;
+   }
+
+   throw "Could not find the correct explosion type";
 }

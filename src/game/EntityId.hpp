@@ -42,17 +42,6 @@ enum class EntityId
 
 //   Explosion,
 
-////enum class ExplosionType
-////{
-////   Crossway,
-////   Vertical,
-////   VerticalLeftEnd,
-////   VerticalRightEnd,
-////   Horizontal,
-////   HorizontalLeftEnd,
-////   HorizontalRightEnd
-////};
-
 //   Player_1,
 //   Player_2,
 //   Player_3,

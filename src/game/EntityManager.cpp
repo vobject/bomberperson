@@ -102,10 +102,11 @@ std::shared_ptr<Bomb> EntityManager::CreateBomb(
 
 std::shared_ptr<Explosion> EntityManager::CreateExplosion(
    const Cell& cell,
+   const ExplosionType type,
    const std::shared_ptr<Player>& owner
 )
 {
-   auto explosion = std::make_shared<Explosion>(mArena, owner);
+   auto explosion = std::make_shared<Explosion>(mArena, type, owner);
    mArena->SetObjectPosition(*explosion, cell);
    mArena->SetObjectSize(*explosion);
 

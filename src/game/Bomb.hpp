@@ -6,11 +6,14 @@
 
 class Player;
 class EntityManager;
+enum class ExplosionType;
 
 enum class BombType
 {
    Countdown,
    Remote
+//   CountDownJelly,
+//   RemoteJelly
 };
 
 enum class BombSound
@@ -44,6 +47,7 @@ public:
 private:
    void PlantCenterExplosion() const;
    void PlantRangeExplosion(Direction dir) const;
+   ExplosionType GetExplosionType(Direction dir, bool end) const;
 
    const BombType mType;
    const std::shared_ptr<Player> mOwner;
@@ -52,7 +56,6 @@ private:
    int mLifeTime = 0_ms;
    int mRange = 1;
    BombSound mSound = BombSound::None;
-
 };
 
 #endif // BOMB_HPP

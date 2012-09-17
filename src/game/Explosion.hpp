@@ -5,10 +5,16 @@
 
 class Player;
 
-//enum class ExplosionType
-//{
-
-//};
+enum class ExplosionType
+{
+   Center,
+   Vertical,
+   VerticalLeftEnd,
+   VerticalRightEnd,
+   Horizontal,
+   HorizontalUpEnd,
+   HorizontalDownEnd
+};
 
 enum class ExplosionSound
 {
@@ -20,6 +26,7 @@ class Explosion : public ArenaObject
 {
 public:
    Explosion(const std::shared_ptr<Arena>& arena,
+             ExplosionType type,
              const std::shared_ptr<Player>& owner);
    virtual ~Explosion();
 
@@ -28,15 +35,12 @@ public:
 
    void Update(int elapsed_time) override;
 
+   ExplosionType GetType() const;
    std::shared_ptr<Player> GetOwner() const;
    ExplosionSound GetSound(bool reset);
 
-   // FIXME: Introduce different ExplosionTypes and only make a sound
-   //  the CenterType of the explosion!
-   // For now we work around this.
-   void SetSound();
-
 private:
+   const ExplosionType mType;
    const std::shared_ptr<Player> mOwner;
    ExplosionSound mSound = ExplosionSound::None;
 };
