@@ -83,7 +83,6 @@ public:
 private:
    struct CellContent
    {
-//      CellContent() {}
       std::shared_ptr<Wall> wall;
       std::shared_ptr<Extra> extra;
       std::shared_ptr<Bomb> bomb;

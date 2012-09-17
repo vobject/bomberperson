@@ -28,7 +28,6 @@ public:
 
    void Update(int elapsed_time) override;
 
-   int GetAnimationTime() const;
    BombSound GetSound(bool reset);
 
    int GetRange() const;
@@ -37,16 +36,11 @@ public:
    void Detonate();
 
 private:
-   // TODO: Keep this in sync with the animation length
-   //  specified in the resource cache.
-   static const int DEFAULT_LIFETIME = 2500_ms;
-
    void PlantCenterExplosion() const;
    void PlantRangeExplosion(Direction dir) const;
 
    EntityManager& mEntityFactory;
 
-   int mLifeTime = 0_ms;
    BombSound mSound = BombSound::None;
    int mRange = 1;
 

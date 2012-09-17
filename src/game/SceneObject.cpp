@@ -52,6 +52,16 @@ void SceneObject::SetSize(const Size& size)
    mSize = size;
 }
 
+int SceneObject::GetAnimationTime() const
+{
+   return mAnimationTime;
+}
+
+void SceneObject::SetAnimationTime(const int ms)
+{
+   mAnimationTime = ms;
+}
+
 void SceneObject::Invalidate()
 {
    mIsValid = false;

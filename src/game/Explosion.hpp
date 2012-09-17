@@ -2,7 +2,6 @@
 #define EXPLOSION_HPP
 
 #include "ArenaObject.hpp"
-#include "../utils/Utils.hpp"
 
 //enum class ExplosionType
 //{
@@ -26,7 +25,6 @@ public:
 
    void Update(int elapsed_time) override;
 
-   int GetAnimationTime() const;
    ExplosionSound GetSound(bool reset);
 
    // FIXME: Introduce different ExplosionTypes and only make a sound
@@ -35,9 +33,6 @@ public:
    void SetSound();
 
 private:
-   static const int DEFAULT_LIFETIME = 1000_ms;
-
-   int mLifeTime = 0_ms;
    ExplosionSound mSound = ExplosionSound::None;
 };
 

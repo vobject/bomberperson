@@ -9,7 +9,7 @@
 
 static const std::string RESOURCE_DIR = "res_q1";
 
-struct DefaultSize
+struct DefaultValue
 {
    static const int SCREEN_WIDTH            = 800_px;
    static const int SCREEN_HEIGHT           = 600_px;
@@ -39,9 +39,11 @@ struct DefaultSize
 
    static const int BOMB_WIDTH              = CELL_WIDTH;
    static const int BOMB_HEIGHT             = CELL_HEIGHT;
+   static const int BOMB_ANIM_LENGTH        = 2500_ms;
 
    static const int EXPLOSION_WIDTH         = CELL_WIDTH;
    static const int EXPLOSION_HEIGHT        = CELL_HEIGHT;
+   static const int EXPLOSION_ANIM_LENGTH   = 1000_ms;
 
    static const int PLAYER_WIDTH            = CELL_WIDTH * 1.75f;
    static const int PLAYER_HEIGHT           = CELL_HEIGHT * 1.75f;

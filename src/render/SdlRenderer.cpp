@@ -186,15 +186,16 @@ void SdlRenderer::Render(const std::shared_ptr<Player>& player)
 {
    const auto type = player->GetType();
    const auto data = player->GetData();
+   const auto anim_time = player->GetAnimationTime();
 
    const auto res = mResCache->GetPlayerResource(type);
-   const auto frame = res.GetFrame(data.anim, data.anim_time, data.speed);
+   const auto frame = res.GetFrame(data.anim, anim_time, data.speed);
 
    auto pos = player->GetPosition();
    const auto size = player->GetSize();
 
-   pos.X -= (DefaultSize::PLAYER_WIDTH - DefaultSize::CELL_WIDTH) / 2;
-   pos.Y -= (DefaultSize::PLAYER_HEIGHT - DefaultSize::CELL_HEIGHT);
+   pos.X -= (DefaultValue::PLAYER_WIDTH - DefaultValue::CELL_WIDTH) / 2;
+   pos.Y -= (DefaultValue::PLAYER_HEIGHT - DefaultValue::CELL_HEIGHT);
 
    SDL_Rect rect = { static_cast<Sint16>(pos.X),
                      static_cast<Sint16>(pos.Y),

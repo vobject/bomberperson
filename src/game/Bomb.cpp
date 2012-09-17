@@ -3,6 +3,7 @@
 #include "EntityManager.hpp"
 #include "Wall.hpp"
 #include "Explosion.hpp"
+#include "../Options.hpp"
 
 Bomb::Bomb(const std::shared_ptr<Arena>& arena, EntityManager& entity_factory)
    : ArenaObject(EntityId::Bomb, ZOrder::Layer_4, arena)
@@ -18,11 +19,9 @@ Bomb::~Bomb()
 
 void Bomb::Update(const int elapsed_time)
 {
-//   SetSound(SoundId::None);
+   SetAnimationTime(GetAnimationTime() + elapsed_time);
 
-   mLifeTime += elapsed_time;
-
-   if (IsValid() && (mLifeTime >= DEFAULT_LIFETIME))
+   if (IsValid() && (GetAnimationTime() >= DefaultValue::BOMB_ANIM_LENGTH))
    {
       // Lifetime of this bomb object ended...
       Invalidate();
@@ -34,11 +33,6 @@ void Bomb::Update(const int elapsed_time)
       PlantRangeExplosion(Direction::Left);
       PlantRangeExplosion(Direction::Right);
    }
-}
-
-int Bomb::GetAnimationTime() const
-{
-   return mLifeTime;
 }
 
 BombSound Bomb::GetSound(const bool reset)
@@ -63,7 +57,7 @@ void Bomb::SetRange(const int range)
 
 void Bomb::Detonate()
 {
-   mLifeTime = DEFAULT_LIFETIME;
+   SetAnimationTime(DefaultValue::BOMB_ANIM_LENGTH);
 }
 
 void Bomb::PlantCenterExplosion() const

@@ -51,14 +51,12 @@ enum class PlayerAnimation
 struct PlayerData
 {
    constexpr PlayerData(const PlayerAnimation anim,
-                        const int anim_time,
                         const int speed,
                         const int distance,
                         const int bombs,
                         const int range,
                         const int wins)
       : anim(PlayerAnimation::StandDown)
-      , anim_time(0_ms)
       , speed(speed)
       , distance(distance)
       , bombs(bombs)
@@ -67,7 +65,6 @@ struct PlayerData
    { }
 
    PlayerAnimation anim;
-   int anim_time;
 
    int speed;
    int distance;

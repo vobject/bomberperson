@@ -23,16 +23,16 @@ EntityManager::~EntityManager()
 std::shared_ptr<Arena> EntityManager::CreateArena(const int player_count)
 {
    ArenaGenerator arena_gen(*this);
-   arena_gen.SetArenaPosition({ DefaultSize::ARENA_POS_X, DefaultSize::ARENA_POS_Y });
-   arena_gen.SetArenaSize({ DefaultSize::ARENA_WIDTH, DefaultSize::ARENA_HEIGHT });
-   arena_gen.SetArenaBorderSize({ DefaultSize::ARENA_BORDER_WIDTH, DefaultSize::ARENA_BORDER_HEIGHT });
+   arena_gen.SetArenaPosition({ DefaultValue::ARENA_POS_X, DefaultValue::ARENA_POS_Y });
+   arena_gen.SetArenaSize({ DefaultValue::ARENA_WIDTH, DefaultValue::ARENA_HEIGHT });
+   arena_gen.SetArenaBorderSize({ DefaultValue::ARENA_BORDER_WIDTH, DefaultValue::ARENA_BORDER_HEIGHT });
 
    // The arena object will be used internally to create every other
    //  ArenaObject derived class.
-   mArena = arena_gen.GetDefaultArena(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y);
-   arena_gen.CreateDefaultWalls(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, *mArena);
-   arena_gen.CreateDefaultExtras(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, *mArena);
-   arena_gen.CreateDefaultSpawnAreas(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, player_count, *mArena);
+   mArena = arena_gen.GetDefaultArena(DefaultValue::ARENA_CELLS_X, DefaultValue::ARENA_CELLS_Y);
+   arena_gen.CreateDefaultWalls(DefaultValue::ARENA_CELLS_X, DefaultValue::ARENA_CELLS_Y, *mArena);
+   arena_gen.CreateDefaultExtras(DefaultValue::ARENA_CELLS_X, DefaultValue::ARENA_CELLS_Y, *mArena);
+   arena_gen.CreateDefaultSpawnAreas(DefaultValue::ARENA_CELLS_X, DefaultValue::ARENA_CELLS_Y, player_count, *mArena);
 
    mEntities.insert(mArena);
    return mArena;
@@ -41,8 +41,8 @@ std::shared_ptr<Arena> EntityManager::CreateArena(const int player_count)
 std::shared_ptr<Scoreboard> EntityManager::CreateScoreboard()
 {
    auto scoreboard = std::make_shared<Scoreboard>();
-   scoreboard->SetPosition({ DefaultSize::SCOREBOARD_POS_X, DefaultSize::SCOREBOARD_POS_Y });
-   scoreboard->SetSize({ DefaultSize::SCOREBOARD_WIDTH, DefaultSize::SCOREBOARD_HEIGHT });
+   scoreboard->SetPosition({ DefaultValue::SCOREBOARD_POS_X, DefaultValue::SCOREBOARD_POS_Y });
+   scoreboard->SetSize({ DefaultValue::SCOREBOARD_WIDTH, DefaultValue::SCOREBOARD_HEIGHT });
 
    mEntities.insert(scoreboard);
    return scoreboard;
@@ -104,20 +104,20 @@ std::shared_ptr<Player> EntityManager::CreatePlayer(const PlayerType type)
    switch (type)
    {
       case PlayerType::Player_1:
-         parent_cell = mArena->GetCellFromCoordinates(DefaultSize::PLAYER_1_CELL_X, DefaultSize::PLAYER_1_CELL_Y);
+         parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_1_CELL_X, DefaultValue::PLAYER_1_CELL_Y);
          break;
       case PlayerType::Player_2:
-         parent_cell = mArena->GetCellFromCoordinates(DefaultSize::PLAYER_2_CELL_X, DefaultSize::PLAYER_2_CELL_Y);
+         parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_2_CELL_X, DefaultValue::PLAYER_2_CELL_Y);
          break;
       case PlayerType::Player_3:
-         parent_cell = mArena->GetCellFromCoordinates(DefaultSize::PLAYER_3_CELL_X, DefaultSize::PLAYER_3_CELL_Y);
+         parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_3_CELL_X, DefaultValue::PLAYER_3_CELL_Y);
          break;
       case PlayerType::Player_4:
-         parent_cell = mArena->GetCellFromCoordinates(DefaultSize::PLAYER_4_CELL_X, DefaultSize::PLAYER_4_CELL_Y);
+         parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_4_CELL_X, DefaultValue::PLAYER_4_CELL_Y);
          break;
    }
    mArena->SetObjectPosition(*player, parent_cell);
-   player->SetSize({ DefaultSize::CELL_WIDTH, DefaultSize::CELL_HEIGHT });
+   player->SetSize({ DefaultValue::CELL_WIDTH, DefaultValue::CELL_HEIGHT });
 
    mEntities.insert(player);
    return player;

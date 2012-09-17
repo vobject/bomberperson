@@ -169,8 +169,8 @@ std::shared_ptr<InputDevice> Match::CreateInputFromInputId(const InputId id)
       }
       case InputId::Mouse_1:
       {
-         const Point mouse_center(DefaultSize::SCREEN_WIDTH / 2,
-                                  DefaultSize::SCREEN_HEIGHT / 2);
+         const Point mouse_center(DefaultValue::SCREEN_WIDTH / 2,
+                                  DefaultValue::SCREEN_HEIGHT / 2);
          mMouse_1 = std::make_shared<MouseInput>(mouse_center, SDL_BUTTON_LEFT,
                                                  SDL_BUTTON_RIGHT);
          return mMouse_1;

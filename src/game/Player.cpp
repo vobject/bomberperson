@@ -13,7 +13,7 @@ Player::Player(
 )
    : ArenaObject(EntityId::Player, ZOrder::Layer_5, arena)
    , mType(type)
-   , mData(PlayerAnimation::StandDown, 0_ms, MIN_SPEED, 1, 1, 1, 0)
+   , mData(PlayerAnimation::StandDown, MIN_SPEED, 1, 1, 1, 0)
    , mSound(PlayerSound::None)
    , mEntityFactory(entity_factory)
 {
@@ -72,10 +72,10 @@ void Player::Update(const int elapsed_time)
    UpdateBombing(elapsed_time);
 
    if (old_anim == mData.anim) {
-      mData.anim_time += elapsed_time;
+      SetAnimationTime(GetAnimationTime() + elapsed_time);
    }
    else {
-      mData.anim_time = 0; // Start new animation.
+      SetAnimationTime(0); // Start new animation.
    }
 }
 

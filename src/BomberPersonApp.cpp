@@ -73,8 +73,8 @@ void BomberPersonApp::Initialize()
 
    InitNui();
 
-   const Size screen_size = { DefaultSize::SCREEN_WIDTH,
-                              DefaultSize::SCREEN_HEIGHT };
+   const Size screen_size = { DefaultValue::SCREEN_WIDTH,
+                              DefaultValue::SCREEN_HEIGHT };
 
    mAudio = std::make_shared<Audio>();
    mRenderer = std::make_shared<SdlRenderer>(screen_size);
@@ -99,8 +99,8 @@ void BomberPersonApp::ProcessInput()
    // Handle application-level requests, e.g. change of the renderer.
    if (SDL_KEYDOWN == event.type && (event.key.keysym.mod & KMOD_LCTRL))
    {
-      const Size screen_size = { DefaultSize::SCREEN_WIDTH,
-                                 DefaultSize::SCREEN_HEIGHT };
+      const Size screen_size = { DefaultValue::SCREEN_WIDTH,
+                                 DefaultValue::SCREEN_HEIGHT };
 
       if (SDLK_1 == event.key.keysym.sym) {
          mRenderer = std::make_shared<SimpleSdlRenderer>(screen_size);

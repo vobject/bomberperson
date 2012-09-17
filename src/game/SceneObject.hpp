@@ -70,10 +70,15 @@ public:
    Size GetSize() const;
    void SetSize(const Size& size);
 
+   int GetAnimationTime() const;
+   void SetAnimationTime(int ms);
+
 //   SoundId GetSound() const;
 //   void SetSound(SoundId id);
 
 //protected:
+   // TODO: Make this protected again as soon as ArenaObject gets its
+   //  Die() method and Arena class can call that instead of this.
    void Invalidate();
 
 private:
@@ -82,7 +87,7 @@ private:
    bool mIsValid = true;
    Point mPos = { 0, 0 };
    Size mSize = { 0, 0 };
-//   SoundId mSoundId = SoundId::None;
+   int mAnimationTime = 0; // No animation by default.
 
    // Do we really need Size in Gamelogic? Isnt a simple point enough?
    // More advanced collision detection and handling could need an objects

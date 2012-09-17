@@ -100,8 +100,8 @@ PlayerResource ResourceCache::GetPlayerResource(const PlayerType type) const
 void ResourceCache::LoadMenuResources()
 {
    const auto id = EntityId::Menu;
-   const Size size = { DefaultSize::SCREEN_WIDTH,
-                       DefaultSize::SCREEN_HEIGHT };
+   const Size size = { DefaultValue::SCREEN_WIDTH,
+                       DefaultValue::SCREEN_HEIGHT };
 
    mMenuRes.insert({ id, {id, { LoadTexture("sprite/mainmenu.png", size) } } });
 }
@@ -109,8 +109,8 @@ void ResourceCache::LoadMenuResources()
 void ResourceCache::LoadArenaResources()
 {
    const auto id = EntityId::Arena;
-   const Size size = { DefaultSize::ARENA_WIDTH,
-                       DefaultSize::ARENA_HEIGHT };
+   const Size size = { DefaultValue::ARENA_WIDTH,
+                       DefaultValue::ARENA_HEIGHT };
 
    mArenaRes.insert({ id, {id, { LoadTexture("sprite/arena_1.png", size) } } });
 }
@@ -119,8 +119,8 @@ void ResourceCache::LoadWallResources()
 {
    const auto id1 = WallType::Indestructible;
    const auto id2 = WallType::Destructible;
-   const Size size = { DefaultSize::WALL_WIDTH,
-                       DefaultSize::WALL_HEIGHT };
+   const Size size = { DefaultValue::WALL_WIDTH,
+                       DefaultValue::WALL_HEIGHT };
 
    mWallRes.insert({ id1, {id1, { LoadTexture("sprite/wall_indestructible.png", size) } } });
    mWallRes.insert({ id2, {id2, { LoadTexture("sprite/wall_destructible.png", size) } } });
@@ -132,8 +132,8 @@ void ResourceCache::LoadExtraResources()
    const auto id2 = ExtraType::Bombs;
    const auto id3 = ExtraType::Range;
    const auto id4 = ExtraType::InfiniteRange;
-   const Size size = { DefaultSize::EXTRA_WIDTH,
-                       DefaultSize::EXTRA_HEIGHT };
+   const Size size = { DefaultValue::EXTRA_WIDTH,
+                       DefaultValue::EXTRA_HEIGHT };
 
    mExtraRes.insert({ id1, {id1, { LoadTexture("sprite/extra_speed.png", size) } } });
    mExtraRes.insert({ id2, {id2, { LoadTexture("sprite/extra_supply.png", size) } } });
@@ -144,8 +144,8 @@ void ResourceCache::LoadExtraResources()
 void ResourceCache::LoadBombResources()
 {
    const auto id = EntityId::Bomb;
-   const Size size = { DefaultSize::BOMB_WIDTH,
-                       DefaultSize::BOMB_HEIGHT };
+   const Size size = { DefaultValue::BOMB_WIDTH,
+                       DefaultValue::BOMB_HEIGHT };
 
    // TODO: Align animation speed and bomb lifetime.
    mBombRes.insert({
@@ -163,8 +163,8 @@ void ResourceCache::LoadBombResources()
 void ResourceCache::LoadExplosionResources()
 {
    const auto id = EntityId::Explosion;
-   const Size size = { DefaultSize::EXPLOSION_WIDTH,
-                       DefaultSize::EXPLOSION_HEIGHT };
+   const Size size = { DefaultValue::EXPLOSION_WIDTH,
+                       DefaultValue::EXPLOSION_HEIGHT };
 
    // TODO: Align animation speed and explosion lifetime.
    mExplosionRes.insert({
@@ -182,8 +182,8 @@ void ResourceCache::LoadExplosionResources()
 
 void ResourceCache::LoadPlayerResources()
 {
-   const Size size = { DefaultSize::PLAYER_WIDTH,
-                       DefaultSize::PLAYER_HEIGHT };
+   const Size size = { DefaultValue::PLAYER_WIDTH,
+                       DefaultValue::PLAYER_HEIGHT };
 
    // TODO: align player speed and animation speed!!
    PlayerResource player_1(PlayerType::Player_1, 2000_ms);
