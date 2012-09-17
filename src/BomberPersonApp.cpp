@@ -7,6 +7,7 @@
 #include "render/SimpleGlRenderer.hpp"
 #include "render/SimpleSdlRenderer.hpp"
 #include "render/SdlRenderer.hpp"
+#include "render/CursesRenderer.hpp"
 #include "game/Logic.hpp"
 
 #include <SDL.h>
@@ -110,6 +111,9 @@ void BomberPersonApp::ProcessInput()
       }
       else if (SDLK_3 == event.key.keysym.sym) {
          mRenderer = std::make_shared<SimpleGlRenderer>(screen_size);
+      }
+      else if (SDLK_4 == event.key.keysym.sym) {
+         mRenderer = std::make_shared<CursesRenderer>(screen_size);
       }
 
       // TODO: KMOD_LCTRL + SDLK_K -> try connecting to kinect device.
