@@ -1,8 +1,8 @@
 #ifndef SPRITE_RESOURCE_HPP
 #define SPRITE_RESOURCE_HPP
 
-#include "../game/EntityId.hpp"
-#include "../utils/Utils.hpp"
+#include "../../game/EntityId.hpp"
+#include "../../utils/Utils.hpp"
 
 #include <string>
 #include <vector>

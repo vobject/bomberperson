@@ -8,7 +8,7 @@
 #include "../game/Bomb.hpp"
 #include "../game/Explosion.hpp"
 #include "../game/Player.hpp"
-#include "../resource/ResourceCache.hpp"
+#include "sdl_res/ResourceCache.hpp"
 #include "../utils/Utils.hpp"
 #include "../Options.hpp"
 

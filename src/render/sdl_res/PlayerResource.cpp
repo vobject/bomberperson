@@ -1,5 +1,5 @@
 #include "PlayerResource.hpp"
-#include "../game/Player.hpp"
+#include "../../game/Player.hpp"
 
 #include <SDL.h>
 

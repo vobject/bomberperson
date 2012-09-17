@@ -6,7 +6,7 @@
 #include "ExtraResource.hpp"
 #include "BombResource.hpp"
 #include "PlayerResource.hpp"
-#include "../utils/Utils.hpp"
+#include "../../utils/Utils.hpp"
 
 #include <map>
 #include <string>

@@ -35,10 +35,12 @@ INCLUDE_DIRECTORIES(
 )
 
 FILE(GLOB BOMBERPERSON_HEADERS src/*.hpp
-                               src/*/*.hpp)
+                               src/*/*.hpp
+                               src/*/*/*.hpp)
 
 FILE(GLOB BOMBERPERSON_SOURCES src/*.cpp
-                               src/*/*.cpp)
+                               src/*/*.cpp
+                               src/*/*/*.cpp)
 
 ADD_DEFINITIONS(
    -Wall
