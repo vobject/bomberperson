@@ -10,6 +10,7 @@
 
 Logic::Logic()
 {
+   // Show the main menu when the game starts.
    mUserInterface = std::make_shared<UserInterface>();
    mUserInterface->ShowMainMenu(false);
 }
@@ -67,104 +68,23 @@ void Logic::Update(const int app_time, const int elapsed_time)
 
    if (mUserInterface->IsActive())
    {
-      if (!mUserInterface->IsDone())
-      {
-         mUserInterface->Update(elapsed_time);
-      }
-      else
-      {
-         switch (mUserInterface->GetSelection())
-         {
-            case UserInterfaceItemId::MainMenu_NewGame:
-               {
-                  mUserInterface->HideMainMenu();
-                  mMatch = std::make_shared<Match>(mUserInterface->GetMatchSettings());
-               }
-               break;
-            case UserInterfaceItemId::MainMenu_ResumeGame:
-               {
-                  if (mMatch)
-                  {
-                     mUserInterface->HideMainMenu();
-                     mMatch->Resume();
-                  }
-                  else
-                  {
-                     mUserInterface->ShowMainMenu(false);
-                  }
-               }
-               break;
-            case UserInterfaceItemId::MainMenu_Exit:
-               mDone = true;
-               break;
-            default:
-               LOG(logERROR) << "ProcessInput: Unknown menu selection.";
-               break;
-         }
-      }
+      UpdateUserInterface(elapsed_time);
    }
    else
    {
-      if (mMatch->GameOver())
-      {
-         mMatch = nullptr;
-         mUserInterface->ShowMainMenu(false);
-      }
-      else if (mMatch->Pause())
-      {
-         mUserInterface->ShowMainMenu(true);
-      }
-      else
-      {
-         mMatch->Update(elapsed_time);
-
-         // TODO: Why not put this into Match::Update().
-         for (auto& ent : mMatch->GetEntities())
-         {
-            if (!ent->IsValid()) {
-               continue;
-            }
-            ent->Update(elapsed_time);
-         }
-
-         // TODO: NOW is the time for collision detection.
-         // TODO: Update all entities againg after collisions were detected.
-      }
+      UpdateMatch(elapsed_time);
    }
 }
 
 void Logic::Sound(const std::shared_ptr<Audio>& audio)
 {
-//   switch (mCurrentState)
-//   {
-//      case GameState::MainMenu:
-//         break;
-//      case GameState::Running:
-//         audio->Play(mMatch);
-//         break;
-//      case GameState::Exit:
-//         break;
-//   }
-
    if (mUserInterface->IsActive())
    {
-      for (const auto& ent : mUserInterface->GetEntities())
-      {
-         if (!ent->IsValid()) {
-            continue;
-         }
-         audio->Play(ent);
-      }
+      SoundUserInterface(*audio);
    }
    else
    {
-      for (const auto& ent : mMatch->GetEntities())
-      {
-         if (!ent->IsValid()) {
-            continue;
-         }
-         audio->Play(ent);
-      }
+      SoundMatch(*audio);
    }
 }
 
@@ -174,23 +94,11 @@ void Logic::Render(const std::shared_ptr<Renderer>& renderer)
 
    if (mUserInterface->IsActive())
    {
-      for (const auto& ent : mUserInterface->GetEntities())
-      {
-         if (!ent->IsValid()) {
-            continue;
-         }
-         renderer->Render(ent);
-      }
+      RenderUserInterface(*renderer);
    }
    else
    {
-      for (const auto& ent : mMatch->GetEntities())
-      {
-         if (!ent->IsValid()) {
-            continue;
-         }
-         renderer->Render(ent);
-      }
+      RenderMatch(*renderer);
    }
 
    renderer->PostRender();
@@ -201,135 +109,103 @@ bool Logic::Done() const
    return mDone;
 }
 
-//void Logic::ProcessInputMainMenuState(const SDL_KeyboardEvent& key)
-//{
-//   if (SDL_KEYDOWN != key.type) {
-//      return;
-//   }
+void Logic::UpdateUserInterface(int elapsed_time)
+{
+   if (!mUserInterface->IsDone())
+   {
+      mUserInterface->Update(elapsed_time);
+      return;
+   }
 
-//   switch (key.keysym.sym)
-//   {
-//      case SDLK_UP:
-//         mMainMenu->SelectionUp();
-//         break;
-//      case SDLK_DOWN:
-//         mMainMenu->SelectionDown();
-//         break;
-//      case SDLK_RETURN:
-//         mMainMenu->Choose();
-//         break;
-//      case SDLK_ESCAPE:
-//         mCurrentState = GameState::Exit;
-//         break;
-//      default:
-//         break;
-//   }
-//}
+   switch (mUserInterface->GetSelection())
+   {
+      case UserInterfaceItemId::MainMenu_NewGame:
+         {
+            mUserInterface->HideMainMenu();
+            mMatch = std::make_shared<Match>(mUserInterface->GetMatchSettings());
+         }
+         break;
+      case UserInterfaceItemId::MainMenu_ResumeGame:
+         {
+            if (mMatch)
+            {
+               mUserInterface->HideMainMenu();
+               mMatch->Resume();
+            }
+            else
+            {
+               mUserInterface->ShowMainMenu(false);
+            }
+         }
+         break;
+      case UserInterfaceItemId::MainMenu_Exit:
+         mDone = true;
+         break;
+      default:
+         LOG(logERROR) << "Logic: Unknown menu selection.";
+         break;
+   }
+}
 
-//void Logic::ProcessInputRunningState(const SDL_KeyboardEvent& key)
-//{
-//   if (SDL_KEYDOWN == key.type)
-//   {
-//      if (SDLK_ESCAPE == key.keysym.sym)
-//      {
-//         // User pressed the ESC key while playing.
-//         ShowMainMenu();
-//         return;
-//      }
+void Logic::UpdateMatch(int elapsed_time)
+{
+   if (mMatch->GameOver())
+   {
+      mMatch = nullptr;
+      mUserInterface->ShowMainMenu(false);
+      return;
+   }
 
-//      mKeyboard_1->Press(key.keysym.sym);
-//      mKeyboard_2->Press(key.keysym.sym);
-//   }
-//   else if (SDL_KEYUP == key.type)
-//   {
-//      mKeyboard_1->Release(key.keysym.sym);
-//      mKeyboard_2->Release(key.keysym.sym);
-//   }
-//}
+   if (mMatch->Pause())
+   {
+      mUserInterface->ShowMainMenu(true);
+      return;
+   }
 
-//void Logic::UpdateMainMenuState(const int elapsed_time)
-//{
-//   if (!mMainMenu->HasChosen())
-//   {
-//      mMainMenu->Update(elapsed_time);
-//      return;
-//   }
+   mMatch->Update(elapsed_time);
+}
 
-//   switch (mMainMenu->GetSelection())
-//   {
-//      case MainMenuItem::StartGame:
-//         ShowGame();
-//         break;
-//      case MainMenuItem::Exit:
-//         mCurrentState = GameState::Exit;
-//         break;
-//   }
-//}
+void Logic::SoundUserInterface(Audio& audio)
+{
+   for (const auto& ent : mUserInterface->GetEntities())
+   {
+      if (!ent->IsValid()) {
+         continue;
+      }
+      audio.Play(ent);
+   }
+}
 
-//void Logic::UpdateRunningState(const int elapsed_time)
-//{
-//   for (auto& player : mEntityManager.GetPlayers())
-//   {
-//      switch (player->GetId())
-//      {
-//         case EntityId::Player_1:
-//            player->SetInputCommands(mKeyboard_1->GetCommands());
-//            break;
-//         case EntityId::Player_2:
-//            player->SetInputCommands(mKeyboard_2->GetCommands());
-//            break;
-//         case EntityId::Player_3:
-//            player->SetInputCommands(mMouse_1->GetCommands());
-//            break;
-////         case EntityId::Player_4:
-////            player->SetInputCommands(mKinect->GetCommands());
-////            break;
-//         default:
-//            LOG(logERROR) << "Player has invalid EntityId!";
-//            break;
-//      }
-//   }
+void Logic::SoundMatch(Audio& audio)
+{
+   for (const auto& ent : mMatch->GetEntities())
+   {
+      if (!ent->IsValid()) {
+         continue;
+      }
+      audio.Play(ent);
+   }
+}
 
-//   if (!mMatch->IsOver())
-//   {
-//      mMatch->Update(elapsed_time);
-//      return;
-//   }
+void Logic::RenderUserInterface(Renderer& renderer)
+{
+   for (const auto& ent : mUserInterface->GetEntities())
+   {
+      if (!ent->IsValid()) {
+         continue;
+      }
+      renderer.Render(ent);
+   }
+}
 
-//   ShowMainMenu();
-//}
+void Logic::RenderMatch(Renderer& renderer)
+{
+   for (const auto& ent : mMatch->GetEntities())
+   {
+      if (!ent->IsValid()) {
+         continue;
+      }
+      renderer.Render(ent);
+   }
+}
 
-//void Logic::ShowMainMenu()
-//{
-//   mMatch = nullptr;
-//   mMouse_1 = nullptr;
-//   mKeyboard_2 = nullptr;
-//   mKeyboard_1 = nullptr;
-
-//   mMainMenu = std::make_shared<MainMenu>();
-//   mMainMenu->SetSize({ DefaultSize::SCREEN_WIDTH, DefaultSize::SCREEN_HEIGHT });
-
-//   mCurrentState = GameState::MainMenu;
-//}
-
-//void Logic::ShowGame()
-//{
-//   mMainMenu = nullptr;
-
-//   mKeyboard_1 = std::make_shared<KeyboardInput>(SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE, SDLK_LALT);
-//   mKeyboard_2 = std::make_shared<KeyboardInput>(SDLK_e, SDLK_d, SDLK_s, SDLK_f, SDLK_q, SDLK_a);
-
-//   Point mouse_center(DefaultSize::SCREEN_WIDTH / 2, DefaultSize::SCREEN_HEIGHT / 2);
-//   mMouse_1 = std::make_shared<MouseInput>(mouse_center, SDL_BUTTON_LEFT, SDL_BUTTON_RIGHT);
-
-//   auto arena_gen = std::make_shared<ArenaGenerator>();
-//   arena_gen->SetArenaPosition({ DefaultSize::ARENA_POS_X, DefaultSize::ARENA_POS_Y });
-//   arena_gen->SetArenaSize({ DefaultSize::ARENA_WIDTH, DefaultSize::ARENA_HEIGHT });
-//   arena_gen->SetArenaBorderSize({ DefaultSize::ARENA_BORDER_WIDTH, DefaultSize::ARENA_BORDER_HEIGHT });
-//   auto arena = arena_gen->GetDefaultArena(DefaultSize::ARENA_CELLS_X, DefaultSize::ARENA_CELLS_Y, 3);
-
-//   mEntityManager.CreatePlayers(3, arena);
-
-//   mMatch = std::make_shared<Match>(arena, mEntityManager.GetPlayers());
-//   mCurrentState = GameState::Active;
-//}

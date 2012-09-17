@@ -88,6 +88,8 @@ void Match::Input(const SDL_MouseButtonEvent& button)
 
 void Match::Update(const int elapsed_time)
 {
+   UpdateEntities(elapsed_time);
+
    mCleanupIdleTime += elapsed_time;
    if (mCleanupIdleTime >= 1000_ms)
    {
@@ -127,6 +129,20 @@ bool Match::GameOver() const
 EntitySet Match::GetEntities() const
 {
    return mEntityManager.GetEntities();
+}
+
+void Match::UpdateEntities(int elapsed_time)
+{
+   for (auto& ent : mEntityManager.GetEntities())
+   {
+      if (!ent->IsValid()) {
+         continue;
+      }
+      ent->Update(elapsed_time);
+   }
+
+   // TODO: NOW is the time for collision detection.
+   // TODO: Update all entities againg after collisions were detected.
 }
 
 std::shared_ptr<Player> Match::CreatePlayerFromPlayerId(const PlayerId id)

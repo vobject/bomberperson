@@ -44,6 +44,8 @@ public:
    EntitySet GetEntities() const;
 
 private:
+   void UpdateEntities(int elapsed_time);
+
    std::shared_ptr<Player> CreatePlayerFromPlayerId(PlayerId id);
    std::shared_ptr<InputDevice> CreateInputFromInputId(InputId id);
 

@@ -2,7 +2,6 @@
 #define LOGIC_HPP
 
 #include <memory>
-#include <list>
 
 struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
@@ -15,16 +14,6 @@ class ArenaGenerator;
 class KeyboardInput;
 class MouseInput;
 class Match;
-
-//enum class GameState
-//{
-//   MainMenu,
-////   GameSetup,
-//   Active,
-////   Options,
-////   Credits,
-//   Exit
-//};
 
 class Logic
 {
@@ -47,28 +36,14 @@ public:
    bool Done() const;
 
 private:
-   void NewGame();
-//   void ReturnToGame();
-//   void GameOver();
+   void UpdateUserInterface(int elapsed_time);
+   void UpdateMatch(int elapsed_time);
 
-//   void ProcessInputMainMenuState(const SDL_KeyboardEvent& ev);
-//   void ProcessInputRunningState(const SDL_KeyboardEvent& ev);
+   void SoundUserInterface(Audio& audio);
+   void SoundMatch(Audio& audio);
 
-//   void UpdateMainMenuState(int elapsed_time);
-//   void UpdateRunningState(int elapsed_time);
-
-//   void ShowMainMenu();
-//   void ShowGame();
-
-   // TODO:
-   // class MatchSettings{ nplayers, player:inputdev };
-   // std::shared_ptr<UserInterface> mUserInterface;
-   // std::shared_ptr<Match> mMatch;
-   // mMatch = std::make_shared<Match>(mUserInterface->GetMatchSettings());
-
-//   GameState mCurrentState = GameState::MainMenu;
-
-//   std::shared_ptr<MainMenu> mMainMenu;
+   void RenderUserInterface(Renderer& renderer);
+   void RenderMatch(Renderer& renderer);
 
    bool mDone = false;
    std::shared_ptr<UserInterface> mUserInterface;
