@@ -111,7 +111,7 @@ void ArenaGenerator::CreateDefaultExtras(
 
          std::shared_ptr<Extra> extra;
 
-         if (!(rand() % (cells_x * cells_y / 3)))
+         if (!(rand() % (cells_x * cells_y / 4)))
          {
             // Very little chance for a golden flame (infinite explosion range).
             extra = mEntityFactory.CreateExtra(cell, ExtraType::InfiniteRange);

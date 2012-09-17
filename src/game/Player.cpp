@@ -283,7 +283,7 @@ void Player::IncreaseSpeed()
 {
    if (mData.speed > MAX_SPEED)
    {
-      mData.speed -= 2_ms;
+      mData.speed -= 1_ms;
    }
    else
    {

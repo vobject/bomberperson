@@ -95,7 +95,7 @@ public:
 
 private:
    // Number of milliseconds the player has to wait to move another pixel.
-   static const int MIN_SPEED = 16_ms;
+   static const int MIN_SPEED = 12_ms;
    static const int MAX_SPEED = 2_ms;
 
    // Number of milliseconds the player has to wait to plant another bomb.
