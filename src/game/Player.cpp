@@ -5,13 +5,14 @@
 #include "Bomb.hpp"
 #include "Explosion.hpp"
 #include "../utils/Utils.hpp"
+#include "../Options.hpp"
 
 Player::Player(
    const std::shared_ptr<Arena>& arena,
    const PlayerType type,
    EntityManager& entity_factory
 )
-   : ArenaObject(EntityId::Player, ZOrder::Layer_5, arena)
+   : ArenaObject(EntityId::Player, ZOrder::Layer_6, arena)
    , mType(type)
    , mData(PlayerAnimation::StandDown, MIN_SPEED, 1, 1, 1, 0)
    , mSound(PlayerSound::None)
@@ -27,18 +28,34 @@ Player::~Player()
 
 void Player::Update(const int elapsed_time)
 {
-   const auto old_anim = mData.anim;
+   if (PlayerAnimation::Dying == mData.anim)
+   {
+      // The player is currently dying. Nothing to do but wait.
+      SetAnimationTime(GetAnimationTime() + elapsed_time);
+
+      if (GetAnimationTime() >= DefaultValue::PLAYER_DEATH_ANIM_LEN)
+      {
+         // The death animation is over.
+         Invalidate();
+      }
+      return;
+   }
+
    const auto parent_cell = GetArena()->GetCellFromObject(*this);
 
    if (GetArena()->HasExplosion(parent_cell))
    {
-      // TODO: Initiate player death.
-//      mSound = PlayerSound::Die;
-
-      // Explosions kill the player instantly.
-      Invalidate();
+      // Explosions kill the player. Prepare his death animation.
+      SetAnimationTime(0);
+      mData.anim = PlayerAnimation::Dying;
+      mData.speed = 0;
+      mSound = PlayerSound::Die;
       return;
    }
+
+   // Original animation used to check if the player's animation
+   //  changed during movement and other update methods.
+   const auto old_anim = mData.anim;
 
    if (GetArena()->HasExtra(parent_cell))
    {
@@ -78,11 +95,6 @@ void Player::Update(const int elapsed_time)
       SetAnimationTime(0); // Start new animation.
    }
 }
-
-//void Player::SetParentCell(const std::shared_ptr<Cell>& cell)
-//{
-//   mParentCell = cell;
-//}
 
 void Player::SetInputCommands(const InputCommands cmds)
 {

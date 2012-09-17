@@ -106,7 +106,7 @@ void Match::Update(const int elapsed_time)
       }
    }
 
-   mIsGameOver = (active_player_count <= 0) ? true : false;
+   mIsGameOver = (active_player_count <= 1) ? true : false;
 }
 
 bool Match::Pause() const

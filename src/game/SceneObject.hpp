@@ -13,8 +13,8 @@ enum class ZOrder
    Layer_2,    // Extras
    Layer_3,    // Cells, Walls
    Layer_4,    // Bombs
-   Layer_5,    // Players
-   Layer_6,    // Explosions
+   Layer_5,    // Explosions
+   Layer_6,    // Players
    MainMenu,
    OverlayMenu,
    Messagebox

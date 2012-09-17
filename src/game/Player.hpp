@@ -44,7 +44,7 @@ enum class PlayerAnimation
    WalkRight,
 //   Idle,
 //   Lockedin,
-//   Die,
+   Dying
 //   Win
 };
 
@@ -87,7 +87,6 @@ public:
 
    void Update(int elapsed_time) override;
 
-//   void SetParentCell(const std::shared_ptr<Cell>& cell);
    void SetInputCommands(InputCommands cmds);
 
    PlayerType GetType() const;
@@ -118,7 +117,6 @@ private:
 
    EntityManager& mEntityFactory;
 
-//   std::shared_ptr<Cell> mParentCell;
    InputCommands mCurrentCommands;
 
    int mMoveIdleTime = 0_ms;

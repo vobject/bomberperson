@@ -2,7 +2,7 @@
 #include "../Options.hpp"
 
 Explosion::Explosion(const std::shared_ptr<Arena>& arena)
-   : ArenaObject(EntityId::Explosion, ZOrder::Layer_6, arena)
+   : ArenaObject(EntityId::Explosion, ZOrder::Layer_5, arena)
 {
 
 }
@@ -16,7 +16,7 @@ void Explosion::Update(const int elapsed_time)
 {
    SetAnimationTime(GetAnimationTime() + elapsed_time);
 
-   if (GetAnimationTime() >= DefaultValue::EXPLOSION_ANIM_LENGTH)
+   if (GetAnimationTime() >= DefaultValue::EXPLOSION_ANIM_LEN)
    {
       // The explosion has burned out.
       Invalidate();

@@ -21,7 +21,7 @@ void Bomb::Update(const int elapsed_time)
 {
    SetAnimationTime(GetAnimationTime() + elapsed_time);
 
-   if (IsValid() && (GetAnimationTime() >= DefaultValue::BOMB_ANIM_LENGTH))
+   if (IsValid() && (GetAnimationTime() >= DefaultValue::BOMB_ANIM_LEN))
    {
       // Lifetime of this bomb object ended...
       Invalidate();
@@ -57,7 +57,7 @@ void Bomb::SetRange(const int range)
 
 void Bomb::Detonate()
 {
-   SetAnimationTime(DefaultValue::BOMB_ANIM_LENGTH);
+   SetAnimationTime(DefaultValue::BOMB_ANIM_LEN);
 }
 
 void Bomb::PlantCenterExplosion() const

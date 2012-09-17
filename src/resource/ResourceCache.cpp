@@ -184,50 +184,55 @@ void ResourceCache::LoadPlayerResources()
 {
    const Size size = { DefaultValue::PLAYER_WIDTH,
                        DefaultValue::PLAYER_HEIGHT };
+   const auto death_len = DefaultValue::PLAYER_DEATH_ANIM_LEN;
 
    // TODO: align player speed and animation speed!!
-   PlayerResource player_1(PlayerType::Player_1, 2000_ms);
-   player_1.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_1_up.png", size) });
-   player_1.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_1_down.png", size) });
-   player_1.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_1_left.png", size) });
-   player_1.SetFrames(PlayerAnimation::StandRight, { LoadTexture("sprite/player_1_right.png", size) });
-   player_1.SetFrames(PlayerAnimation::WalkUp, { LoadTexture("sprite/player_1_up_1.png", size), LoadTexture("sprite/player_1_up_2.png", size) });
-   player_1.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_1_down_1.png", size), LoadTexture("sprite/player_1_down_2.png", size) });
-   player_1.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_1_left_1.png", size), LoadTexture("sprite/player_1_left_2.png", size) });
-   player_1.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_1_right_1.png", size), LoadTexture("sprite/player_1_right_2.png", size) });
+   PlayerResource player_1(PlayerType::Player_1);
+   player_1.SetFrames(PlayerAnimation::StandUp, 2000_ms, { LoadTexture("sprite/player_1_up.png", size) });
+   player_1.SetFrames(PlayerAnimation::StandDown, 2000_ms, { LoadTexture("sprite/player_1_down.png", size) });
+   player_1.SetFrames(PlayerAnimation::StandLeft, 2000_ms, { LoadTexture("sprite/player_1_left.png", size) });
+   player_1.SetFrames(PlayerAnimation::StandRight, 2000_ms, { LoadTexture("sprite/player_1_right.png", size) });
+   player_1.SetFrames(PlayerAnimation::WalkUp, 2000_ms, { LoadTexture("sprite/player_1_up_1.png", size), LoadTexture("sprite/player_1_up_2.png", size) });
+   player_1.SetFrames(PlayerAnimation::WalkDown, 2000_ms, { LoadTexture("sprite/player_1_down_1.png", size), LoadTexture("sprite/player_1_down_2.png", size) });
+   player_1.SetFrames(PlayerAnimation::WalkLeft, 2000_ms, { LoadTexture("sprite/player_1_left_1.png", size), LoadTexture("sprite/player_1_left_2.png", size) });
+   player_1.SetFrames(PlayerAnimation::WalkRight, 2000_ms, { LoadTexture("sprite/player_1_right_1.png", size), LoadTexture("sprite/player_1_right_2.png", size) });
+   player_1.SetFrames(PlayerAnimation::Dying, death_len, { LoadTexture("sprite/player_1_death_1.png", size), LoadTexture("sprite/player_1_death_2.png", size), LoadTexture("sprite/player_1_death_3.png", size), LoadTexture("sprite/player_1_death_4.png", size) });
    mPlayerRes.insert({ player_1.GetType(), player_1 });
 
-   PlayerResource player_2(PlayerType::Player_2, 2000_ms);
-   player_2.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_2_up.png", size) });
-   player_2.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_2_down.png", size) });
-   player_2.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_2_left.png", size) });
-   player_2.SetFrames(PlayerAnimation::StandRight, { LoadTexture("sprite/player_2_right.png", size) });
-   player_2.SetFrames(PlayerAnimation::WalkUp, { LoadTexture("sprite/player_2_up_1.png", size), LoadTexture("sprite/player_2_up_2.png", size) });
-   player_2.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_2_down_1.png", size), LoadTexture("sprite/player_2_down_2.png", size) });
-   player_2.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_2_left_1.png", size), LoadTexture("sprite/player_2_left_2.png", size) });
-   player_2.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_2_right_1.png", size), LoadTexture("sprite/player_2_right_2.png", size) });
+   PlayerResource player_2(PlayerType::Player_2);
+   player_2.SetFrames(PlayerAnimation::StandUp, 2000_ms, { LoadTexture("sprite/player_2_up.png", size) });
+   player_2.SetFrames(PlayerAnimation::StandDown, 2000_ms, { LoadTexture("sprite/player_2_down.png", size) });
+   player_2.SetFrames(PlayerAnimation::StandLeft, 2000_ms, { LoadTexture("sprite/player_2_left.png", size) });
+   player_2.SetFrames(PlayerAnimation::StandRight, 2000_ms, { LoadTexture("sprite/player_2_right.png", size) });
+   player_2.SetFrames(PlayerAnimation::WalkUp, 2000_ms, { LoadTexture("sprite/player_2_up_1.png", size), LoadTexture("sprite/player_2_up_2.png", size) });
+   player_2.SetFrames(PlayerAnimation::WalkDown, 2000_ms, { LoadTexture("sprite/player_2_down_1.png", size), LoadTexture("sprite/player_2_down_2.png", size) });
+   player_2.SetFrames(PlayerAnimation::WalkLeft, 2000_ms, { LoadTexture("sprite/player_2_left_1.png", size), LoadTexture("sprite/player_2_left_2.png", size) });
+   player_2.SetFrames(PlayerAnimation::WalkRight, 2000_ms, { LoadTexture("sprite/player_2_right_1.png", size), LoadTexture("sprite/player_2_right_2.png", size) });
+   player_2.SetFrames(PlayerAnimation::Dying, death_len, { LoadTexture("sprite/player_2_death_1.png", size), LoadTexture("sprite/player_2_death_2.png", size), LoadTexture("sprite/player_2_death_3.png", size), LoadTexture("sprite/player_2_death_4.png", size) });
    mPlayerRes.insert({ player_2.GetType(), player_2 });
 
-   PlayerResource player_3(PlayerType::Player_3, 2000_ms);
-   player_3.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_3_up.png", size) });
-   player_3.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_3_down.png", size) });
-   player_3.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_3_left.png", size) });
-   player_3.SetFrames(PlayerAnimation::StandRight, { LoadTexture("sprite/player_3_right.png", size) });
-   player_3.SetFrames(PlayerAnimation::WalkUp, { LoadTexture("sprite/player_3_up_1.png", size), LoadTexture("sprite/player_3_up_2.png", size) });
-   player_3.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_3_down_1.png", size), LoadTexture("sprite/player_3_down_2.png", size) });
-   player_3.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_3_left_1.png", size), LoadTexture("sprite/player_3_left_2.png", size) });
-   player_3.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_3_right_1.png", size), LoadTexture("sprite/player_3_right_2.png", size) });
+   PlayerResource player_3(PlayerType::Player_3);
+   player_3.SetFrames(PlayerAnimation::StandUp, 2000_ms, { LoadTexture("sprite/player_3_up.png", size) });
+   player_3.SetFrames(PlayerAnimation::StandDown, 2000_ms, { LoadTexture("sprite/player_3_down.png", size) });
+   player_3.SetFrames(PlayerAnimation::StandLeft, 2000_ms, { LoadTexture("sprite/player_3_left.png", size) });
+   player_3.SetFrames(PlayerAnimation::StandRight, 2000_ms, { LoadTexture("sprite/player_3_right.png", size) });
+   player_3.SetFrames(PlayerAnimation::WalkUp, 2000_ms, { LoadTexture("sprite/player_3_up_1.png", size), LoadTexture("sprite/player_3_up_2.png", size) });
+   player_3.SetFrames(PlayerAnimation::WalkDown, 2000_ms, { LoadTexture("sprite/player_3_down_1.png", size), LoadTexture("sprite/player_3_down_2.png", size) });
+   player_3.SetFrames(PlayerAnimation::WalkLeft, 2000_ms, { LoadTexture("sprite/player_3_left_1.png", size), LoadTexture("sprite/player_3_left_2.png", size) });
+   player_3.SetFrames(PlayerAnimation::WalkRight, 2000_ms, { LoadTexture("sprite/player_3_right_1.png", size), LoadTexture("sprite/player_3_right_2.png", size) });
+   player_3.SetFrames(PlayerAnimation::Dying, death_len, { LoadTexture("sprite/player_3_death_1.png", size), LoadTexture("sprite/player_3_death_2.png", size), LoadTexture("sprite/player_3_death_3.png", size), LoadTexture("sprite/player_3_death_4.png", size) });
    mPlayerRes.insert({ player_3.GetType(), player_3 });
 
-   PlayerResource player_4(PlayerType::Player_4, 2000_ms);
-   player_4.SetFrames(PlayerAnimation::StandUp, { LoadTexture("sprite/player_4_up.png", size) });
-   player_4.SetFrames(PlayerAnimation::StandDown, { LoadTexture("sprite/player_4_down.png", size) });
-   player_4.SetFrames(PlayerAnimation::StandLeft, { LoadTexture("sprite/player_4_left.png", size) });
-   player_4.SetFrames(PlayerAnimation::StandRight, { LoadTexture("sprite/player_4_right.png", size) });
-   player_4.SetFrames(PlayerAnimation::WalkUp, { LoadTexture("sprite/player_4_up_1.png", size), LoadTexture("sprite/player_4_up_2.png", size) });
-   player_4.SetFrames(PlayerAnimation::WalkDown, { LoadTexture("sprite/player_4_down_1.png", size), LoadTexture("sprite/player_4_down_2.png", size) });
-   player_4.SetFrames(PlayerAnimation::WalkLeft, { LoadTexture("sprite/player_4_left_1.png", size), LoadTexture("sprite/player_4_left_2.png", size) });
-   player_4.SetFrames(PlayerAnimation::WalkRight, { LoadTexture("sprite/player_4_right_1.png", size), LoadTexture("sprite/player_4_right_2.png", size) });
+   PlayerResource player_4(PlayerType::Player_4);
+   player_4.SetFrames(PlayerAnimation::StandUp, 2000_ms, { LoadTexture("sprite/player_4_up.png", size) });
+   player_4.SetFrames(PlayerAnimation::StandDown, 2000_ms, { LoadTexture("sprite/player_4_down.png", size) });
+   player_4.SetFrames(PlayerAnimation::StandLeft, 2000_ms, { LoadTexture("sprite/player_4_left.png", size) });
+   player_4.SetFrames(PlayerAnimation::StandRight, 2000_ms, { LoadTexture("sprite/player_4_right.png", size) });
+   player_4.SetFrames(PlayerAnimation::WalkUp, 2000_ms, { LoadTexture("sprite/player_4_up_1.png", size), LoadTexture("sprite/player_4_up_2.png", size) });
+   player_4.SetFrames(PlayerAnimation::WalkDown, 2000_ms, { LoadTexture("sprite/player_4_down_1.png", size), LoadTexture("sprite/player_4_down_2.png", size) });
+   player_4.SetFrames(PlayerAnimation::WalkLeft, 2000_ms, { LoadTexture("sprite/player_4_left_1.png", size), LoadTexture("sprite/player_4_left_2.png", size) });
+   player_4.SetFrames(PlayerAnimation::WalkRight, 2000_ms, { LoadTexture("sprite/player_4_right_1.png", size), LoadTexture("sprite/player_4_right_2.png", size) });
+   player_4.SetFrames(PlayerAnimation::Dying, death_len, { LoadTexture("sprite/player_4_death_1.png", size), LoadTexture("sprite/player_4_death_2.png", size), LoadTexture("sprite/player_4_death_3.png", size), LoadTexture("sprite/player_4_death_4.png", size) });
    mPlayerRes.insert({ player_4.GetType(), player_4 });
 }
 

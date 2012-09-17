@@ -17,13 +17,15 @@ public:
                const std::shared_ptr<Arena>& arena);
    virtual ~ArenaObject();
 
-   // TODO:
-   // Die(); Request death/destruction animation.
+//   // Request death/destruction animation of an object.
+//   bool IsDying() const;
+//   void StartDying();
 
 protected:
    std::shared_ptr<Arena> GetArena() const;
 
 private:
+//   bool mIsDying = false;
    const std::shared_ptr<Arena> mArena;
 };
 

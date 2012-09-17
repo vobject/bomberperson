@@ -16,6 +16,16 @@ ArenaObject::~ArenaObject()
 
 }
 
+//bool ArenaObject::IsDying() const
+//{
+//   return mIsDying;
+//}
+
+//void ArenaObject::StartDying()
+//{
+//   mIsDying = true;
+//}
+
 std::shared_ptr<Arena> ArenaObject::GetArena() const
 {
    return mArena;
