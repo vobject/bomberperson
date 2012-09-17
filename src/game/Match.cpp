@@ -180,7 +180,7 @@ std::shared_ptr<InputDevice> Match::CreateInputFromInputId(const InputId id)
       case InputId::Keyboard_2:
       {
          mKeyboard_2 = std::make_shared<KeyboardInput>(SDLK_e, SDLK_d, SDLK_s,
-                                                       SDLK_f, SDLK_q, SDLK_a);
+                                                       SDLK_f, SDLK_a, SDLK_q);
          return mKeyboard_2;
       }
       case InputId::Mouse_1:

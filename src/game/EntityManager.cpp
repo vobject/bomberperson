@@ -76,20 +76,36 @@ std::shared_ptr<Extra> EntityManager::CreateExtra(
 
 std::shared_ptr<Bomb> EntityManager::CreateBomb(
    const Cell& cell,
-   const BombType type
+   const BombType type,
+   const PlayerType owner
 )
 {
-   auto bomb = std::make_shared<Bomb>(mArena, type, *this);
-   mArena->SetObjectPosition(*bomb, cell);
-   mArena->SetObjectSize(*bomb);
+   // Find the right player object to be passed to the new bomb as its owner.
+   for (const auto& ent : mEntities)
+   {
+      const auto ptr = std::dynamic_pointer_cast<Player>(ent);
 
-   mEntities.insert(bomb);
-   return bomb;
+      if (ptr && (ptr->GetType() == owner))
+      {
+         auto bomb = std::make_shared<Bomb>(mArena, type, ptr, *this);
+         mArena->SetObjectPosition(*bomb, cell);
+         mArena->SetObjectSize(*bomb);
+
+         mEntities.insert(bomb);
+         return bomb;
+      }
+   }
+
+   // Can never happen.
+   throw "The player who wants to create a bomb does not exist.";
 }
 
-std::shared_ptr<Explosion> EntityManager::CreateExplosion(const Cell& cell)
+std::shared_ptr<Explosion> EntityManager::CreateExplosion(
+   const Cell& cell,
+   const std::shared_ptr<Player>& owner
+)
 {
-   auto explosion = std::make_shared<Explosion>(mArena);
+   auto explosion = std::make_shared<Explosion>(mArena, owner);
    mArena->SetObjectPosition(*explosion, cell);
    mArena->SetObjectSize(*explosion);
 

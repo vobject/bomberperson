@@ -45,6 +45,12 @@ void Player::Update(const int elapsed_time)
 
    if (GetArena()->HasExplosion(parent_cell))
    {
+      const auto explosion_owner = GetArena()->GetExplosion(parent_cell)->GetOwner();
+      if (explosion_owner.get() != this) {
+         // We did not commit suicide. Increase kill counter for the owner.
+         explosion_owner->IncrementKills(GetType());
+      }
+
       // Explosions kill the player. Prepare his death animation.
       SetAnimationTime(0);
       mData.anim = PlayerAnimation::Dying;
@@ -123,6 +129,14 @@ PlayerSound Player::GetSound(const bool reset)
       mSound = PlayerSound::None;
    }
    return ret;
+}
+
+void Player::IncrementKills(const PlayerType type)
+{
+   // Ignore which player was killed by now.
+   (void) type;
+
+   mData.kills++;
 }
 
 void Player::UpdateMovement(const int elapsed_time)
@@ -207,10 +221,8 @@ void Player::UpdateBombing(const int elapsed_time)
          mData.remote_bombs--;
       }
 
-      auto bomb = mEntityFactory.CreateBomb(parent_cell, bomb_type);
+      auto bomb = mEntityFactory.CreateBomb(parent_cell, bomb_type, GetType());
       bomb->SetRange(mData.range);
-//      bomb->SetOwner(GetId());
-//      bomb->SetSound(SoundId::BombPlanted);
       GetArena()->SetBomb(parent_cell, bomb);
 
       mPlantedBombs.push_back(bomb);

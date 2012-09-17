@@ -8,10 +8,12 @@
 Bomb::Bomb(
    const std::shared_ptr<Arena>& arena,
    const BombType type,
+   const std::shared_ptr<Player>& owner,
    EntityManager& entity_factory
 )
    : ArenaObject(EntityId::Bomb, ZOrder::Layer_4, arena)
    , mType(type)
+   , mOwner(owner)
    , mEntityFactory(entity_factory)
 {
    mSound = BombSound::Planted;
@@ -78,7 +80,7 @@ void Bomb::Detonate()
 void Bomb::PlantCenterExplosion() const
 {
    const auto parent = GetArena()->GetCellFromObject(*this);
-   auto explosion = mEntityFactory.CreateExplosion(parent);
+   auto explosion = mEntityFactory.CreateExplosion(parent, mOwner);
    explosion->SetSound();
    GetArena()->SetExplosion(parent, explosion);
 }
@@ -108,7 +110,7 @@ void Bomb::PlantRangeExplosion(Direction dir) const
       }
 
       // TODO: Select the right ExplosionType (horizontal, vertical, etc).
-      auto range_exp = mEntityFactory.CreateExplosion(range_cell);
+      auto range_exp = mEntityFactory.CreateExplosion(range_cell, mOwner);
       GetArena()->SetExplosion(range_cell, range_exp);
 
       if (GetArena()->HasWall(range_cell) &&

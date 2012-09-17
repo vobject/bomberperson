@@ -1,8 +1,12 @@
 #include "Explosion.hpp"
 #include "../Options.hpp"
 
-Explosion::Explosion(const std::shared_ptr<Arena>& arena)
+Explosion::Explosion(
+   const std::shared_ptr<Arena>& arena,
+   const std::shared_ptr<Player>& owner
+)
    : ArenaObject(EntityId::Explosion, ZOrder::Layer_5, arena)
+   , mOwner(owner)
 {
 
 }
@@ -21,6 +25,11 @@ void Explosion::Update(const int elapsed_time)
       // The explosion has burned out.
       Invalidate();
    }
+}
+
+std::shared_ptr<Player> Explosion::GetOwner() const
+{
+   return mOwner;
 }
 
 ExplosionSound Explosion::GetSound(const bool reset)

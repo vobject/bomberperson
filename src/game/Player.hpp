@@ -94,6 +94,8 @@ public:
    PlayerData GetData() const;
    PlayerSound GetSound(bool reset);
 
+   void IncrementKills(PlayerType type);
+
 private:
    // Number of milliseconds the player has to wait to move another pixel.
    static const int MIN_SPEED = 12_ms;

@@ -3,6 +3,8 @@
 
 #include "ArenaObject.hpp"
 
+class Player;
+
 //enum class ExplosionType
 //{
 
@@ -17,7 +19,8 @@ enum class ExplosionSound
 class Explosion : public ArenaObject
 {
 public:
-   Explosion(const std::shared_ptr<Arena>& arena);
+   Explosion(const std::shared_ptr<Arena>& arena,
+             const std::shared_ptr<Player>& owner);
    virtual ~Explosion();
 
    Explosion(const Explosion&) = delete;
@@ -25,6 +28,7 @@ public:
 
    void Update(int elapsed_time) override;
 
+   std::shared_ptr<Player> GetOwner() const;
    ExplosionSound GetSound(bool reset);
 
    // FIXME: Introduce different ExplosionTypes and only make a sound
@@ -33,6 +37,7 @@ public:
    void SetSound();
 
 private:
+   const std::shared_ptr<Player> mOwner;
    ExplosionSound mSound = ExplosionSound::None;
 };
 

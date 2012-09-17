@@ -4,6 +4,7 @@
 #include "ArenaObject.hpp"
 #include "../utils/Utils.hpp"
 
+class Player;
 class EntityManager;
 
 enum class BombType
@@ -23,6 +24,7 @@ class Bomb : public ArenaObject
 public:
    Bomb(const std::shared_ptr<Arena>& arena,
         BombType type,
+        const std::shared_ptr<Player>& owner,
         EntityManager& entity_factory);
    virtual ~Bomb();
 
@@ -44,6 +46,7 @@ private:
    void PlantRangeExplosion(Direction dir) const;
 
    const BombType mType;
+   const std::shared_ptr<Player> mOwner;
    EntityManager& mEntityFactory;
 
    int mLifeTime = 0_ms;

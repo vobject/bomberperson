@@ -46,8 +46,8 @@ public:
 
    std::shared_ptr<Wall> CreateWall(const Cell& cell, WallType type);
    std::shared_ptr<Extra> CreateExtra(const Cell& cell, ExtraType type);
-   std::shared_ptr<Bomb> CreateBomb(const Cell& cell, BombType type);
-   std::shared_ptr<Explosion> CreateExplosion(const Cell& cell);
+   std::shared_ptr<Bomb> CreateBomb(const Cell& cell, BombType type, PlayerType owner);
+   std::shared_ptr<Explosion> CreateExplosion(const Cell& cell, const std::shared_ptr<Player>& owner);
    std::shared_ptr<Player> CreatePlayer(PlayerType type);
 
    EntitySet GetEntities() const;
