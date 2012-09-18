@@ -44,6 +44,31 @@ void Bomb::Update(const int elapsed_time)
       PlantRangeExplosion(Direction::Down);
       PlantRangeExplosion(Direction::Left);
       PlantRangeExplosion(Direction::Right);
+      return;
+   }
+
+   if (mIsMoving)
+   {
+      mMoveIdleTime += elapsed_time;
+      if ((mMoveIdleTime >= mMoveSpeed) && CanMove(mMoveDirection, mMoveDistance))
+      {
+         switch (mMoveDirection)
+         {
+            case Direction::Up:
+               SetPosition({ GetPosition().X, GetPosition().Y - 1 });
+               break;
+            case Direction::Down:
+               SetPosition({ GetPosition().X, GetPosition().Y + 1 });
+               break;
+            case Direction::Left:
+               SetPosition({ GetPosition().X - 1, GetPosition().Y });
+               break;
+            case Direction::Right:
+               SetPosition({ GetPosition().X + 1, GetPosition().Y });
+               break;
+         }
+         mMoveIdleTime = 0_ms;
+      }
    }
 }
 
@@ -70,6 +95,59 @@ int Bomb::GetRange() const
 void Bomb::SetRange(const int range)
 {
    mRange = range;
+}
+
+bool Bomb::CanMove(const Direction dir, const int distance) const
+{
+   // TODO: This code is basically copied from Player class.
+   //  This might be a sign to outsource the whole collision detection
+   //  stuff into its own class/subsytem.
+
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+   const auto cell_size = GetArena()->GetCellSize();
+   const auto cell_pos = GetArena()->GetCellPosition(parent_cell);
+
+   // Check for movement inside the current cell.
+   // Movement inside the current cell is always ok.
+   switch (dir)
+   {
+      case Direction::Up:
+         if ((GetPosition().Y - distance) >= cell_pos.Y)
+            return true;
+         break;
+      case Direction::Down:
+         if ((GetPosition().Y + GetSize().Height + distance) <= (cell_pos.Y + cell_size.Height))
+            return true;
+         break;
+      case Direction::Left:
+         if ((GetPosition().X - distance) >= cell_pos.X)
+            return true;
+         break;
+      case Direction::Right:
+         if ((GetPosition().X + GetSize().Width + distance) <= (cell_pos.X + cell_size.Width))
+            return true;
+         break;
+   }
+
+   // Bomb wants to move to another cell - check if that is allowed.
+   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
+   if ((-1 != neighbor_cell.X) &&
+       (-1 != neighbor_cell.Y) &&
+       !GetArena()->HasWall(neighbor_cell) &&
+       !GetArena()->HasBomb(neighbor_cell))
+   {
+      // A cell exists and does not block the bomb.
+      return true;
+   }
+   return false;
+}
+
+void Bomb::Move(const Direction dir, const int speed, const int distance)
+{
+   mMoveDirection = dir;
+   mMoveSpeed = speed;
+   mMoveDistance = distance;
+   mIsMoving = true;
 }
 
 void Bomb::Detonate()

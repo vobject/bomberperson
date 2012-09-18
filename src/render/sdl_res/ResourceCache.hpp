@@ -39,9 +39,6 @@ public:
 //   Texture GetPlayer(const Kinect& kinect);
    // std::shared_ptr<...> GetAudioSample(const std::string& id);
 
-//   void AddDirectory(const std::string& dir);
-//   SDL_Surface* GetResource(const std::string& id);
-
 private:
    void LoadMenuResources();
    void LoadArenaResources();

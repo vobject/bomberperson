@@ -59,6 +59,7 @@ struct PlayerData
       , bombs(1)
       , range(1)
       , remote_bombs(0)
+      , can_kick(false)
       , kills(0)
       , wins(0)
    { }
@@ -70,6 +71,7 @@ struct PlayerData
    int bombs;
    int range;
    int remote_bombs;
+   bool can_kick;
 
    int kills;
    int wins;
@@ -110,9 +112,11 @@ private:
 
    bool CanMove(Direction dir, int distance) const;
    bool CanPlantBomb();
+   void KickBomb(Direction dir) const;
 
    void IncreaseSpeed();
    PlayerAnimation GetStopWalkingState(PlayerAnimation anim) const;
+   Direction GetPlayerDirection() const;
 
    PlayerType mType;
    PlayerData mData;
@@ -129,6 +133,9 @@ private:
    //  it alterable from the outside (game logic).
    int mPlantingSpeed = MIN_PLANTING_SPEED;
    std::vector<std::shared_ptr<Bomb>> mPlantedBombs;
+
+   // HACK: Handle this properly!
+   mutable bool mParentCellChanged = false;
 };
 
 #endif // PLAYER_HPP

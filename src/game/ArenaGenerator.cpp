@@ -118,7 +118,7 @@ void ArenaGenerator::CreateDefaultExtras(
          }
          else
          {
-            switch (rand() % 4)
+            switch (rand() % 5)
             {
                case 0:
                   extra = mEntityFactory.CreateExtra(cell, ExtraType::Speed);
@@ -130,6 +130,9 @@ void ArenaGenerator::CreateDefaultExtras(
                   extra = mEntityFactory.CreateExtra(cell, ExtraType::Range);
                   break;
                case 3:
+                  extra = mEntityFactory.CreateExtra(cell, ExtraType::Kick);
+                  break;
+               case 4:
                   extra = mEntityFactory.CreateExtra(cell, ExtraType::RemoteBombs);
                   break;
             }
@@ -219,6 +222,6 @@ void ArenaGenerator::CreateDefaultSpawnAreas(
 
 bool ArenaGenerator::ShouldCreateItem() const
 {
-   // 25% chance to generate '0' and return true.
-   return !(rand() % 4);
+   // 33% chance to generate '0' and return true.
+   return !(rand() % 3);
 }

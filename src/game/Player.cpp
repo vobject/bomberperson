@@ -83,6 +83,10 @@ void Player::Update(const int elapsed_time)
             mData.range = 99;
             mSound = PlayerSound::Collect_InfiniteRange;
             break;
+         case ExtraType::Kick:
+            mData.can_kick = true;
+            mSound = PlayerSound::Collect_Speed;
+            break;
          case ExtraType::RemoteBombs:
             mData.remote_bombs += 5;
             mSound = PlayerSound::Collect_Bombs;
@@ -159,8 +163,10 @@ void Player::UpdateMovement(const int elapsed_time)
 
       if (CanMove(Direction::Up, mData.distance)) {
          up += mData.distance;
+         KickBomb(Direction::Up);
       }
    }
+
    if (mCurrentCommands.down)
    {
       update_anim = true;
@@ -168,8 +174,10 @@ void Player::UpdateMovement(const int elapsed_time)
 
       if (CanMove(Direction::Down, mData.distance)) {
          down += mData.distance;
+         KickBomb(Direction::Down);
       }
    }
+
    if (mCurrentCommands.left)
    {
       update_anim = true;
@@ -177,8 +185,10 @@ void Player::UpdateMovement(const int elapsed_time)
 
       if (CanMove(Direction::Left, mData.distance)) {
          left += mData.distance;
+         KickBomb(Direction::Left);
       }
    }
+
    if (mCurrentCommands.right)
    {
       update_anim = true;
@@ -186,6 +196,7 @@ void Player::UpdateMovement(const int elapsed_time)
 
       if (CanMove(Direction::Right, mData.distance)) {
          right += mData.distance;
+         KickBomb(Direction::Right);
       }
    }
 
@@ -244,6 +255,7 @@ void Player::UpdateBombing(const int elapsed_time)
 
 bool Player::CanMove(const Direction dir, const int distance) const
 {
+   mParentCellChanged = false;
    const auto parent_cell = GetArena()->GetCellFromObject(*this);
    const auto cell_size = GetArena()->GetCellSize();
    const auto cell_pos = GetArena()->GetCellPosition(parent_cell);
@@ -274,13 +286,19 @@ bool Player::CanMove(const Direction dir, const int distance) const
    const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
    if ((-1 != neighbor_cell.X) &&
        (-1 != neighbor_cell.Y) &&
-       !GetArena()->HasWall(neighbor_cell) &&
-       !GetArena()->HasBomb(neighbor_cell))
+       !GetArena()->HasWall(neighbor_cell))
    {
-      // A cell exists and does not block the player.
-      return true;
-   }
+      // We may probably move into the next cell. There is one last thing
+      //  we need to check: does it have a (movable) bomb?
+      if (!GetArena()->HasBomb(neighbor_cell) ||
+          (mData.can_kick && GetArena()->GetBomb(neighbor_cell)->CanMove(dir, distance)))
+      {
+         mParentCellChanged = true;
 
+         // A cell exists and does not block the player.
+         return true;
+      }
+   }
    return false;
 }
 
@@ -303,11 +321,28 @@ bool Player::CanPlantBomb()
    return (mData.bombs > bombs_alive);
 }
 
+void Player::KickBomb(const Direction dir) const
+{
+   if (!mParentCellChanged || !mData.can_kick) {
+      return;
+   }
+
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
+
+   if ((-1 != neighbor_cell.X) &&
+       (-1 != neighbor_cell.Y) &&
+       GetArena()->HasBomb(neighbor_cell))
+   {
+      GetArena()->GetBomb(neighbor_cell)->Move(dir, mData.speed, mData.distance);
+   }
+}
+
 void Player::IncreaseSpeed()
 {
    if (mData.speed > MAX_SPEED)
    {
-      mData.speed -= 1_ms;
+      mData.speed -= 2_ms;
    }
    else
    {
@@ -332,4 +367,26 @@ PlayerAnimation Player::GetStopWalkingState(const PlayerAnimation anim) const
       default:
          return anim;
    }
+}
+
+Direction Player::GetPlayerDirection() const
+{
+   switch (mData.anim)
+   {
+      case PlayerAnimation::WalkUp:
+      case PlayerAnimation::StandUp:
+         return Direction::Up;
+      case PlayerAnimation::WalkDown:
+      case PlayerAnimation::StandDown:
+         return Direction::Down;
+      case PlayerAnimation::WalkLeft:
+      case PlayerAnimation::StandLeft:
+         return Direction::Left;
+      case PlayerAnimation::WalkRight:
+      case PlayerAnimation::StandRight:
+         return Direction::Right;
+      default:
+         break;
+   }
+   throw "Player: Invalid player direction.";
 }

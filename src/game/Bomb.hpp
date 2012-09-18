@@ -42,6 +42,8 @@ public:
    int GetRange() const;
    void SetRange(int range);
 
+   bool CanMove(Direction dir, int distance) const;
+   void Move(Direction dir, int speed, int distance);
    void Detonate();
 
 private:
@@ -56,6 +58,12 @@ private:
    int mLifeTime = 0_ms;
    int mRange = 1;
    BombSound mSound = BombSound::None;
+
+   bool mIsMoving = false;
+   int mMoveIdleTime = 0_ms;
+   Direction mMoveDirection;
+   int mMoveSpeed;
+   int mMoveDistance;
 };
 
 #endif // BOMB_HPP

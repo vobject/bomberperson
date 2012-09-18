@@ -134,7 +134,8 @@ void ResourceCache::LoadExtraResources()
    const auto id2 = ExtraType::Bombs;
    const auto id3 = ExtraType::Range;
    const auto id4 = ExtraType::InfiniteRange;
-   const auto id5 = ExtraType::RemoteBombs;
+   const auto id5 = ExtraType::Kick;
+   const auto id6 = ExtraType::RemoteBombs;
    const Size size = { DefaultValue::EXTRA_WIDTH,
                        DefaultValue::EXTRA_HEIGHT };
 
@@ -142,7 +143,8 @@ void ResourceCache::LoadExtraResources()
    mExtraRes.insert({ id2, { id2, { LoadTexture("extra_supply.png", size) } } });
    mExtraRes.insert({ id3, { id3, { LoadTexture("extra_range.png", size) } } });
    mExtraRes.insert({ id4, { id4, { LoadTexture("extra_range_gold.png", size) } } });
-   mExtraRes.insert({ id5, { id5, { LoadTexture("extra_remotebombs.png", size) } } });
+   mExtraRes.insert({ id5, { id5, { LoadTexture("extra_kick.png", size) } } });
+   mExtraRes.insert({ id6, { id6, { LoadTexture("extra_remotebombs.png", size) } } });
 }
 
 void ResourceCache::LoadBombResources()
