@@ -52,37 +52,47 @@ void SimpleSdlRenderer::PostRender()
    SDL_Flip(mScreen);
 }
 
+void SimpleSdlRenderer::Render(const std::shared_ptr<MenuItem>& obj)
+{
+
+}
+
+void SimpleSdlRenderer::Render(const std::shared_ptr<MenuItemSelector>& obj)
+{
+
+}
+
 void SimpleSdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
 {
-   const auto pos = mainmenu->GetPosition();
-   const auto size = mainmenu->GetSize();
+//   const auto pos = mainmenu->GetPosition();
+//   const auto size = mainmenu->GetSize();
 
-   SDL_Rect rect = { static_cast<Sint16>(pos.X),
-                     static_cast<Sint16>(pos.Y),
-                     static_cast<Uint16>(size.Width),
-                     static_cast<Uint16>(size.Height) };
-   SDL_FillRect(mScreen, &rect, 0x7f7f6f);
+//   SDL_Rect rect = { static_cast<Sint16>(pos.X),
+//                     static_cast<Sint16>(pos.Y),
+//                     static_cast<Uint16>(size.Width),
+//                     static_cast<Uint16>(size.Height) };
+//   SDL_FillRect(mScreen, &rect, 0x7f7f6f);
 
-   const auto items = mainmenu->GetMenuItems();
-   const auto selection = mainmenu->GetSelection();
+//   const auto items = mainmenu->GetMenuItems();
+//   const auto selection = mainmenu->GetSelection();
 
-   for (size_t i = 0; i < items.size(); i++)
-   {
-      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + 128),
-                             static_cast<Sint16>(pos.Y + 96 + (96 * i)),
-                             static_cast<Uint16>(384),
-                             static_cast<Uint16>(64) };
-      SDL_FillRect(mScreen, &item_rect, 0xffffff);
+//   for (size_t i = 0; i < items.size(); i++)
+//   {
+//      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + 128),
+//                             static_cast<Sint16>(pos.Y + 96 + (96 * i)),
+//                             static_cast<Uint16>(384),
+//                             static_cast<Uint16>(64) };
+//      SDL_FillRect(mScreen, &item_rect, 0xffffff);
 
-      if (selection.id == items[i].id)
-      {
-         SDL_Rect sel_rect = { static_cast<Sint16>(pos.X + 64),
-                               static_cast<Sint16>(pos.Y + 110 + (96 * i)),
-                               static_cast<Uint16>(48),
-                               static_cast<Uint16>(48) };
-         SDL_FillRect(mScreen, &sel_rect, 0xffff00);
-      }
-   }
+//      if (selection.id == items[i].id)
+//      {
+//         SDL_Rect sel_rect = { static_cast<Sint16>(pos.X + 64),
+//                               static_cast<Sint16>(pos.Y + 110 + (96 * i)),
+//                               static_cast<Uint16>(48),
+//                               static_cast<Uint16>(48) };
+//         SDL_FillRect(mScreen, &sel_rect, 0xffff00);
+//      }
+//   }
 }
 
 void SimpleSdlRenderer::Render(const std::shared_ptr<Arena>& arena)

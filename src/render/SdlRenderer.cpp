@@ -1,5 +1,7 @@
 #include "SdlRenderer.hpp"
 #include "../game/UserInterface.hpp"
+#include "../game/MenuItem.hpp"
+#include "../game/MenuItemSelector.hpp"
 #include "../game/MainMenu.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Scoreboard.hpp"
@@ -72,47 +74,51 @@ void SdlRenderer::PostRender()
    SDL_Flip(mScreen);
 }
 
-void SdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
+void SdlRenderer::Render(const std::shared_ptr<MenuItem>& obj)
 {
-   const auto id = mainmenu->GetId();
-   const auto frame = mResCache->GetMenuResource(id).GetFrame();
-   Render(mainmenu, frame);
+   const auto pos = obj->GetPosition();
 
-   const auto pos = mainmenu->GetPosition();
-   const auto items = mainmenu->GetMenuItems();
-   const auto selection = mainmenu->GetSelection();
-
-   for (size_t i = 0; i < items.size(); i++)
-   {
-      auto surface = TTF_RenderText_Blended(mMenuFont,
-                                            items[i].text.c_str(),
-                                            { 0xC0, 0xC0, 0xC0, 0 });
-      SDL_Rect txt_rect = { static_cast<Sint16>(pos.X + 224),
-                            static_cast<Sint16>(pos.Y + 164 + (96 * i)),
-                            0,
-                            0 };
-      SDL_BlitSurface(surface, NULL, mScreen, &txt_rect);
-      SDL_FreeSurface(surface);
-
-      if (selection.id == items[i].id)
-      {
-//         SDL_Rect sel_rect = { static_cast<Sint16>(pos.X + 64),
-//                               static_cast<Sint16>(pos.Y + 110 + (96 * i)),
-//                               static_cast<Uint16>(48),
-//                               static_cast<Uint16>(48) };
-//         SDL_FillRect(mScreen, &sel_rect, 0xffff00);
-
-         auto sel_icon = TTF_RenderText_Blended(mMenuFont,
-                                                "Q",
-                                                { 0x70, 0x70, 0x70, 0 });
-         SDL_Rect ico_rect = { static_cast<Sint16>(pos.X + 144),
-                               static_cast<Sint16>(pos.Y + 158 + (96 * i)),
-                               0,
-                               0 };
-         SDL_BlitSurface(sel_icon, NULL, mScreen, &ico_rect);
-         SDL_FreeSurface(sel_icon);
-      }
+   SDL_Color color = { 0x90, 0x90, 0x90, 0 };
+   if (obj->IsEnabled()) {
+      color = { 0xC0, 0xC0, 0xC0, 0 };
    }
+
+   auto surface = TTF_RenderText_Blended(mMenuFont,
+                                         obj->GetText().c_str(),
+                                         color);
+   SDL_Rect rect = { static_cast<Sint16>(pos.X),
+                     static_cast<Sint16>(pos.Y),
+                     0,
+                     0 };
+   SDL_BlitSurface(surface, NULL, mScreen, &rect);
+   SDL_FreeSurface(surface);
+}
+
+void SdlRenderer::Render(const std::shared_ptr<MenuItemSelector>& obj)
+{
+   const auto id = obj->GetId();
+   const auto anim_time = obj->GetAnimationTime();
+   const auto frame = mResCache->GetMenuResource(id).GetFrame(anim_time);
+   Render(obj, frame);
+
+//   const auto pos = obj->GetPosition();
+
+//   auto surface = TTF_RenderText_Blended(mMenuFont,
+//                                         "Q",
+//                                         { 0x70, 0x70, 0x70, 0 });
+//   SDL_Rect rect = { static_cast<Sint16>(pos.X),
+//                     static_cast<Sint16>(pos.Y),
+//                     0,
+//                     0 };
+//   SDL_BlitSurface(surface, NULL, mScreen, &rect);
+//   SDL_FreeSurface(surface);
+}
+
+void SdlRenderer::Render(const std::shared_ptr<MainMenu>& obj)
+{
+   const auto id = obj->GetId();
+   const auto frame = mResCache->GetMenuResource(id).GetFrame();
+   Render(obj, frame);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)

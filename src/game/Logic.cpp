@@ -119,13 +119,13 @@ void Logic::UpdateUserInterface(int elapsed_time)
 
    switch (mUserInterface->GetSelection())
    {
-      case UserInterfaceItemId::MainMenu_NewGame:
+      case UiItemId::MainMenu_NewGame:
          {
             mUserInterface->HideMainMenu();
             mMatch = std::make_shared<Match>(mUserInterface->GetMatchSettings());
          }
          break;
-      case UserInterfaceItemId::MainMenu_ResumeGame:
+      case UiItemId::MainMenu_ResumeGame:
          {
             if (mMatch)
             {
@@ -138,7 +138,7 @@ void Logic::UpdateUserInterface(int elapsed_time)
             }
          }
          break;
-      case UserInterfaceItemId::MainMenu_Exit:
+      case UiItemId::MainMenu_Exit:
          mDone = true;
          break;
       default:
@@ -208,4 +208,3 @@ void Logic::RenderMatch(Renderer& renderer)
       renderer.Render(ent);
    }
 }
-

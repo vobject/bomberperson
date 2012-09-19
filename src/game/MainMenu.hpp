@@ -7,6 +7,10 @@
 #include <string>
 #include <vector>
 
+class EntityManager;
+class MenuItem;
+class MenuItemSelector;
+
 enum class MenuType
 {
    Mainmenu
@@ -25,21 +29,10 @@ enum class MenuSound
    Invalid
 };
 
-//enum class MainMenuItem
-//{
-//   StartGame,
-////   SetupGame,
-////   Options,
-////   Credits,
-//   Exit
-//};
-
-class UserInterfaceItem;
-
 class MainMenu : public SceneObject
 {
 public:
-    MainMenu();
+    MainMenu(EntityManager& entity_factory);
     virtual ~MainMenu();
 
     MainMenu(const MainMenu&) = delete;
@@ -47,20 +40,23 @@ public:
 
     void Update(int elapsed_time) override;
 
-    void AddMenuItem(const UserInterfaceItem& item);
-    std::vector<UserInterfaceItem> GetMenuItems() const;
-
     void SelectionUp();
     void SelectionDown();
     void Choose();
 
-    UserInterfaceItem GetSelection();
+    std::shared_ptr<MenuItem> GetSelection();
+    std::vector<std::shared_ptr<MenuItem>> GetMenuItems() const;
     MenuSound GetSound(bool reset);
 
+    void SetResumeStatus(bool enabled);
+
 private:
+    EntityManager& mEntityFactory;
+
     unsigned int mSelectionMarker = 0;
+    std::shared_ptr<MenuItemSelector> mSelector;
+    std::vector<std::shared_ptr<MenuItem>> mItems;
     MenuSound mSound = MenuSound::None;
-    std::vector<UserInterfaceItem> mItems;
 };
 
 #endif // MAIN_MENU_HPP

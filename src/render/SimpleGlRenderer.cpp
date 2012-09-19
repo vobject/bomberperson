@@ -62,7 +62,17 @@ void SimpleGlRenderer::PostRender()
    SDL_GL_SwapBuffers();
 }
 
-void SimpleGlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
+void SimpleGlRenderer::Render(const std::shared_ptr<MenuItem>& obj)
+{
+   // TODO: Implement Me!
+}
+
+void SimpleGlRenderer::Render(const std::shared_ptr<MenuItemSelector>& obj)
+{
+   // TODO: Implement Me!
+}
+
+void SimpleGlRenderer::Render(const std::shared_ptr<MainMenu>& obj)
 {
    // TODO: Implement Me!
 }

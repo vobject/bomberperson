@@ -15,39 +15,11 @@ enum class ZOrder
    Layer_4,    // Bombs
    Layer_5,    // Explosions
    Layer_6,    // Players
-   MainMenu,
+   Menu,
+   MenuItem,
    OverlayMenu,
    Messagebox
 };
-
-//enum class SoundId
-//{
-//   None,
-
-////   MainMenuSwitch,
-////   MainMenuSelect,
-
-////   WallDestruction,
-
-//   BombPlanted,
-
-//   Explosion,
-
-//   PlayerPicksUpExtra,
-//   PlayerDies,
-////   PlayerWins
-//};
-
-// TODO?
-//class ArenaObject : public SceneObject
-//{
-   // Cell, Wall, Extra, Bomb, Explosion?, Player
-   // ArenaObject(Cell& parent_cell);
-   // ArenaObject(Arena& arena, Cell& parent_cell);
-   // protected: Get/SetParentCell(); GetArena();
-   // private: mArena; mParentCell;
-// Get/SetPosition() only relative to the parent cell??
-//};
 
 class SceneObject
 {
@@ -73,12 +45,6 @@ public:
    int GetAnimationTime() const;
    void SetAnimationTime(int ms);
 
-//   SoundId GetSound() const;
-//   void SetSound(SoundId id);
-
-//protected:
-   // TODO: Make this protected again as soon as ArenaObject gets its
-   //  Die() method and Arena class can call that instead of this.
    void Invalidate();
 
 private:

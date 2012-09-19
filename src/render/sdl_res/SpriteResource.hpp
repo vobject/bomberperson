@@ -9,9 +9,6 @@
 
 struct SDL_Surface;
 
-// TODO: Make this the base class for PlayerResource.
-//  First it has to adapt the animation technique that PlayerResource
-//  is already using.
 class SpriteResource
 {
 public:

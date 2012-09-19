@@ -66,7 +66,7 @@ void Audio::Play(const std::shared_ptr<SceneObject>& ent)
       Play(ptr);
    }
    else {
-      LOG(logERROR) << "Audio::Play(SceneObject) Unknown object!";
+//      LOG(logERROR) << "Audio::Play(SceneObject) Unknown object!";
    }
 }
 

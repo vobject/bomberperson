@@ -101,11 +101,21 @@ PlayerResource ResourceCache::GetPlayerResource(const PlayerType type) const
 
 void ResourceCache::LoadMenuResources()
 {
-   const auto id = EntityId::Menu;
+   const auto id1 = EntityId::Menu;
+   const auto id_sel = EntityId::MenuItemSelector;
    const Size size = { DefaultValue::SCREEN_WIDTH,
                        DefaultValue::SCREEN_HEIGHT };
+   const Size size_sel = { 64, 84 };
 
-   mMenuRes.insert({ id, { id, { LoadTexture("mainmenu.png", size) } } });
+   mMenuRes.insert({ id1, { id1, { LoadTexture("mainmenu.png", size) } } });
+   mMenuRes.insert({ id_sel, { id_sel,
+                               { LoadTexture("menu_selector_1.png", size_sel),
+                                 LoadTexture("menu_selector_2.png", size_sel),
+                                 LoadTexture("menu_selector_3.png", size_sel),
+                                 LoadTexture("menu_selector_4.png", size_sel),
+                                 LoadTexture("menu_selector_5.png", size_sel),
+                                 LoadTexture("menu_selector_6.png", size_sel) },
+                               1000_ms } });
 }
 
 void ResourceCache::LoadArenaResources()

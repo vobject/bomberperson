@@ -1,5 +1,7 @@
 #include "EntityManager.hpp"
-#include "EntityId.hpp"
+#include "MainMenu.hpp"
+#include "MenuItem.hpp"
+#include "MenuItemSelector.hpp"
 #include "Arena.hpp"
 #include "ArenaGenerator.hpp"
 #include "Scoreboard.hpp"
@@ -18,6 +20,31 @@ EntityManager::EntityManager()
 EntityManager::~EntityManager()
 {
 
+}
+
+std::shared_ptr<MainMenu> EntityManager::CreateMainmenu()
+{
+   auto menu = std::make_shared<MainMenu>(*this);
+
+   mEntities.insert(menu);
+   return menu;
+}
+
+std::shared_ptr<MenuItem> EntityManager::CreateMenuItem(const UiItemId id)
+{
+   auto item = std::make_shared<MenuItem>(id);
+
+   mEntities.insert(item);
+   return item;
+}
+
+std::shared_ptr<MenuItemSelector> EntityManager::CreateMenuItemSelector()
+{
+   auto selector = std::make_shared<MenuItemSelector>();
+   selector->SetSize({ 48, 48 });
+
+   mEntities.insert(selector);
+   return selector;
 }
 
 std::shared_ptr<Arena> EntityManager::CreateArena(const int player_count)

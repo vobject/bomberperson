@@ -1,5 +1,6 @@
 #include "UserInterface.hpp"
 #include "MainMenu.hpp"
+#include "MenuItem.hpp"
 
 #include <SDL_events.h>
 
@@ -35,15 +36,15 @@ void UserInterface::Input(const SDL_KeyboardEvent& key)
          break;
       case SDLK_RETURN:
          mMainMenu->Choose();
-         mSelection = mMainMenu->GetSelection().id;
+         mSelection = mMainMenu->GetSelection()->GetItemId();
          mDone = true;
          break;
       case SDLK_BACKSPACE:
-         mSelection = UserInterfaceItemId::MainMenu_ResumeGame;
+         mSelection = UiItemId::MainMenu_ResumeGame;
          mDone = true;
          break;
       case SDLK_ESCAPE:
-         mSelection = UserInterfaceItemId::MainMenu_Exit;
+         mSelection = UiItemId::MainMenu_Exit;
          mDone = true;
          break;
       default:
@@ -63,7 +64,13 @@ void UserInterface::Input(const SDL_MouseButtonEvent& button)
 
 void UserInterface::Update(const int elapsed_time)
 {
-   (void) elapsed_time;
+   for (auto& ent : mEntityManager.GetEntities())
+   {
+      if (!ent->IsValid()) {
+         continue;
+      }
+      ent->Update(elapsed_time);
+   }
 }
 
 bool UserInterface::IsActive() const
@@ -80,16 +87,16 @@ void UserInterface::ShowMainMenu(const bool game_paused)
 {
    if (!mMainMenu)
    {
-      mMainMenu = std::make_shared<MainMenu>();
-      mMainMenu->AddMenuItem({ UserInterfaceItemId::MainMenu_ResumeGame, "Resume Game", true });
-      mMainMenu->AddMenuItem({ UserInterfaceItemId::MainMenu_NewGame, "New Game", true });
-      mMainMenu->AddMenuItem({ UserInterfaceItemId::MainMenu_Exit, "Exit", true });
+      mMainMenu = mEntityManager.CreateMainmenu();
+      mSelection = mMainMenu->GetSelection()->GetItemId();
+   }
 
-      if (!game_paused) {
-         // HACK
-         mMainMenu->SelectionDown();
-         mMainMenu->GetSound(true);
-      }
+   if (game_paused)
+   {
+      mMainMenu->SetResumeStatus(true);
+
+      // HACK: Select "Resume Game" item by default if the game was paused.
+      mMainMenu->SelectionUp();
    }
 
    mActive = true;
@@ -98,11 +105,12 @@ void UserInterface::ShowMainMenu(const bool game_paused)
 
 void UserInterface::HideMainMenu()
 {
+   mEntityManager.Reset();
    mMainMenu = nullptr;
    mActive = false;
 }
 
-UserInterfaceItemId UserInterface::GetSelection() const
+UiItemId UserInterface::GetSelection() const
 {
   return  mSelection;
 }
@@ -114,5 +122,5 @@ MatchSettings UserInterface::GetMatchSettings() const
 
 EntitySet UserInterface::GetEntities() const
 {
-   return { mMainMenu };//mEntityManager.GetEntities();
+   return mEntityManager.GetEntities();
 }

@@ -5,6 +5,9 @@
 #include <set>
 
 class SceneObject;
+class MainMenu;
+class MenuItem;
+class MenuItemSelector;
 class Arena;
 class Scoreboard;
 class Wall;
@@ -15,6 +18,8 @@ class Player;
 struct Cell;
 
 enum class EntityId;
+enum class UiItemId;
+
 enum class WallType;
 enum class ExtraType;
 enum class BombType;
@@ -38,6 +43,10 @@ class EntityManager
 public:
    EntityManager();
    ~EntityManager();
+
+   std::shared_ptr<MainMenu> CreateMainmenu();
+   std::shared_ptr<MenuItem> CreateMenuItem(UiItemId id);
+   std::shared_ptr<MenuItemSelector> CreateMenuItemSelector();
 
    // A valid arena object should be created before any other ArenaObject
    //  derivatives (wall, extra, explosion, player) are created because
