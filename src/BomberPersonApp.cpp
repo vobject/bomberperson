@@ -11,7 +11,9 @@
 
 #include <SDL.h>
 
+#if !defined(_WIN32)
 #include <X11/Xlib.h>
+#endif
 
 #include <chrono>
 
@@ -66,10 +68,12 @@ void BomberPersonApp::Mainloop()
 
 void BomberPersonApp::Initialize()
 {
+#if !defined(_WIN32)
    // HACK for ubuntu1204: https://github.com/DrMcCoy/xoreos/commit/9a6c84d5458256ac5a0ff7525055ef2d8761e683
    if (!XInitThreads()) {
       throw "Failed to initialize Xlib muti-threading support";
    }
+#endif
 
    InitNui();
 
