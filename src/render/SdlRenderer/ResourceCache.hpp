@@ -19,7 +19,7 @@ enum class EntityId;
 class ResourceCache
 {
 public:
-   ResourceCache();
+   ResourceCache(const std::string& renderer_dir);
    ~ResourceCache();
 
    ResourceCache(const ResourceCache&) = delete;

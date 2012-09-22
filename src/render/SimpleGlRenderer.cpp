@@ -1,4 +1,7 @@
 #include "SimpleGlRenderer.hpp"
+#include "../game/UserInterface.hpp"
+#include "../game/MenuItem.hpp"
+#include "../game/MenuItemSelector.hpp"
 #include "../game/MainMenu.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Scoreboard.hpp"
