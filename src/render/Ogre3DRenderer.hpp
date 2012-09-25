@@ -3,9 +3,15 @@
 
 #include "Renderer.hpp"
 
-#include <Ogre.h>
+namespace Ogre {
+   class Root;
+   class RenderWindow;
+   class SceneManager;
+   class Viewport;
+}
 
 struct Size;
+class Ogre3DResourceCache;
 
 class Ogre3DRenderer : public Renderer
 {
@@ -29,19 +35,32 @@ public:
    void Render(const std::shared_ptr<Extra>& bomb) override;
    void Render(const std::shared_ptr<Bomb>& bomb) override;
    void Render(const std::shared_ptr<Explosion>& explosion) override;
-   void Render(const std::shared_ptr<Player>& player) override;
+   void Render(const std::shared_ptr<Player>& obj) override;
 
 private:
-   Ogre::Root* mRoot = nullptr;
-   Ogre::SceneManager* mSceneMgr = nullptr;
-   Ogre::Camera* mCamera = nullptr;
-   Ogre::Viewport* mViewPort = nullptr;
-   Ogre::RenderWindow* mRenderWindow = nullptr;
+   void InitMenuScene();
+   void InitArenaScene();
 
-   // Resources
-   Ogre::SceneNode* mMainMenuBgNode = nullptr;
-   Ogre::SceneNode* mHeadNode1 = nullptr;
-   Ogre::SceneNode* mHeadNode2 = nullptr;
+   void SelectMenuScene();
+   void SelectArenaScene();
+   void SelectViewport(Ogre::SceneManager* const scene_mgr);
+
+   std::unique_ptr<Ogre3DResourceCache> mResCache;
+
+   // None of these pointers are owning.
+   Ogre::Root* mRoot = nullptr;
+   Ogre::RenderWindow* mRenderWindow = nullptr;
+   Ogre::SceneManager* mMenuSceneMgr = nullptr;
+   Ogre::SceneManager* mArenaSceneMgr = nullptr;
+   Ogre::Viewport* mViewPort = nullptr;
+
+//   // Resources
+//   Ogre::SceneNode* mMainMenuBgNode = nullptr;
+//   Ogre::SceneNode* mHeadNode1 = nullptr;
+//   Ogre::SceneNode* mHeadNode2 = nullptr;
+//   Ogre::SceneNode* mNinjaNode1 = nullptr;
+
+   bool mMenuSceneSelected = false;
 };
 
 #endif // OGRE3D_RENDERER_HPP

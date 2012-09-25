@@ -1,5 +1,5 @@
-#ifndef RESOURCE_CACHE_HPP
-#define RESOURCE_CACHE_HPP
+#ifndef SDL_RESOURCE_CACHE_HPP
+#define SDL_RESOURCE_CACHE_HPP
 
 #include "SpriteResource.hpp"
 #include "WallResource.hpp"
@@ -61,4 +61,4 @@ private:
    std::vector<SDL_Surface*> mSurfaceCache;
 };
 
-#endif // RESOURCE_CACHE_HPP
+#endif // SDL_RESOURCE_CACHE_HPP
