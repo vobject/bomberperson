@@ -32,7 +32,7 @@ public:
    void Render(const std::shared_ptr<Arena>& arena) override;
    void Render(const std::shared_ptr<Scoreboard>& scoreboard) override;
    void Render(const std::shared_ptr<Wall>& explosion) override;
-   void Render(const std::shared_ptr<Extra>& bomb) override;
+   void Render(const std::shared_ptr<Extra>& obj) override;
    void Render(const std::shared_ptr<Bomb>& bomb) override;
    void Render(const std::shared_ptr<Explosion>& explosion) override;
    void Render(const std::shared_ptr<Player>& obj) override;

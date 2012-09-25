@@ -1,7 +1,10 @@
 #include "SceneObject.hpp"
 
+unsigned int SceneObject::sCurrentInstanceId;
+
 SceneObject::SceneObject(const EntityId id, const ZOrder zorder)
-   : mId(id)
+   : mInstanceId(sCurrentInstanceId++)
+   , mId(id)
    , mZOrder(zorder)
 {
 
@@ -15,6 +18,11 @@ SceneObject::~SceneObject()
 bool SceneObject::operator<(const SceneObject& other) const
 {
    return mZOrder < other.mZOrder;
+}
+
+unsigned int SceneObject::GetInstanceId() const
+{
+   return mInstanceId;
 }
 
 bool SceneObject::IsValid() const

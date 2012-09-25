@@ -15,14 +15,16 @@
 #include "../utils/Utils.hpp"
 #include "../Options.hpp"
 
-#include <SDL.h>
-
 #include <OgreRoot.h>
 #include <OgreRenderWindow.h>
 #include <OgreSceneManager.h>
 #include <OgreViewport.h>
 #include <OgreEntity.h>
 #include <OgreMeshManager.h>
+
+#include <SDL.h>
+
+#include <sstream>
 
 Ogre3DRenderer::Ogre3DRenderer(const Size res)
 {
@@ -188,9 +190,44 @@ void Ogre3DRenderer::Render(const std::shared_ptr<Wall>& wall)
    SelectArenaScene();
 }
 
-void Ogre3DRenderer::Render(const std::shared_ptr<Extra>& extra)
+void Ogre3DRenderer::Render(const std::shared_ptr<Extra>& obj)
 {
    SelectArenaScene();
+
+   std::ostringstream os;
+   os << obj->GetInstanceId();
+   const auto node_name(os.str());
+
+   Ogre::SceneNode* node = nullptr;
+
+   if (mArenaSceneMgr->hasSceneNode(node_name))
+   {
+      node = mArenaSceneMgr->getSceneNode(node_name);
+   }
+   else
+   {
+      auto parent_node = mArenaSceneMgr->getSceneNode("Arena");
+      auto entity = mArenaSceneMgr->createEntity("ogrehead.mesh");
+
+      node = parent_node->createChildSceneNode(node_name);
+      node->attachObject(entity);
+
+      const auto obj_size = obj->GetSize();
+      const auto box_size = entity->getBoundingBox().getSize();
+
+      const auto x_scale = obj_size.Width / box_size.x;
+      const auto y_scale = obj_size.Height / box_size.y * 1.75f;
+      const auto z_scale = obj_size.Width / box_size.z;
+      node->setScale(x_scale, y_scale, z_scale);
+      node->showBoundingBox(true);
+   }
+
+   const auto pos = obj->GetPosition();
+   node->setPosition(pos.X - (mViewPort->getActualWidth() / 2),
+                     40.0f,
+                     pos.Y - (mViewPort->getActualHeight() / 2));
+   node->yaw(Ogre::Degree(0.05f));
+
 }
 
 void Ogre3DRenderer::Render(const std::shared_ptr<Bomb>& bomb)
@@ -208,7 +245,6 @@ void Ogre3DRenderer::Render(const std::shared_ptr<Player>& obj)
    SelectArenaScene();
 
    const auto type = obj->GetType();
-   const auto parent_node_name = "Arena";
    std::string node_name;
    std::string mesh_name;
 
@@ -240,6 +276,7 @@ void Ogre3DRenderer::Render(const std::shared_ptr<Player>& obj)
    }
    else
    {
+      const auto parent_node_name = "Arena";
       auto entity = mArenaSceneMgr->createEntity(mesh_name);
       auto parent_node = mArenaSceneMgr->getSceneNode(parent_node_name);
 
@@ -296,7 +333,7 @@ void Ogre3DRenderer::InitArenaScene()
    mArenaSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
    auto cam = mArenaSceneMgr->createCamera("DefaultCamera");
-   cam->setPosition(0.0f, 900.0f, 600.0f);
+   cam->setPosition(0.0f, 900.0f, 500.0f);
    cam->lookAt(0.0f, 0.0f, 0.0f);
    cam->setNearClipDistance(5.0f);
 }

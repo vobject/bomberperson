@@ -32,6 +32,7 @@ public:
    virtual void Update(int elapsed_time) = 0;
 //   virtual void Restore() = 0;
 
+   unsigned int GetInstanceId() const;
    bool IsValid() const;
    EntityId GetId() const;
    ZOrder GetZOrder() const;
@@ -48,6 +49,8 @@ public:
    void Invalidate();
 
 private:
+   static unsigned int sCurrentInstanceId;
+   const unsigned int mInstanceId;
    const EntityId mId;
    const ZOrder mZOrder;
    bool mIsValid = true;
