@@ -48,6 +48,7 @@ struct DefaultValue
    static const int PLAYER_WIDTH            = CELL_WIDTH * 1.75f;
    static const int PLAYER_HEIGHT           = CELL_HEIGHT * 1.75f;
    static const int PLAYER_WALK_ANIM_LEN    = 1000_ms;
+   static const int PLAYER_SPAWN_ANIM_LEN   = 1000_ms;
    static const int PLAYER_DEATH_ANIM_LEN   = 1000_ms;
    static const int PLAYER_1_CELL_X         = 0;
    static const int PLAYER_1_CELL_Y         = 0;

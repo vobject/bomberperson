@@ -2,6 +2,7 @@
 #define PLAYER_HPP
 
 #include "ArenaObject.hpp"
+#include "EventListener.hpp"
 #include "EventQueue.hpp"
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
@@ -9,7 +10,6 @@
 #include <memory>
 #include <vector>
 
-class EntityManager;
 class Bomb;
 
 enum class PlayerType
@@ -43,6 +43,7 @@ enum class PlayerAnimation
    WalkDown,
    WalkLeft,
    WalkRight,
+   Spawn,
 //   Idle,
 //   Lockedin,
    Dying
@@ -59,7 +60,7 @@ struct PlayerData
       , distance(distance)
       , bombs(1)
       , range(1)
-      , remote_bombs(0)
+      , remote_bombs(1)
       , can_kick(false)
       , kills(0)
       , wins(0)
@@ -78,13 +79,12 @@ struct PlayerData
    int wins;
 };
 
-class Player : public ArenaObject
+class Player : public ArenaObject, public EventListener
 {
 public:
    Player(const std::shared_ptr<Arena>& arena,
           PlayerType type,
-          EventQueue& queue,
-          EntityManager& entity_factory);
+          EventQueue& queue);
    virtual ~Player();
 
    Player(const Player&) = delete;
@@ -93,15 +93,16 @@ public:
    void Update(int elapsed_time) override;
    void OnEvent(const Event& event) override;
 
-   void SetInputCommands(InputCommands cmds);
-
    PlayerType GetType() const;
    PlayerData GetData() const;
    PlayerSound GetSound(bool reset);
 
-   void IncrementKills(PlayerType type);
+//   void IncrementKills(PlayerType type);
 
 protected:
+   void OnCreateBomb(const CreateBombEvent& event);
+   void OnCreateExplosion(const CreateExplosionEvent& event);
+   void OnInput(const InputEvent& event);
    void OnMovePlayer(const MovePlayerEvent& event);
 
 private:
@@ -118,7 +119,7 @@ private:
 
    bool CanMove(Direction dir, int distance) const;
    bool CanPlantBomb();
-   void KickBomb(Direction dir) const;
+//   void KickBomb(Direction dir) const;
 
    void IncreaseSpeed();
    PlayerAnimation GetStopWalkingState(PlayerAnimation anim) const;
@@ -129,9 +130,14 @@ private:
    PlayerSound mSound;
 
    EventQueue& mEventQueue;
-   EntityManager& mEntityFactory;
 
-   InputCommands mCurrentCommands;
+//   InputCommands mCurrentCommands;
+   bool mInputUp;
+   bool mInputDown;
+   bool mInputLeft;
+   bool mInputRight;
+   bool mInputAction1;
+   bool mInputAction2;
 
    int mMoveIdleTime = 0_ms;
    int mBombIdleTime = 0_ms;
@@ -139,10 +145,11 @@ private:
    // Move this into the PlayerData object if we choose to make
    //  it alterable from the outside (game logic).
    int mPlantingSpeed = MIN_PLANTING_SPEED;
-   std::vector<std::shared_ptr<Bomb>> mPlantedBombs;
+//   std::vector<std::shared_ptr<Bomb>> mPlantedBombs;
+   int mBombsPlanted = 0;
 
    // HACK: Handle this properly!
-   mutable bool mParentCellChanged = false;
+//   mutable bool mParentCellChanged = false;
 };
 
 #endif // PLAYER_HPP

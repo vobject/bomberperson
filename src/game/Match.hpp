@@ -17,9 +17,10 @@ class InputDevice;
 class KeyboardInput;
 class MouseInput;
 //class KinectInput;
-class Arena;
+
 class Player;
 class Scoreboard;
+enum class PlayerType;
 
 class Match
 {
@@ -47,29 +48,28 @@ public:
 private:
    void UpdateEntities(int elapsed_time);
 
-   std::shared_ptr<Player> CreatePlayerFromPlayerId(PlayerId id);
-   std::shared_ptr<InputDevice> CreateInputFromInputId(InputId id);
+   void CreateInputDevices();
+   void CreateInputEvents();
+   PlayerType PlayerTypeFromPlayerId(PlayerId id);
 
    const MatchSettings mSettings;
    EventQueue mEventQueue;
    EntityManager mEntityManager;
 
-   std::shared_ptr<Arena> mArena;
-
    // The input devices get their own member variables for easier input update.
-   std::shared_ptr<KeyboardInput> mKeyboard_1;
-   std::shared_ptr<KeyboardInput> mKeyboard_2;
-   std::shared_ptr<MouseInput> mMouse_1;
-//   std::shared_ptr<KinectInput> mKinect_1;
+   std::pair<PlayerType, std::shared_ptr<KeyboardInput>> mKeyboard_1;
+   std::pair<PlayerType, std::shared_ptr<KeyboardInput>> mKeyboard_2;
+   std::pair<PlayerType, std::shared_ptr<MouseInput>> mMouse_1;
+//   std::pair<PlayerType, std::shared_ptr<KinectInput>> mKinect_1;
 
-   // Yes, the stored pointers here are redundant:
-   // - a pointer to the player object exists inside the EntityManager
-   // - a pointer to the input device exists as member variable (see above)
-   // This data structure on the other side creates a mapping between
-   //  player and input device, so that we know what input device belongs
-   //  to which player.
-   std::vector<std::pair<std::shared_ptr<Player>,
-                         std::shared_ptr<InputDevice>>> mPlayerInputPair;
+//   // Yes, the stored pointers here are redundant:
+//   // - a pointer to the player object exists inside the EntityManager
+//   // - a pointer to the input device exists as member variable (see above)
+//   // This data structure on the other side creates a mapping between
+//   //  player and input device, so that we know what input device belongs
+//   //  to which player.
+//   std::vector<std::pair<std::shared_ptr<Player>,
+//                         std::shared_ptr<InputDevice>>> mPlayerInputPair;
 
    // We will clean up the mEntityManager of dead entities every X seconds.
    // This will keep track of the timing.

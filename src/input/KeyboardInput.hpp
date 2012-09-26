@@ -19,7 +19,6 @@ public:
    void Press(SDLKey key);
    void Release(SDLKey key);
 
-protected:
    bool TestUp() const override;
    bool TestDown() const override;
    bool TestLeft() const override;

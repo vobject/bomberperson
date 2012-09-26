@@ -29,6 +29,9 @@ struct Cell
 {
    constexpr Cell(const int x, const int y) : X(x), Y(y) { }
 
+   constexpr bool operator==(const Cell& other)
+   { return ((X == other.X) && (Y == other.Y)); }
+
    int X;
    int Y;
 };

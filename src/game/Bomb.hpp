@@ -2,11 +2,13 @@
 #define BOMB_HPP
 
 #include "ArenaObject.hpp"
+#include "EventListener.hpp"
+#include "EventQueue.hpp"
 #include "../utils/Utils.hpp"
 
-class Player;
-class EntityManager;
+class CreateExplosionEvent;
 enum class ExplosionType;
+enum class PlayerType;
 
 enum class BombType
 {
@@ -22,19 +24,20 @@ enum class BombSound
    Planted
 };
 
-class Bomb : public ArenaObject
+class Bomb : public ArenaObject, public EventListener
 {
 public:
    Bomb(const std::shared_ptr<Arena>& arena,
         BombType type,
-        const std::shared_ptr<Player>& owner,
-        EntityManager& entity_factory);
+        PlayerType owner,
+        EventQueue& queue);
    virtual ~Bomb();
 
    Bomb(const Bomb&) = delete;
    Bomb& operator=(const Bomb&) = delete;
 
    void Update(int elapsed_time) override;
+   void OnEvent(const Event& event) override;
 
    BombType GetType() const;
    BombSound GetSound(bool reset);
@@ -42,9 +45,13 @@ public:
    int GetRange() const;
    void SetRange(int range);
 
-   bool CanMove(Direction dir, int distance) const;
-   void Move(Direction dir, int speed, int distance);
+//   bool CanMove(Direction dir, int distance) const;
+//   void Move(Direction dir, int speed, int distance);
    void Detonate();
+
+protected:
+   void OnCreateExplosion(const CreateExplosionEvent& event);
+   void OnDetonateRemoteBomb(const DetonateRemoteBombEvent& event);
 
 private:
    void PlantCenterExplosion() const;
@@ -52,18 +59,19 @@ private:
    ExplosionType GetExplosionType(Direction dir, bool end) const;
 
    const BombType mType;
-   const std::shared_ptr<Player> mOwner;
-   EntityManager& mEntityFactory;
+   const PlayerType mOwner;
+
+   EventQueue& mEventQueue;
 
    int mLifeTime = 0_ms;
    int mRange = 1;
    BombSound mSound = BombSound::None;
 
-   bool mIsMoving = false;
-   int mMoveIdleTime = 0_ms;
-   Direction mMoveDirection;
-   int mMoveSpeed;
-   int mMoveDistance;
+//   bool mIsMoving = false;
+//   int mMoveIdleTime = 0_ms;
+//   Direction mMoveDirection;
+//   int mMoveSpeed;
+//   int mMoveDistance;
 };
 
 #endif // BOMB_HPP

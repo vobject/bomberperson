@@ -34,7 +34,7 @@ public:
    virtual void Update(int elapsed_time) = 0;
 
    // TODO: Make me pure virtual.
-   virtual void OnEvent(const Event& event) { (void) event; }
+//   virtual void OnEvent(const Event& event) { (void) event; }
 
    unsigned int GetInstanceId() const;
    bool IsValid() const;

@@ -4,7 +4,7 @@
 Explosion::Explosion(
    const std::shared_ptr<Arena>& arena,
    const ExplosionType type,
-   const std::shared_ptr<Player>& owner
+   const PlayerType owner
 )
    : ArenaObject(EntityId::Explosion, ZOrder::Layer_5, arena)
    , mType(type)
@@ -36,7 +36,7 @@ ExplosionType Explosion::GetType() const
    return mType;
 }
 
-std::shared_ptr<Player> Explosion::GetOwner() const
+PlayerType Explosion::GetOwner() const
 {
    return mOwner;
 }

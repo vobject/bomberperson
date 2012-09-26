@@ -3,7 +3,7 @@
 
 #include "ArenaObject.hpp"
 
-class Player;
+enum class PlayerType;
 
 enum class ExplosionType
 {
@@ -27,7 +27,7 @@ class Explosion : public ArenaObject
 public:
    Explosion(const std::shared_ptr<Arena>& arena,
              ExplosionType type,
-             const std::shared_ptr<Player>& owner);
+             PlayerType owner);
    virtual ~Explosion();
 
    Explosion(const Explosion&) = delete;
@@ -36,12 +36,12 @@ public:
    void Update(int elapsed_time) override;
 
    ExplosionType GetType() const;
-   std::shared_ptr<Player> GetOwner() const;
+   PlayerType GetOwner() const;
    ExplosionSound GetSound(bool reset);
 
 private:
    const ExplosionType mType;
-   const std::shared_ptr<Player> mOwner;
+   const PlayerType mOwner;
    ExplosionSound mSound = ExplosionSound::None;
 };
 

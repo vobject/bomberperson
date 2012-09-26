@@ -15,12 +15,27 @@
 EntityManager::EntityManager(EventQueue& queue)
    : mEventQueue(queue)
 {
-
+   mEventQueue.Register(this);
 }
 
 EntityManager::~EntityManager()
 {
+   mEventQueue.UnRegister(this);
+}
 
+void EntityManager::OnEvent(const Event& event)
+{
+   switch (event.GetType())
+   {
+      case EventType::CreateBomb:
+         OnCreateBomb(dynamic_cast<const CreateBombEvent&>(event));
+         break;
+      case EventType::CreateExplosion:
+         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
+         break;
+      default:
+         break;
+   }
 }
 
 std::shared_ptr<MainMenu> EntityManager::CreateMainmenu()
@@ -102,52 +117,39 @@ std::shared_ptr<Extra> EntityManager::CreateExtra(
    return extra;
 }
 
-std::shared_ptr<Bomb> EntityManager::CreateBomb(
-   const Cell& cell,
-   const BombType type,
-   const PlayerType owner
-)
+void EntityManager::OnCreateBomb(const CreateBombEvent& event)
 {
-   // Find the right player object to be passed to the new bomb as its owner.
-   for (const auto& ent : mEntities)
-   {
-      const auto ptr = std::dynamic_pointer_cast<Player>(ent);
+   auto bomb = std::make_shared<Bomb>(mArena,
+                                      event.GetBombType(),
+                                      event.GetOwner(),
+                                      mEventQueue);
+   bomb->SetRange(event.GetRange());
 
-      if (ptr && (ptr->GetType() == owner))
-      {
-         auto bomb = std::make_shared<Bomb>(mArena, type, ptr, *this);
-         mArena->SetObjectPosition(*bomb, cell);
-         mArena->SetObjectSize(*bomb);
+   mArena->SetObjectPosition(*bomb, event.GetCell());
+   mArena->SetObjectSize(*bomb);
+   mArena->SetBomb(event.GetCell(), bomb);
 
-         mEntities.insert(bomb);
-         return bomb;
-      }
-   }
-
-   // Can never happen.
-   throw "The player who wants to create a bomb does not exist.";
+   mEntities.insert(bomb);
 }
 
-std::shared_ptr<Explosion> EntityManager::CreateExplosion(
-   const Cell& cell,
-   const ExplosionType type,
-   const std::shared_ptr<Player>& owner
-)
+void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
 {
-   auto explosion = std::make_shared<Explosion>(mArena, type, owner);
-   mArena->SetObjectPosition(*explosion, cell);
+   auto explosion = std::make_shared<Explosion>(mArena,
+                                                event.GetExplosionType(),
+                                                event.GetOwner());
+
+   mArena->SetObjectPosition(*explosion, event.GetCell());
    mArena->SetObjectSize(*explosion);
+   mArena->SetExplosion(event.GetCell(), explosion);
 
    mEntities.insert(explosion);
-   return explosion;
 }
 
 std::shared_ptr<Player> EntityManager::CreatePlayer(const PlayerType type)
 {
    std::shared_ptr<Player> player = std::make_shared<Player>(mArena,
                                                              type,
-                                                             mEventQueue,
-                                                             *this);
+                                                             mEventQueue);
    Cell parent_cell = { -1, -1 };
 
    switch (type)

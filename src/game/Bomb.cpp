@@ -1,6 +1,6 @@
 #include "Bomb.hpp"
+#include "EventQueue.hpp"
 #include "Arena.hpp"
-#include "EntityManager.hpp"
 #include "Wall.hpp"
 #include "Explosion.hpp"
 #include "../Options.hpp"
@@ -8,20 +8,22 @@
 Bomb::Bomb(
    const std::shared_ptr<Arena>& arena,
    const BombType type,
-   const std::shared_ptr<Player>& owner,
-   EntityManager& entity_factory
+   PlayerType owner,
+   EventQueue& queue
 )
    : ArenaObject(EntityId::Bomb, ZOrder::Layer_4, arena)
    , mType(type)
    , mOwner(owner)
-   , mEntityFactory(entity_factory)
+   , mEventQueue(queue)
 {
+   mEventQueue.Register(this);
+
    mSound = BombSound::Planted;
 }
 
 Bomb::~Bomb()
 {
-
+   mEventQueue.UnRegister(this);
 }
 
 void Bomb::Update(const int elapsed_time)
@@ -35,9 +37,6 @@ void Bomb::Update(const int elapsed_time)
 
    if (IsValid() && (mLifeTime >= DefaultValue::BOMB_ANIM_LEN))
    {
-      // Lifetime of this bomb object ended...
-      Invalidate();
-
       // ... instead it creates some explosions around it.
       PlantCenterExplosion();
       PlantRangeExplosion(Direction::Up);
@@ -47,28 +46,43 @@ void Bomb::Update(const int elapsed_time)
       return;
    }
 
-   if (mIsMoving)
+//   if (mIsMoving)
+//   {
+//      mMoveIdleTime += elapsed_time;
+//      if ((mMoveIdleTime >= mMoveSpeed) && CanMove(mMoveDirection, mMoveDistance))
+//      {
+//         switch (mMoveDirection)
+//         {
+//            case Direction::Up:
+//               SetPosition({ GetPosition().X, GetPosition().Y - 1 });
+//               break;
+//            case Direction::Down:
+//               SetPosition({ GetPosition().X, GetPosition().Y + 1 });
+//               break;
+//            case Direction::Left:
+//               SetPosition({ GetPosition().X - 1, GetPosition().Y });
+//               break;
+//            case Direction::Right:
+//               SetPosition({ GetPosition().X + 1, GetPosition().Y });
+//               break;
+//         }
+//         mMoveIdleTime = 0_ms;
+//      }
+//   }
+}
+
+void Bomb::OnEvent(const Event& event)
+{
+   switch (event.GetType())
    {
-      mMoveIdleTime += elapsed_time;
-      if ((mMoveIdleTime >= mMoveSpeed) && CanMove(mMoveDirection, mMoveDistance))
-      {
-         switch (mMoveDirection)
-         {
-            case Direction::Up:
-               SetPosition({ GetPosition().X, GetPosition().Y - 1 });
-               break;
-            case Direction::Down:
-               SetPosition({ GetPosition().X, GetPosition().Y + 1 });
-               break;
-            case Direction::Left:
-               SetPosition({ GetPosition().X - 1, GetPosition().Y });
-               break;
-            case Direction::Right:
-               SetPosition({ GetPosition().X + 1, GetPosition().Y });
-               break;
-         }
-         mMoveIdleTime = 0_ms;
-      }
+      case EventType::CreateExplosion:
+         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
+         break;
+      case EventType::DetonateRemoteBomb:
+         OnDetonateRemoteBomb(dynamic_cast<const DetonateRemoteBombEvent&>(event));
+         break;
+      default:
+         break;
    }
 }
 
@@ -97,71 +111,98 @@ void Bomb::SetRange(const int range)
    mRange = range;
 }
 
-bool Bomb::CanMove(const Direction dir, const int distance) const
-{
-   // TODO: This code is basically copied from Player class.
-   //  This might be a sign to outsource the whole collision detection
-   //  stuff into its own class/subsytem.
+//bool Bomb::CanMove(const Direction dir, const int distance) const
+//{
+//   // TODO: This code is basically copied from Player class.
+//   //  This might be a sign to outsource the whole collision detection
+//   //  stuff into its own class/subsytem.
 
-   const auto parent_cell = GetArena()->GetCellFromObject(*this);
-   const auto cell_size = GetArena()->GetCellSize();
-   const auto cell_pos = GetArena()->GetCellPosition(parent_cell);
+//   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+//   const auto cell_size = GetArena()->GetCellSize();
+//   const auto cell_pos = GetArena()->GetCellPosition(parent_cell);
 
-   // Check for movement inside the current cell.
-   // Movement inside the current cell is always ok.
-   switch (dir)
-   {
-      case Direction::Up:
-         if ((GetPosition().Y - distance) >= cell_pos.Y)
-            return true;
-         break;
-      case Direction::Down:
-         if ((GetPosition().Y + GetSize().Height + distance) <= (cell_pos.Y + cell_size.Height))
-            return true;
-         break;
-      case Direction::Left:
-         if ((GetPosition().X - distance) >= cell_pos.X)
-            return true;
-         break;
-      case Direction::Right:
-         if ((GetPosition().X + GetSize().Width + distance) <= (cell_pos.X + cell_size.Width))
-            return true;
-         break;
-   }
+//   // Check for movement inside the current cell.
+//   // Movement inside the current cell is always ok.
+//   switch (dir)
+//   {
+//      case Direction::Up:
+//         if ((GetPosition().Y - distance) >= cell_pos.Y)
+//            return true;
+//         break;
+//      case Direction::Down:
+//         if ((GetPosition().Y + GetSize().Height + distance) <= (cell_pos.Y + cell_size.Height))
+//            return true;
+//         break;
+//      case Direction::Left:
+//         if ((GetPosition().X - distance) >= cell_pos.X)
+//            return true;
+//         break;
+//      case Direction::Right:
+//         if ((GetPosition().X + GetSize().Width + distance) <= (cell_pos.X + cell_size.Width))
+//            return true;
+//         break;
+//   }
 
-   // Bomb wants to move to another cell - check if that is allowed.
-   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
-   if ((-1 != neighbor_cell.X) &&
-       (-1 != neighbor_cell.Y) &&
-       !GetArena()->HasWall(neighbor_cell) &&
-       !GetArena()->HasBomb(neighbor_cell))
-   {
-      // A cell exists and does not block the bomb.
-      return true;
-   }
-   return false;
-}
+//   // Bomb wants to move to another cell - check if that is allowed.
+//   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
+//   if ((-1 != neighbor_cell.X) &&
+//       (-1 != neighbor_cell.Y) &&
+//       !GetArena()->HasWall(neighbor_cell) &&
+//       !GetArena()->HasBomb(neighbor_cell))
+//   {
+//      // A cell exists and does not block the bomb.
+//      return true;
+//   }
+//   return false;
+//}
 
-void Bomb::Move(const Direction dir, const int speed, const int distance)
-{
-   mMoveDirection = dir;
-   mMoveSpeed = speed;
-   mMoveDistance = distance;
-   mIsMoving = true;
-}
+//void Bomb::Move(const Direction dir, const int speed, const int distance)
+//{
+//   mMoveDirection = dir;
+//   mMoveSpeed = speed;
+//   mMoveDistance = distance;
+//   mIsMoving = true;
+//}
 
 void Bomb::Detonate()
 {
    mLifeTime = DefaultValue::BOMB_ANIM_LEN;
 }
 
+void Bomb::OnCreateExplosion(const CreateExplosionEvent& event)
+{
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+
+   if ((event.GetCell() == parent_cell) &&
+       (event.GetExplosionType() == ExplosionType::Center))
+   {
+      // Lifetime of this bomb object ended...
+      Invalidate();
+   }
+}
+
+void Bomb::OnDetonateRemoteBomb(const DetonateRemoteBombEvent& event)
+{
+   if (event.GetOwner() != mOwner) {
+      // This event is not for us.
+   }
+
+   if (BombType::Remote != mType) {
+      // This object is not a remote bomb.
+   }
+
+   // This bomb is a remote bomb and belongs to the player
+   //  who requested his remotes to detonate. Do so (indirectly).
+   mLifeTime = DefaultValue::BOMB_ANIM_LEN;
+}
+
 void Bomb::PlantCenterExplosion() const
 {
-   const auto parent = GetArena()->GetCellFromObject(*this);
-   auto explosion = mEntityFactory.CreateExplosion(parent,
-                                                   ExplosionType::Center,
-                                                   mOwner);
-   GetArena()->SetExplosion(parent, explosion);
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+
+   mEventQueue.Add(std::make_shared<CreateExplosionEvent>(parent_cell,
+                                                          ExplosionType::Center,
+                                                          mOwner));
 }
 
 void Bomb::PlantRangeExplosion(const Direction dir) const
@@ -189,10 +230,10 @@ void Bomb::PlantRangeExplosion(const Direction dir) const
       }
 
       const auto exp_type = GetExplosionType(dir, (range_to_go == 1));
-      auto range_exp = mEntityFactory.CreateExplosion(range_cell,
-                                                      exp_type,
-                                                      mOwner);
-      GetArena()->SetExplosion(range_cell, range_exp);
+
+      mEventQueue.Add(std::make_shared<CreateExplosionEvent>(range_cell,
+                                                             exp_type,
+                                                             mOwner));
 
       if (GetArena()->HasWall(range_cell) &&
           GetArena()->GetWall(range_cell)->IsDestructible())

@@ -1,6 +1,5 @@
 #include "Player.hpp"
 #include "EventQueue.hpp"
-#include "EntityManager.hpp"
 #include "Arena.hpp"
 #include "Extra.hpp"
 #include "Bomb.hpp"
@@ -11,15 +10,13 @@
 Player::Player(
    const std::shared_ptr<Arena>& arena,
    const PlayerType type,
-   EventQueue& queue,
-   EntityManager& entity_factory
+   EventQueue& queue
 )
    : ArenaObject(EntityId::Player, ZOrder::Layer_6, arena)
    , mType(type)
-   , mData(PlayerAnimation::StandDown, MIN_SPEED, 1)
+   , mData(PlayerAnimation::Spawn, MIN_SPEED, 1)
    , mSound(PlayerSound::None)
    , mEventQueue(queue)
-   , mEntityFactory(entity_factory)
 {
    mEventQueue.Register(this);
 }
@@ -31,6 +28,19 @@ Player::~Player()
 
 void Player::Update(const int elapsed_time)
 {
+   if (PlayerAnimation::Spawn == mData.anim)
+   {
+      // The player is currently spawning. Nothing to do but wait.
+      SetAnimationTime(GetAnimationTime() + elapsed_time);
+
+      if (GetAnimationTime() >= DefaultValue::PLAYER_SPAWN_ANIM_LEN)
+      {
+         // The spawning animation is over.
+         mData.anim = PlayerAnimation::StandDown;
+      }
+      return;
+   }
+
    if (PlayerAnimation::Dying == mData.anim)
    {
       // The player is currently dying. Nothing to do but wait.
@@ -49,10 +59,10 @@ void Player::Update(const int elapsed_time)
    if (GetArena()->HasExplosion(parent_cell))
    {
       const auto explosion_owner = GetArena()->GetExplosion(parent_cell)->GetOwner();
-      if (explosion_owner.get() != this) {
-         // We did not commit suicide. Increase kill counter for the owner.
-         explosion_owner->IncrementKills(GetType());
-      }
+//      if (explosion_owner.get() != this) {
+//         // We did not commit suicide. Increase kill counter for the owner.
+//         explosion_owner->IncrementKills(GetType());
+//      }
 
       // Explosions kill the player. Prepare his death animation.
       SetAnimationTime(0);
@@ -61,10 +71,6 @@ void Player::Update(const int elapsed_time)
       mSound = PlayerSound::Die;
       return;
    }
-
-   // Original animation used to check if the player's animation
-   //  changed during movement and other update methods.
-   const auto old_anim = mData.anim;
 
    if (GetArena()->HasExtra(parent_cell))
    {
@@ -105,18 +111,22 @@ void Player::Update(const int elapsed_time)
    UpdateMovement(elapsed_time);
    UpdateBombing(elapsed_time);
 
-   if (old_anim == mData.anim) {
-      SetAnimationTime(GetAnimationTime() + elapsed_time);
-   }
-   else {
-      SetAnimationTime(0); // Start new animation.
-   }
+   SetAnimationTime(GetAnimationTime() + elapsed_time);
 }
 
 void Player::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
+      case EventType::CreateBomb:
+         OnCreateBomb(dynamic_cast<const CreateBombEvent&>(event));
+         break;
+      case EventType::CreateExplosion:
+         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
+         break;
+      case EventType::Input:
+         OnInput(dynamic_cast<const InputEvent&>(event));
+         break;
       case EventType::MovePlayer:
          OnMovePlayer(dynamic_cast<const MovePlayerEvent&>(event));
          break;
@@ -125,41 +135,110 @@ void Player::OnEvent(const Event& event)
    }
 }
 
-void Player::OnMovePlayer(const MovePlayerEvent& event)
+void Player::OnCreateBomb(const CreateBombEvent& event)
 {
-   if (event.GetPlayerType() == GetType())
-   {
-      auto up = 0;
-      auto down = 0;
-      auto left = 0;
-      auto right = 0;
-
-      for (const auto& dir_dist : event.GetMovementData())
-      {
-         switch (dir_dist.first)
-         {
-            case Direction::Up:
-               up += dir_dist.second;
-               break;
-            case Direction::Down:
-               down += dir_dist.second;
-               break;
-            case Direction::Left:
-               left += dir_dist.second;
-               break;
-            case Direction::Right:
-               right += dir_dist.second;
-               break;
-         }
-
-         SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
-      }
+   if (event.GetOwner() != GetType()) {
+      // This event is not for us.
+      return;
    }
+
+   if (BombType::Remote == event.GetBombType()) {
+      mData.remote_bombs--;
+   }
+
+   mBombsPlanted++;
+   mBombIdleTime = 0_ms;
 }
 
-void Player::SetInputCommands(const InputCommands cmds)
+void Player::OnCreateExplosion(const CreateExplosionEvent& event)
 {
-   mCurrentCommands = cmds;
+   if (event.GetOwner() != GetType()) {
+      // This event is not for us.
+      return;
+   }
+
+   if (event.GetExplosionType() != ExplosionType::Center) {
+      // Not the explosion type we are looking for.
+      return;
+   }
+
+   // This is the center explosion of a bomb we planted some time ago.
+   // It did explosde and does not cound as 'planted' anymore.
+   mBombsPlanted--;
+}
+
+void Player::OnInput(const InputEvent& event)
+{
+   if (event.GetPlayerType() != GetType()) {
+      // This event is not for us.
+      return;
+   }
+
+   mInputUp = event.GetUp();
+   mInputDown = event.GetDown();
+   mInputLeft = event.GetLeft();
+   mInputRight = event.GetRight();
+   mInputAction1 = event.GetAction1();
+   mInputAction2 = event.GetAction2();
+}
+
+void Player::OnMovePlayer(const MovePlayerEvent& event)
+{
+   if (event.GetPlayerType() != GetType()) {
+      // This event is not for us.
+      return;
+   }
+
+   // The original animation - used to check if the player's
+   //  animation changed during movement.
+   const auto old_anim = mData.anim;
+
+   auto up = 0;
+   auto down = 0;
+   auto left = 0;
+   auto right = 0;
+   const auto movement_data = event.GetMovementData();
+
+   for (const auto& dir_dist : movement_data)
+   {
+      switch (dir_dist.first)
+      {
+         case Direction::Up:
+            mData.anim = PlayerAnimation::WalkUp;
+            up += dir_dist.second;
+            break;
+         case Direction::Down:
+            mData.anim = PlayerAnimation::WalkDown;
+            down += dir_dist.second;
+            break;
+         case Direction::Left:
+            mData.anim = PlayerAnimation::WalkLeft;
+            left += dir_dist.second;
+            break;
+         case Direction::Right:
+            mData.anim = PlayerAnimation::WalkRight;
+            right += dir_dist.second;
+            break;
+      }
+
+      SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
+   }
+
+   if (movement_data.empty())
+   {
+      // Select the right stand-still animation in case we did not move.
+      mData.anim = GetStopWalkingState(mData.anim);
+   }
+   else
+   {
+      // Reset the movement timer if there was input for the player, so
+      //  that we have to wait for the idle time cycle until we can move again.
+      mMoveIdleTime = 0_ms;
+   }
+
+   if (old_anim != mData.anim) {
+      SetAnimationTime(0); // Start new animation.
+   }
 }
 
 PlayerType Player::GetType() const
@@ -182,13 +261,13 @@ PlayerSound Player::GetSound(const bool reset)
    return ret;
 }
 
-void Player::IncrementKills(const PlayerType type)
-{
-   // Ignore which player was killed by now.
-   (void) type;
+//void Player::IncrementKills(const PlayerType type)
+//{
+//   // Ignore which player was killed by now.
+//   (void) type;
 
-   mData.kills++;
-}
+//   mData.kills++;
+//}
 
 void Player::UpdateMovement(const int elapsed_time)
 {
@@ -199,69 +278,53 @@ void Player::UpdateMovement(const int elapsed_time)
 
    std::vector<std::pair<Direction, int>> dir_dist;
 
-   auto up = 0;
-   auto down = 0;
-   auto left = 0;
-   auto right = 0;
-   auto update_anim = false;
-
-   if (mCurrentCommands.up)
+   if (mInputUp)
    {
-      update_anim = true;
-      mData.anim = PlayerAnimation::WalkUp;
-
+      auto distance = 0;
       if (CanMove(Direction::Up, mData.distance)) {
-         dir_dist.push_back({Direction::Up, mData.distance});
-         up += mData.distance;
-         KickBomb(Direction::Up);
+         distance = mData.distance;
       }
+      dir_dist.push_back({ Direction::Up, distance });
    }
 
-   if (mCurrentCommands.down)
+   if (mInputDown)
    {
-      update_anim = true;
-      mData.anim = PlayerAnimation::WalkDown;
-
+      auto distance = 0;
       if (CanMove(Direction::Down, mData.distance)) {
-         dir_dist.push_back({Direction::Down, mData.distance});
-         down += mData.distance;
-         KickBomb(Direction::Down);
+         distance = mData.distance;
       }
+      dir_dist.push_back({ Direction::Down, distance });
    }
 
-   if (mCurrentCommands.left)
+   if (mInputLeft)
    {
-      update_anim = true;
-      mData.anim = PlayerAnimation::WalkLeft;
-
+      auto distance = 0;
       if (CanMove(Direction::Left, mData.distance)) {
-         dir_dist.push_back({Direction::Left, mData.distance});
-         left += mData.distance;
-         KickBomb(Direction::Left);
+         distance = mData.distance;
       }
+      dir_dist.push_back({ Direction::Left, distance });
    }
 
-   if (mCurrentCommands.right)
+   if (mInputRight)
    {
-      update_anim = true;
-      mData.anim = PlayerAnimation::WalkRight;
-
+      auto distance = 0;
       if (CanMove(Direction::Right, mData.distance)) {
-         dir_dist.push_back({Direction::Right, mData.distance});
-         right += mData.distance;
-         KickBomb(Direction::Right);
+         distance = mData.distance;
       }
+      dir_dist.push_back({ Direction::Right, distance });
    }
 
-   mEventQueue.Add(std::make_shared<MovePlayerEvent>(GetType(), dir_dist));
-//   SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
-
-   if (!update_anim)
+   if (!dir_dist.empty() ||
+         ((mData.anim != PlayerAnimation::StandUp) &&
+          (mData.anim != PlayerAnimation::StandDown) &&
+          (mData.anim != PlayerAnimation::StandLeft) &&
+          (mData.anim != PlayerAnimation::StandRight)))
    {
-      mData.anim = GetStopWalkingState(mData.anim);
+      // Create an event in case:
+      //  1. The player requested to move.
+      //  2. The player was moving before (results in a stand-still event).
+      mEventQueue.Add(std::make_shared<MovePlayerEvent>(GetType(), dir_dist));
    }
-
-   mMoveIdleTime = 0_ms;
 }
 
 void Player::UpdateBombing(const int elapsed_time)
@@ -273,9 +336,9 @@ void Player::UpdateBombing(const int elapsed_time)
 
    const auto parent_cell = GetArena()->GetCellFromObject(*this);
 
-   if (mCurrentCommands.action1 && // User pressed the right button.
+   if (mInputAction1 && // User pressed the right button.
        !GetArena()->HasBomb(parent_cell) && // No bomb in this cell yet.
-       CanPlantBomb()) // Player did not run out of bomb supply.
+       (mData.bombs > mBombsPlanted)) // Player did not run out of bomb supply.
    {
       auto bomb_type = BombType::Countdown; // The default bomb type.
 
@@ -283,36 +346,28 @@ void Player::UpdateBombing(const int elapsed_time)
       {
          // Always plant remote controlled bombs if the player has them.
          bomb_type = BombType::Remote;
-         mData.remote_bombs--;
       }
 
-      auto bomb = mEntityFactory.CreateBomb(parent_cell, bomb_type, GetType());
-      bomb->SetRange(mData.range);
-      GetArena()->SetBomb(parent_cell, bomb);
-
-      mPlantedBombs.push_back(bomb);
-      mBombIdleTime = 0_ms;
+      mEventQueue.Add(std::make_shared<CreateBombEvent>(parent_cell,
+                                                        bomb_type,
+                                                        mData.range,
+                                                        GetType()));
    }
 
-   if (mCurrentCommands.action2)
+   if (mInputAction2)
    {
       // Detonate all remote controlled bombs that the player planted.
-      for (auto& bomb : mPlantedBombs)
-      {
-         if (bomb->IsValid() && (BombType::Remote == bomb->GetType()))
-         {
-            bomb->Detonate();
-         }
-      }
+      mEventQueue.Add(std::make_shared<DetonateRemoteBombEvent>(GetType()));
    }
 }
 
 bool Player::CanMove(const Direction dir, const int distance) const
 {
-   mParentCellChanged = false;
-   const auto parent_cell = GetArena()->GetCellFromObject(*this);
-   const auto cell_size = GetArena()->GetCellSize();
-   const auto cell_pos = GetArena()->GetCellPosition(parent_cell);
+//   mParentCellChanged = false;
+   const auto arena = GetArena();
+   const auto parent_cell = arena->GetCellFromObject(*this);
+   const auto cell_size = arena->GetCellSize();
+   const auto cell_pos = arena->GetCellPosition(parent_cell);
 
    // Check for movement inside the current cell.
    // Movement inside the current cell is always ok.
@@ -337,17 +392,19 @@ bool Player::CanMove(const Direction dir, const int distance) const
    }
 
    // Player wants to walk to another cell - check if that is allowed.
-   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
+   const auto neighbor_cell = arena->GetNeighborCell(parent_cell, dir);
    if ((-1 != neighbor_cell.X) &&
        (-1 != neighbor_cell.Y) &&
-       !GetArena()->HasWall(neighbor_cell))
+       !arena->HasWall(neighbor_cell))
    {
       // We may probably move into the next cell. There is one last thing
       //  we need to check: does it have a (movable) bomb?
-      if (!GetArena()->HasBomb(neighbor_cell) ||
-          (mData.can_kick && GetArena()->GetBomb(neighbor_cell)->CanMove(dir, distance)))
+      if (!arena->HasBomb(neighbor_cell)
+//          ||
+//          (mData.can_kick && arena->GetBomb(neighbor_cell)->CanMove(dir, distance))
+          )
       {
-         mParentCellChanged = true;
+//         mParentCellChanged = true;
 
          // A cell exists and does not block the player.
          return true;
@@ -359,38 +416,38 @@ bool Player::CanMove(const Direction dir, const int distance) const
 bool Player::CanPlantBomb()
 {
    int bombs_alive = 0;
-   for (const auto& bomb : mPlantedBombs)
-   {
-      if (bomb->IsValid())
-      {
-         bombs_alive++;
-      }
-   }
+//   for (const auto& bomb : mPlantedBombs)
+//   {
+//      if (bomb->IsValid())
+//      {
+//         bombs_alive++;
+//      }
+//   }
 
-   // Garbage collection of the planted-bombs-vector.
-   if (!bombs_alive) {
-      mPlantedBombs.clear();
-   }
+//   // Garbage collection of the planted-bombs-vector.
+//   if (!bombs_alive) {
+//      mPlantedBombs.clear();
+//   }
 
    return (mData.bombs > bombs_alive);
 }
 
-void Player::KickBomb(const Direction dir) const
-{
-   if (!mParentCellChanged || !mData.can_kick) {
-      return;
-   }
+//void Player::KickBomb(const Direction dir) const
+//{
+//   if (!mParentCellChanged || !mData.can_kick) {
+//      return;
+//   }
 
-   const auto parent_cell = GetArena()->GetCellFromObject(*this);
-   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
+//   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+//   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
 
-   if ((-1 != neighbor_cell.X) &&
-       (-1 != neighbor_cell.Y) &&
-       GetArena()->HasBomb(neighbor_cell))
-   {
-      GetArena()->GetBomb(neighbor_cell)->Move(dir, mData.speed, mData.distance);
-   }
-}
+//   if ((-1 != neighbor_cell.X) &&
+//       (-1 != neighbor_cell.Y) &&
+//       GetArena()->HasBomb(neighbor_cell))
+//   {
+//      GetArena()->GetBomb(neighbor_cell)->Move(dir, mData.speed, mData.distance);
+//   }
+//}
 
 void Player::IncreaseSpeed()
 {

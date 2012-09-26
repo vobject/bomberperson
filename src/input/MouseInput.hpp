@@ -14,7 +14,6 @@ public:
    void Release(int button);
    void Move(Point pt);
 
-protected:
    bool TestUp() const override;
    bool TestDown() const override;
    bool TestLeft() const override;

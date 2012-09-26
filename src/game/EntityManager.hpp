@@ -1,10 +1,14 @@
 #ifndef ENTITYMANAGER_HPP
 #define ENTITYMANAGER_HPP
 
+#include "EventListener.hpp"
+
 #include <memory>
 #include <set>
 
 class EventQueue;
+class CreateBombEvent;
+class CreateExplosionEvent;
 
 class SceneObject;
 class MainMenu;
@@ -40,11 +44,13 @@ struct Sort_Dereferenced_SharedPtr
 
 typedef std::multiset<std::shared_ptr<SceneObject>, Sort_Dereferenced_SharedPtr<SceneObject>> EntitySet;
 
-class EntityManager
+class EntityManager : public EventListener
 {
 public:
    EntityManager(EventQueue& queue);
    ~EntityManager();
+
+   void OnEvent(const Event& event);
 
    std::shared_ptr<MainMenu> CreateMainmenu();
    std::shared_ptr<MenuItem> CreateMenuItem(UiItemId id);
@@ -58,8 +64,8 @@ public:
 
    std::shared_ptr<Wall> CreateWall(const Cell& cell, WallType type);
    std::shared_ptr<Extra> CreateExtra(const Cell& cell, ExtraType type);
-   std::shared_ptr<Bomb> CreateBomb(const Cell& cell, BombType type, PlayerType owner);
-   std::shared_ptr<Explosion> CreateExplosion(const Cell& cell, ExplosionType type, const std::shared_ptr<Player>& owner);
+   void OnCreateBomb(const CreateBombEvent& event);
+   void OnCreateExplosion(const CreateExplosionEvent& event);
    std::shared_ptr<Player> CreatePlayer(PlayerType type);
 
    EntitySet GetEntities() const;

@@ -48,7 +48,6 @@ public:
                TestAction2() };
    }
 
-protected:
    virtual bool TestUp() const = 0;
    virtual bool TestDown() const = 0;
    virtual bool TestLeft() const = 0;
