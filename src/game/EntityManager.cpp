@@ -12,7 +12,8 @@
 #include "Player.hpp"
 #include "../Options.hpp"
 
-EntityManager::EntityManager()
+EntityManager::EntityManager(EventQueue& queue)
+   : mEventQueue(queue)
 {
 
 }
@@ -145,6 +146,7 @@ std::shared_ptr<Player> EntityManager::CreatePlayer(const PlayerType type)
 {
    std::shared_ptr<Player> player = std::make_shared<Player>(mArena,
                                                              type,
+                                                             mEventQueue,
                                                              *this);
    Cell parent_cell = { -1, -1 };
 

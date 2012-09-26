@@ -1,6 +1,7 @@
 #ifndef USER_INTERFACE_HPP
 #define USER_INTERFACE_HPP
 
+#include "EventQueue.hpp"
 #include "EntityManager.hpp"
 #include "../utils/Utils.hpp"
 
@@ -74,6 +75,7 @@ public:
     EntitySet GetEntities() const;
 
 private:
+   EventQueue mEventQueue;
    EntityManager mEntityManager;
    MatchSettings mSettings;
    bool mActive = false;

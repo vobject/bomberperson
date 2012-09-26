@@ -4,6 +4,8 @@
 #include <memory>
 #include <set>
 
+class EventQueue;
+
 class SceneObject;
 class MainMenu;
 class MenuItem;
@@ -41,7 +43,7 @@ typedef std::multiset<std::shared_ptr<SceneObject>, Sort_Dereferenced_SharedPtr<
 class EntityManager
 {
 public:
-   EntityManager();
+   EntityManager(EventQueue& queue);
    ~EntityManager();
 
    std::shared_ptr<MainMenu> CreateMainmenu();
@@ -66,6 +68,7 @@ public:
    void Reset();
 
 private:
+   EventQueue& mEventQueue;
    std::shared_ptr<Arena> mArena;
    EntitySet mEntities;
 };

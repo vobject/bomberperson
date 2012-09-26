@@ -5,6 +5,7 @@
 #include <SDL_events.h>
 
 UserInterface::UserInterface()
+   : mEntityManager(mEventQueue)
 {
     mSettings = {
        {

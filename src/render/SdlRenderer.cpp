@@ -42,13 +42,13 @@ SdlRenderer::SdlRenderer(const Size res)
 
    // TODO: Load fonts from ResCache.
 
-   mFont = TTF_OpenFont("res_q1/font/scoreboard.ttf", 16);
+   mFont = TTF_OpenFont("res_q1_master/font/scoreboard.ttf", 16);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
 
-   mMenuFont = TTF_OpenFont("res_q1/font/menu.ttf", 72);
+   mMenuFont = TTF_OpenFont("res_q1_master/font/menu.ttf", 72);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";

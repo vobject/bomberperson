@@ -12,6 +12,7 @@
 
 Match::Match(const MatchSettings& settings)
    : mSettings(settings)
+   , mEntityManager(mEventQueue)
 {
    // The arena is needed for the creation of the players.
    mArena = mEntityManager.CreateArena(mSettings.players.size());
@@ -88,8 +89,6 @@ void Match::Input(const SDL_MouseButtonEvent& button)
 
 void Match::Update(const int elapsed_time)
 {
-   UpdateEntities(elapsed_time);
-
    mCleanupIdleTime += elapsed_time;
    if (mCleanupIdleTime >= 1000_ms)
    {
@@ -107,6 +106,9 @@ void Match::Update(const int elapsed_time)
          active_player_count++;
       }
    }
+
+   UpdateEntities(elapsed_time);
+   mEventQueue.ProcessEvents();
 
    mIsGameOver = (active_player_count <= 1) ? true : false;
 }
@@ -135,9 +137,9 @@ void Match::UpdateEntities(int elapsed_time)
 {
    for (auto& ent : mEntityManager.GetEntities())
    {
-      if (!ent->IsValid()) {
-         continue;
-      }
+//      if (!ent->IsValid()) {
+//         continue;
+//      }
       ent->Update(elapsed_time);
    }
 

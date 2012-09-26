@@ -1,6 +1,7 @@
 #ifndef MATCH_HPP
 #define MATCH_HPP
 
+#include "EventQueue.hpp"
 #include "EntityManager.hpp"
 #include "UserInterface.hpp"
 #include "../utils/Utils.hpp"
@@ -50,6 +51,7 @@ private:
    std::shared_ptr<InputDevice> CreateInputFromInputId(InputId id);
 
    const MatchSettings mSettings;
+   EventQueue mEventQueue;
    EntityManager mEntityManager;
 
    std::shared_ptr<Arena> mArena;

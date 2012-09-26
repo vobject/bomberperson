@@ -2,6 +2,7 @@
 #define PLAYER_HPP
 
 #include "ArenaObject.hpp"
+#include "EventQueue.hpp"
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
@@ -82,6 +83,7 @@ class Player : public ArenaObject
 public:
    Player(const std::shared_ptr<Arena>& arena,
           PlayerType type,
+          EventQueue& queue,
           EntityManager& entity_factory);
    virtual ~Player();
 
@@ -89,6 +91,7 @@ public:
    Player& operator=(const Player&) = delete;
 
    void Update(int elapsed_time) override;
+   void OnEvent(const Event& event) override;
 
    void SetInputCommands(InputCommands cmds);
 
@@ -97,6 +100,9 @@ public:
    PlayerSound GetSound(bool reset);
 
    void IncrementKills(PlayerType type);
+
+protected:
+   void OnMovePlayer(const MovePlayerEvent& event);
 
 private:
    // Number of milliseconds the player has to wait to move another pixel.
@@ -122,6 +128,7 @@ private:
    PlayerData mData;
    PlayerSound mSound;
 
+   EventQueue& mEventQueue;
    EntityManager& mEntityFactory;
 
    InputCommands mCurrentCommands;

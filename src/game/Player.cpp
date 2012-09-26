@@ -1,4 +1,5 @@
 #include "Player.hpp"
+#include "EventQueue.hpp"
 #include "EntityManager.hpp"
 #include "Arena.hpp"
 #include "Extra.hpp"
@@ -10,20 +11,22 @@
 Player::Player(
    const std::shared_ptr<Arena>& arena,
    const PlayerType type,
+   EventQueue& queue,
    EntityManager& entity_factory
 )
    : ArenaObject(EntityId::Player, ZOrder::Layer_6, arena)
    , mType(type)
    , mData(PlayerAnimation::StandDown, MIN_SPEED, 1)
    , mSound(PlayerSound::None)
+   , mEventQueue(queue)
    , mEntityFactory(entity_factory)
 {
-
+   mEventQueue.Register(this);
 }
 
 Player::~Player()
 {
-
+   mEventQueue.UnRegister(this);
 }
 
 void Player::Update(const int elapsed_time)
@@ -110,6 +113,50 @@ void Player::Update(const int elapsed_time)
    }
 }
 
+void Player::OnEvent(const Event& event)
+{
+   switch (event.GetType())
+   {
+      case EventType::MovePlayer:
+         OnMovePlayer(dynamic_cast<const MovePlayerEvent&>(event));
+         break;
+      default:
+         break;
+   }
+}
+
+void Player::OnMovePlayer(const MovePlayerEvent& event)
+{
+   if (event.GetPlayerType() == GetType())
+   {
+      auto up = 0;
+      auto down = 0;
+      auto left = 0;
+      auto right = 0;
+
+      for (const auto& dir_dist : event.GetMovementData())
+      {
+         switch (dir_dist.first)
+         {
+            case Direction::Up:
+               up += dir_dist.second;
+               break;
+            case Direction::Down:
+               down += dir_dist.second;
+               break;
+            case Direction::Left:
+               left += dir_dist.second;
+               break;
+            case Direction::Right:
+               right += dir_dist.second;
+               break;
+         }
+
+         SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
+      }
+   }
+}
+
 void Player::SetInputCommands(const InputCommands cmds)
 {
    mCurrentCommands = cmds;
@@ -150,6 +197,8 @@ void Player::UpdateMovement(const int elapsed_time)
       return;
    }
 
+   std::vector<std::pair<Direction, int>> dir_dist;
+
    auto up = 0;
    auto down = 0;
    auto left = 0;
@@ -162,6 +211,7 @@ void Player::UpdateMovement(const int elapsed_time)
       mData.anim = PlayerAnimation::WalkUp;
 
       if (CanMove(Direction::Up, mData.distance)) {
+         dir_dist.push_back({Direction::Up, mData.distance});
          up += mData.distance;
          KickBomb(Direction::Up);
       }
@@ -173,6 +223,7 @@ void Player::UpdateMovement(const int elapsed_time)
       mData.anim = PlayerAnimation::WalkDown;
 
       if (CanMove(Direction::Down, mData.distance)) {
+         dir_dist.push_back({Direction::Down, mData.distance});
          down += mData.distance;
          KickBomb(Direction::Down);
       }
@@ -184,6 +235,7 @@ void Player::UpdateMovement(const int elapsed_time)
       mData.anim = PlayerAnimation::WalkLeft;
 
       if (CanMove(Direction::Left, mData.distance)) {
+         dir_dist.push_back({Direction::Left, mData.distance});
          left += mData.distance;
          KickBomb(Direction::Left);
       }
@@ -195,12 +247,14 @@ void Player::UpdateMovement(const int elapsed_time)
       mData.anim = PlayerAnimation::WalkRight;
 
       if (CanMove(Direction::Right, mData.distance)) {
+         dir_dist.push_back({Direction::Right, mData.distance});
          right += mData.distance;
          KickBomb(Direction::Right);
       }
    }
 
-   SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
+   mEventQueue.Add(std::make_shared<MovePlayerEvent>(GetType(), dir_dist));
+//   SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
 
    if (!update_anim)
    {
