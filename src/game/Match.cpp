@@ -206,9 +206,9 @@ void Match::UpdateEntities(int elapsed_time)
 {
    for (auto& ent : mEntityManager.GetEntities())
    {
-//      if (!ent->IsValid()) {
-//         continue;
-//      }
+      if (!ent->IsValid()) {
+         continue;
+      }
       ent->Update(elapsed_time);
    }
 

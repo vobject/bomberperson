@@ -449,7 +449,6 @@ void Player::UpdateBombing(const int elapsed_time)
 
 bool Player::CanMove(const Direction dir, const int distance) const
 {
-//   mParentCellChanged = false;
    const auto arena = GetArena();
    const auto parent_cell = arena->GetCellFromObject(*this);
    const auto cell_size = arena->GetCellSize();
@@ -460,43 +459,59 @@ bool Player::CanMove(const Direction dir, const int distance) const
    switch (dir)
    {
       case Direction::Up:
-         if ((GetPosition().Y - distance) >= cell_pos.Y)
+         if ((GetPosition().Y - distance) >= cell_pos.Y) {
             return true;
+         }
          break;
       case Direction::Down:
-         if ((GetPosition().Y + GetSize().Height + distance) <= (cell_pos.Y + cell_size.Height))
+         if ((GetPosition().Y + GetSize().Height + distance) <= (cell_pos.Y + cell_size.Height)) {
             return true;
+         }
          break;
       case Direction::Left:
-         if ((GetPosition().X - distance) >= cell_pos.X)
+         if ((GetPosition().X - distance) >= cell_pos.X) {
             return true;
+         }
          break;
       case Direction::Right:
-         if ((GetPosition().X + GetSize().Width + distance) <= (cell_pos.X + cell_size.Width))
+         if ((GetPosition().X + GetSize().Width + distance) <= (cell_pos.X + cell_size.Width)) {
             return true;
+         }
          break;
    }
 
    // Player wants to walk to another cell - check if that is allowed.
    const auto neighbor_cell = arena->GetNeighborCell(parent_cell, dir);
-   if ((-1 != neighbor_cell.X) &&
-       (-1 != neighbor_cell.Y) &&
-       !arena->HasWall(neighbor_cell))
-   {
-      // We may probably move into the next cell. There is one last thing
-      //  we need to check: does it have a (movable) bomb?
-      if (!arena->HasBomb(neighbor_cell)
-//          ||
-//          (mData.can_kick && arena->GetBomb(neighbor_cell)->CanMove(dir, distance))
-          )
-      {
-//         mParentCellChanged = true;
 
-         // A cell exists and does not block the player.
-         return true;
-      }
+   if ((-1 == neighbor_cell.X) || (-1 == neighbor_cell.Y)) {
+      // There is no cell in this direction.
+      return false;
    }
-   return false;
+
+   if (arena->HasWall(neighbor_cell)) {
+      // Players cannot walk through walls.
+      return false;
+   }
+
+   if (arena->HasBomb(neighbor_cell) && !mCanKick) {
+       // A bomb blocks the path and the player does not have the kick-extra.
+      return false;
+   }
+
+   if (arena->HasBomb(neighbor_cell) && mCanKick)
+   {
+      // A bomb blocks the player path but we can try to kick it.
+      // In any way, return false, because the bomb first has to move.
+      const auto bomb = arena->GetBomb(neighbor_cell);
+      mEventQueue.Add(std::make_shared<MoveBombEvent>(bomb->GetInstanceId(),
+                                                      mSpeed,
+                                                      mDistance,
+                                                      dir));
+      return false;
+   }
+
+   // No Wall, no bomb - movement is fine.
+   return true;
 }
 
 //void Player::KickBomb(const Direction dir) const

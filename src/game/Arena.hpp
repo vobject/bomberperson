@@ -2,9 +2,13 @@
 #define ARENA_HPP
 
 #include "SceneObject.hpp"
+#include "EventListener.hpp"
 
 #include <memory>
 #include <vector>
+
+class EventQueue;
+class ParentCellChangedEvent;
 
 class ArenaObject;
 class Wall;
@@ -32,21 +36,25 @@ struct Cell
    constexpr bool operator==(const Cell& other)
    { return ((X == other.X) && (Y == other.Y)); }
 
+   constexpr bool operator!=(const Cell& other)
+   { return !(*this == other); }
+
    int X;
    int Y;
 };
 
-class Arena : public SceneObject
+class Arena : public SceneObject, public EventListener
 {
 public:
    Arena(const Point& pos, const Size& size, const Size& borders,
-         int cells_x, int cells_y);
+         int cells_x, int cells_y, EventQueue& queue);
    virtual ~Arena();
 
    Arena(const Arena&) = delete;
    Arena& operator=(const Arena&) = delete;
 
    void Update(int elapsed_time) override;
+   void OnEvent(const Event& event) override;
 
    // TODO?
    // GetBorderSize();
@@ -67,7 +75,7 @@ public:
    bool HasWall(const Cell& cell) const;
    std::shared_ptr<Wall> GetWall(const Cell& cell) const;
    void SetWall(const Cell& cell, const std::shared_ptr<Wall>& wall);
-   void DestroyWall(const Cell& cell);
+   void DestroyWall(const Cell& cell); // TODO: Get rid of this.
 
    bool HasExtra(const Cell& cell) const;
    std::shared_ptr<Extra> GetExtra(const Cell& cell) const;
@@ -82,6 +90,8 @@ public:
    void SetExplosion(const Cell& cell, const std::shared_ptr<Explosion>& explosion);
 
 private:
+   void OnParentCellChanged(const ParentCellChangedEvent& event);
+
    struct CellContent
    {
       std::shared_ptr<Wall> wall;
@@ -101,6 +111,8 @@ private:
    const Size mBorders; // Size of the arenas borders in pixel.
    const Size mCellSize;
    std::vector<std::vector<std::pair<Cell, CellContent>>> mCells;
+
+   EventQueue& mEventQueue;
 };
 
 #endif // ARENA_HPP

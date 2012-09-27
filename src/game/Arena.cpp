@@ -1,4 +1,7 @@
 #include "Arena.hpp"
+#include "EventQueue.hpp"
+#include "EventType.hpp"
+
 #include "ArenaObject.hpp"
 #include "Wall.hpp"
 #include "Extra.hpp"
@@ -11,7 +14,8 @@ Arena::Arena(
    const Size& size,
    const Size& borders,
    const int cells_x,
-   const int cells_y
+   const int cells_y,
+   EventQueue& queue
 )
    : SceneObject(EntityId::Arena, ZOrder::Layer_1)
    , mXCells(cells_x)
@@ -20,9 +24,12 @@ Arena::Arena(
    , mCellSize((size.Width - (mBorders.Width * 2)) / mXCells,
                (size.Height - (mBorders.Height * 2)) / mYCells)
    , mCells(mXCells)
+   , mEventQueue(queue)
 {
    SetPosition(pos);
    SetSize(size);
+
+   mEventQueue.Register(this);
 
    // We now have all the information needed to initialize the cells.
 
@@ -30,14 +37,6 @@ Arena::Arena(
    {
       for (int y = 0; y < mYCells; y++)
       {
-//         mCells[x][y].first.X = GetPosition().X +
-//                                mBorders.Width +
-//                                (cell_size.Width * x);
-
-//         mCells[x][y].first.Y = GetPosition().Y +
-//                                mBorders.Height +
-//                                (cell_size.Height * y);
-
          mCells[x].push_back({{ x, y }, CellContent()});
 
          // The initial arena does not contain any objects like walls,
@@ -48,12 +47,24 @@ Arena::Arena(
 
 Arena::~Arena()
 {
-
+   mEventQueue.UnRegister(this);
 }
 
 void Arena::Update(const int elapsed_time)
 {
    // TODO: May be used for an animated ground (e.g. grass or craters).
+}
+
+void Arena::OnEvent(const Event& event)
+{
+   switch (event.GetType())
+   {
+      case EventType::ParentCellChanged:
+         OnParentCellChanged(dynamic_cast<const ParentCellChangedEvent&>(event));
+         break;
+      default:
+         break;
+   }
 }
 
 void Arena::SetObjectPosition(ArenaObject& obj, const Cell& cell) const
@@ -180,6 +191,23 @@ std::shared_ptr<Explosion> Arena::GetExplosion(const Cell& cell) const
 void Arena::SetExplosion(const Cell& cell, const std::shared_ptr<Explosion>& explosion)
 {
    mCells.at(cell.X).at(cell.Y).second.explosion = explosion;
+}
+
+void Arena::OnParentCellChanged(const ParentCellChangedEvent& event)
+{
+   // Currently only bombs can change their parent cell.
+
+   if (!HasBomb(event.GetOldCell())) {
+      throw "Cannot change the parent cell for a non-existend bomb.";
+   }
+
+   if (HasBomb(event.GetNewCell())) {
+      throw "The new parent cell already contains a bomb.";
+   }
+
+   const auto bomb = GetBomb(event.GetOldCell());
+   SetBomb(event.GetOldCell(), nullptr);
+   SetBomb(event.GetNewCell(), bomb);
 }
 
 Cell Arena::GetCellAboveOf(const int cell_x, const int cell_y) const

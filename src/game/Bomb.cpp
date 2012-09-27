@@ -38,10 +38,8 @@ void Bomb::Update(const int elapsed_time)
       mLifeTime += elapsed_time;
    }
 
-   // TODO: Why is the Update() method called for an invalid bomb object?!
-   if (IsValid() && (mLifeTime >= DefaultValue::BOMB_ANIM_LEN))
+   if (mLifeTime >= DefaultValue::BOMB_ANIM_LEN)
    {
-      // ... instead it creates some explosions around it.
       PlantCenterExplosion();
       PlantRangeExplosion(Direction::Up);
       PlantRangeExplosion(Direction::Down);
@@ -101,48 +99,72 @@ void Bomb::SetRange(const int range)
 
 void Bomb::OnMoveBomb(const MoveBombEvent& event)
 {
-    if (event.GetBombInstance() != GetInstanceId()) {
-       // This event is not for us.
-       return;
-    }
+   if (event.GetBombInstance() != GetInstanceId()) {
+      // This event is not for us.
+      return;
+   }
 
-    if (!event.GetDistance())
-    {
-        // This is a 'stop-moving' event.
-        mIsMoving = false;
-        return;
-    }
+   if (!event.GetDistance())
+   {
+      // This is a 'stop-moving' event.
+      mIsMoving = false;
+      return;
+   }
 
-    // Initialize the class members with the movement information from the event.
-    // We need this information because from now on the Bomb class will
-    //  issue its own bomb movement events after the idle time passed.
-    mSpeed = event.GetSpeed();
-    mDistance = event.GetDistance();
-    mDirection = event.GetDirection();
+   // This event may have been sent from a player who does not know
+   //  if the bomb could actually be moved in the desired direction.
+   //  So we have to check againg if everything is ok.
+   if (!CanMove(event.GetDirection(), event.GetDistance()))
+   {
+      // Unable to move because of some obstacle.
+      mIsMoving = false;
+      return;
+   }
 
-    auto up = 0;
-    auto down = 0;
-    auto left = 0;
-    auto right = 0;
+   // This is needed in case the movement will change our parent cell.
+   const auto old_parent_cell = GetArena()->GetCellFromObject(*this);
 
-    switch (mDirection)
-    {
-       case Direction::Up:
-          up += (mSpeed * mDistance);
-          break;
-       case Direction::Down:
-          down += (mSpeed * mDistance);
-          break;
-       case Direction::Left:
-          left += (mSpeed * mDistance);
-          break;
-       case Direction::Right:
-          right += (mSpeed * mDistance);
-          break;
-    }
+   // Initialize the class members with the movement information from the event.
+   // We need this information because from now on the Bomb class will
+   //  issue its own bomb movement events after the idle time passed.
+   mSpeed = event.GetSpeed();
+   mDistance = event.GetDistance();
+   mDirection = event.GetDirection();
 
-    SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
-    mMoveIdleTime = 0_ms;
+   auto up = 0;
+   auto down = 0;
+   auto left = 0;
+   auto right = 0;
+
+   switch (mDirection)
+   {
+      case Direction::Up:
+         up += mDistance;
+         break;
+      case Direction::Down:
+         down += mDistance;
+         break;
+      case Direction::Left:
+         left += mDistance;
+         break;
+      case Direction::Right:
+         right += mDistance;
+         break;
+   }
+
+   SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
+   mMoveIdleTime = 0_ms;
+   mIsMoving = true;
+
+   // The object has changed its parent cell due to the movement.
+   const auto new_parent_cell = GetArena()->GetCellFromObject(*this);
+
+   if (new_parent_cell != old_parent_cell)
+   {
+      mEventQueue.Add(std::make_shared<ParentCellChangedEvent>(GetInstanceId(),
+                                                               old_parent_cell,
+                                                               new_parent_cell));
+   }
 }
 
 void Bomb::OnCreateExplosion(const CreateExplosionEvent& event)
@@ -179,16 +201,14 @@ void Bomb::UpdateMovement(const int elapsed_time)
        return;
     }
 
-    auto distance = 0;
-    if (CanMove(mDirection, mDistance)) {
-        distance = mDistance;
-    }
+    // The receiving handler will not blindly execute the movement.
+    // It will check if the movement is valid. If it is not, the
+    //  bomb will stop moving.
 
-    // If CanMove() was successful, the bomb will be moved.
-    // But if CanMove() failed, the requested movement distance is 0. This means
-    //  that the MoveBombEvent will cause the bomb to stop.
-
-    mEventQueue.Add(std::make_shared<MoveBombEvent>(GetInstanceId(), mSpeed, distance, mDirection));
+    mEventQueue.Add(std::make_shared<MoveBombEvent>(GetInstanceId(),
+                                                    mSpeed,
+                                                    mDistance,
+                                                    mDirection));
 }
 
 void Bomb::PlantCenterExplosion() const
@@ -291,15 +311,22 @@ bool Bomb::CanMove(const Direction dir, const int distance) const
 
    // Bomb wants to move to another cell - check if that is allowed.
    const auto neighbor_cell = arena->GetNeighborCell(parent_cell, dir);
-   if ((-1 != neighbor_cell.X) &&
-       (-1 != neighbor_cell.Y) &&
-       !arena->HasWall(neighbor_cell) &&
-       !arena->HasBomb(neighbor_cell))
-   {
-      // A cell exists and does not block the bomb.
-      return true;
+
+   if ((-1 == neighbor_cell.X) || (-1 == neighbor_cell.Y)) {
+      // There is no cell in this direction.
+      return false;
    }
-   return false;
+
+   if (arena->HasWall(neighbor_cell) ||
+       arena->HasBomb(neighbor_cell) ||
+       arena->HasExtra(neighbor_cell))
+   {
+      // The path is blocked by a wall or a bomb.
+      return false;
+   }
+
+   // The movement to another cell is permitted.
+   return true;
 }
 
 ExplosionType Bomb::GetExplosionType(const Direction dir, const bool end) const

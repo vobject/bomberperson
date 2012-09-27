@@ -144,9 +144,6 @@ private:
    // Move this into the PlayerData object if we choose to make
    //  it alterable from the outside (game logic).
    int mPlantingSpeed = MIN_PLANTING_SPEED;
-
-   // HACK: Handle this properly!
-//   mutable bool mParentCellChanged = false;
 };
 
 #endif // PLAYER_HPP

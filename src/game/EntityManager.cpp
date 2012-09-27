@@ -92,7 +92,8 @@ void EntityManager::OnCreateArena(const CreateArenaEvent& event)
                                     event.GetSize(),
                                     event.GetBorderSize(),
                                     event.GetCellsX(),
-                                    event.GetCellsY());
+                                    event.GetCellsY(),
+                                    mEventQueue);
 
    ArenaGenerator arena_gen(mEventQueue);
    arena_gen.SetDimensions(event.GetCellsX(), event.GetCellsY());

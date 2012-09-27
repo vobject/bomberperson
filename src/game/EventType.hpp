@@ -45,9 +45,11 @@ enum class EventType
    MoveBomb,
    MovePlayer,
 
+   ParentCellChanged,
+
    PickupExtra,
 
-   DetonateRemoteBomb
+   DetonateRemoteBomb,
 };
 
 class Event
@@ -362,19 +364,40 @@ private:
 class MovePlayerEvent : public Event
 {
 public:
-  MovePlayerEvent(PlayerType player, const std::vector<std::pair<Direction, int>>& dir)
-     : Event(EventType::MovePlayer)
-     , mPlayer(player)
-     , mDirectionDistancePair(dir)
-  { }
-  virtual ~MovePlayerEvent() { }
+   MovePlayerEvent(PlayerType player, const std::vector<std::pair<Direction, int>>& dir)
+      : Event(EventType::MovePlayer)
+      , mPlayer(player)
+      , mDirectionDistancePair(dir)
+   { }
+   virtual ~MovePlayerEvent() { }
 
-  PlayerType GetPlayer() const { return mPlayer; }
-  std::vector<std::pair<Direction, int>> GetMovementData() const { return mDirectionDistancePair; }
+   PlayerType GetPlayer() const { return mPlayer; }
+   std::vector<std::pair<Direction, int>> GetMovementData() const { return mDirectionDistancePair; }
 
 private:
-  const PlayerType mPlayer;
-  const std::vector<std::pair<Direction, int>> mDirectionDistancePair;
+   const PlayerType mPlayer;
+   const std::vector<std::pair<Direction, int>> mDirectionDistancePair;
+};
+
+class ParentCellChangedEvent : public Event
+{
+public:
+   ParentCellChangedEvent(unsigned int instance, const Cell& old_parent, const Cell& new_parent)
+      : Event(EventType::ParentCellChanged)
+      , mInstance(instance)
+      , mOldCell(old_parent)
+      , mNewCell(new_parent)
+   { }
+   virtual ~ParentCellChangedEvent() { }
+
+   unsigned int GetInstance() const { return mInstance; }
+   Cell GetOldCell() const { return mOldCell; }
+   Cell GetNewCell() const { return mNewCell; }
+
+private:
+   const unsigned int mInstance;
+   const Cell mOldCell;
+   const Cell mNewCell;
 };
 
 class PickupExtraEvent : public Event
