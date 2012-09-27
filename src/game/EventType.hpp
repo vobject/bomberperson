@@ -14,6 +14,7 @@ enum class PlayerType;
 
 enum class EventType
 {
+   // Create new objects internally
    CreateArena,
    CreateScoreboard,
    CreateWall,
@@ -22,20 +23,31 @@ enum class EventType
    CreateExplosion,
    CreatePlayer,
 
-   RemovePlayer,
+   // Spawn animation to show the object on the scene.
+   SpawnPlayerStart,
+   SpawnPlayerEnd,
 
+   // Death animation of the object.
+   // DestroyArena,
+   // DestroyScoreboard,
    // DestroyWall,
    // DestroyExtra,
+//   DestroyBomb,
+//   DestroyExplosion,
    // DestroyPlayer,
+   DestroyPlayerStart,
+   DestroyPlayerEnd,
+
+   // Remove the object from the game logic.
+   RemovePlayer,
 
    Input,
 
    MovePlayer,
-   KillPlayer,
 
    PickupExtra,
 
-   DetonateRemoteBomb,
+   DetonateRemoteBomb
 };
 
 class Event
@@ -195,6 +207,84 @@ private:
    const PlayerType mPlayer;
 };
 
+class SpawnPlayerStartEvent : public Event
+{
+public:
+   SpawnPlayerStartEvent(PlayerType type)
+      : Event(EventType::SpawnPlayerStart)
+      , mPlayer(type)
+   { }
+   virtual ~SpawnPlayerStartEvent() { }
+
+   PlayerType GetPlayer() const { return mPlayer; }
+
+private:
+   const PlayerType mPlayer;
+};
+
+class SpawnPlayerEndEvent : public Event
+{
+public:
+   SpawnPlayerEndEvent(PlayerType type)
+      : Event(EventType::SpawnPlayerEnd)
+      , mPlayer(type)
+   { }
+   virtual ~SpawnPlayerEndEvent() { }
+
+   PlayerType GetPlayer() const { return mPlayer; }
+
+private:
+   const PlayerType mPlayer;
+};
+
+class DestroyPlayerStartEvent : public Event
+{
+public:
+   DestroyPlayerStartEvent(PlayerType player, PlayerType killer)
+      : Event(EventType::DestroyPlayerStart)
+      , mPlayer(player)
+      , mKiller(killer)
+   { }
+   virtual ~DestroyPlayerStartEvent() { }
+
+   PlayerType GetPlayer() const { return mPlayer; }
+   PlayerType GetKiller() const { return mKiller; }
+
+private:
+   const PlayerType mPlayer;
+   const PlayerType mKiller;
+};
+
+class DestroyPlayerEndEvent : public Event
+{
+public:
+   DestroyPlayerEndEvent(PlayerType player)
+      : Event(EventType::DestroyPlayerEnd)
+      , mPlayer(player)
+   { }
+   virtual ~DestroyPlayerEndEvent() { }
+
+   PlayerType GetPlayer() const { return mPlayer; }
+
+private:
+   const PlayerType mPlayer;
+};
+
+class RemovePlayerEvent : public Event
+{
+public:
+   RemovePlayerEvent(PlayerType player)
+      : Event(EventType::RemovePlayer)
+      , mPlayer(player)
+   { }
+   virtual ~RemovePlayerEvent() { }
+
+   PlayerType GetPlayer() const { return mPlayer; }
+
+private:
+   const PlayerType mPlayer;
+};
+
 class DetonateRemoteBombEvent : public Event
 {
 public:
@@ -261,24 +351,6 @@ public:
 private:
    const PlayerType mPlayer;
    const std::vector<std::pair<Direction, int>> mDirectionDistancePair;
-};
-
-class KillPlayerEvent : public Event
-{
-public:
-   KillPlayerEvent(PlayerType player, PlayerType killer)
-      : Event(EventType::KillPlayer)
-      , mPlayer(player)
-      , mKiller(killer)
-   { }
-   virtual ~KillPlayerEvent() { }
-
-   PlayerType GetPlayer() const { return mPlayer; }
-   PlayerType GetKiller() const { return mKiller; }
-
-private:
-   const PlayerType mPlayer;
-   const PlayerType mKiller;
 };
 
 class PickupExtraEvent : public Event

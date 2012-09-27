@@ -14,6 +14,7 @@ class CreateExtraEvent;
 class CreateBombEvent;
 class CreateExplosionEvent;
 class CreatePlayerEvent;
+class RemovePlayerEvent;
 
 class SceneObject;
 class MainMenu;
@@ -61,6 +62,7 @@ private:
    void OnCreateBomb(const CreateBombEvent& event);
    void OnCreateExplosion(const CreateExplosionEvent& event);
    void OnCreatePlayer(const CreatePlayerEvent& event);
+   void OnRemovePlayer(const RemovePlayerEvent& event);
 
    EventQueue& mEventQueue;
    EntitySet mEntities;

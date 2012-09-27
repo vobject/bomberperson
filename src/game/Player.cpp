@@ -19,6 +19,9 @@ Player::Player(
    , mEventQueue(queue)
 {
    mEventQueue.Register(this);
+
+   // The player is only visible as soon as it starts to spawn.
+   SetVisible(false);
 }
 
 Player::~Player()
@@ -36,18 +39,18 @@ void Player::Update(const int elapsed_time)
       if (GetAnimationTime() >= DefaultValue::PLAYER_SPAWN_ANIM_LEN)
       {
          // The spawning animation is over.
-         mAnimation = PlayerAnimation::StandDown;
+         mEventQueue.Add(std::make_shared<SpawnPlayerEndEvent>(GetType()));
       }
       return;
    }
 
-   if (PlayerAnimation::Dying == mAnimation)
+   if (PlayerAnimation::Destroy == mAnimation)
    {
       // The player is currently dying. Nothing to do but wait.
       if (GetAnimationTime() >= DefaultValue::PLAYER_DEATH_ANIM_LEN)
       {
          // The death animation is over.
-         Invalidate();
+         mEventQueue.Add(std::make_shared<DestroyPlayerEndEvent>(GetType()));
       }
       return;
    }
@@ -59,7 +62,7 @@ void Player::Update(const int elapsed_time)
    {
       // Explosions kill the player. Prepare his death animation.
       const auto killer = arena->GetExplosion(parent_cell)->GetOwner();
-      mEventQueue.Add(std::make_shared<KillPlayerEvent>(GetType(), killer));
+      mEventQueue.Add(std::make_shared<DestroyPlayerStartEvent>(GetType(), killer));
       return;
    }
 
@@ -76,6 +79,18 @@ void Player::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
+      case EventType::SpawnPlayerStart:
+         OnSpawnPlayerStart(dynamic_cast<const SpawnPlayerStartEvent&>(event));
+         break;
+      case EventType::SpawnPlayerEnd:
+         OnSpawnPlayerEnd(dynamic_cast<const SpawnPlayerEndEvent&>(event));
+         break;
+      case EventType::DestroyPlayerStart:
+         OnDestroyPlayerStart(dynamic_cast<const DestroyPlayerStartEvent&>(event));
+         break;
+      case EventType::DestroyPlayerEnd:
+         OnDestroyPlayerEnd(dynamic_cast<const DestroyPlayerEndEvent&>(event));
+         break;
       case EventType::CreateBomb:
          OnCreateBomb(dynamic_cast<const CreateBombEvent&>(event));
          break;
@@ -88,15 +103,105 @@ void Player::OnEvent(const Event& event)
       case EventType::MovePlayer:
          OnMovePlayer(dynamic_cast<const MovePlayerEvent&>(event));
          break;
-      case EventType::KillPlayer:
-         OnKillPlayer(dynamic_cast<const KillPlayerEvent&>(event));
-         break;
       case EventType::PickupExtra:
          OnPickupExtra(dynamic_cast<const PickupExtraEvent&>(event));
          break;
       default:
          break;
    }
+}
+
+PlayerType Player::GetType() const
+{
+   return mType;
+}
+
+PlayerAnimation Player::GetAnimation() const
+{
+   return mAnimation;
+}
+
+int Player::GetSpeed() const
+{
+   return mSpeed;
+}
+
+int Player::GetDistance() const
+{
+   return mDistance;
+}
+
+PlayerSound Player::GetSound(const bool reset)
+{
+   const auto ret = mSound;
+
+   if (reset) {
+      mSound = PlayerSound::None;
+   }
+   return ret;
+}
+
+void Player::OnSpawnPlayerStart(const SpawnPlayerStartEvent& event)
+{
+   if (event.GetPlayer() != GetType()) {
+      // This event is not for us.
+      return;
+   }
+
+   SetAnimationTime(0);
+   mAnimation = PlayerAnimation::Spawn;
+   mSound = PlayerSound::Spawn;
+   mSpeed = 0; // Might be used for animation speed.
+   SetVisible(true);
+}
+
+void Player::OnSpawnPlayerEnd(const SpawnPlayerEndEvent& event)
+{
+   if (event.GetPlayer() != GetType()) {
+      // This event is not for us.
+      return;
+   }
+
+   // Set the players default values, now that the spawning animation is over.
+   mAnimation = PlayerAnimation::StandDown;
+   mSound = PlayerSound::None;
+   mSpeed = MIN_SPEED;
+   SetAnimationTime(0);
+}
+
+void Player::OnDestroyPlayerStart(const DestroyPlayerStartEvent& event)
+{
+   if (event.GetPlayer() != GetType())
+   {
+      // We were not the victim of this kill-event.
+      // Check if we actually killed another player.
+      if (event.GetKiller() == GetType())
+      {
+         // Keep track of the player we killed.
+         mKills.push_back(event.GetPlayer());
+      }
+
+      return;
+   }
+
+   // We were killed.
+   SetAnimationTime(0);
+   mAnimation = PlayerAnimation::Destroy;
+   mSound = PlayerSound::Destroy;
+   mSpeed = 0; // Might be used for animation speed.
+}
+
+void Player::OnDestroyPlayerEnd(const DestroyPlayerEndEvent& event)
+{
+   if (event.GetPlayer() != GetType()) {
+      // This event is not for us.
+      return;
+   }
+
+   SetVisible(false);
+
+   // The death animation is over. Remove the player from the game.
+   mEventQueue.Add(std::make_shared<RemovePlayerEvent>(GetType()));
 }
 
 void Player::OnCreateBomb(const CreateBombEvent& event)
@@ -205,26 +310,6 @@ void Player::OnMovePlayer(const MovePlayerEvent& event)
    }
 }
 
-void Player::OnKillPlayer(const KillPlayerEvent& event)
-{
-   // Check if we were killed.
-   if (event.GetPlayer() == GetType())
-   {
-      SetAnimationTime(0);
-      mAnimation = PlayerAnimation::Dying;
-      mSound = PlayerSound::Die;
-      mSpeed = 0; // This might be used as a factor of the animation speed.
-   }
-
-   // We were not the victim of this kill-event.
-   // Check if we actually killed another player.
-   if (event.GetKiller() == GetType())
-   {
-      // Keep track of the player we killed.
-      mKills.push_back(event.GetPlayer());
-   }
-}
-
 void Player::OnPickupExtra(const PickupExtraEvent& event)
 {
    if (event.GetPlayer() != GetType()) {
@@ -271,36 +356,6 @@ void Player::OnPickupExtra(const PickupExtraEvent& event)
 
    // An extra should no longer exist after it was picked up by a player.
    extra->Invalidate();
-}
-
-PlayerType Player::GetType() const
-{
-   return mType;
-}
-
-PlayerAnimation Player::GetAnimation() const
-{
-   return mAnimation;
-}
-
-int Player::GetSpeed() const
-{
-   return mSpeed;
-}
-
-int Player::GetDistance() const
-{
-   return mDistance;
-}
-
-PlayerSound Player::GetSound(const bool reset)
-{
-   const auto ret = mSound;
-
-   if (reset) {
-      mSound = PlayerSound::None;
-   }
-   return ret;
 }
 
 void Player::UpdateMovement(const int elapsed_time)

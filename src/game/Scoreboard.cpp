@@ -1,17 +1,20 @@
 #include "Scoreboard.hpp"
+#include "EventQueue.hpp"
+#include "EventType.hpp"
 #include "Player.hpp"
 
 #include <sstream>
 
-Scoreboard::Scoreboard()
+Scoreboard::Scoreboard(EventQueue& queue)
    : SceneObject(EntityId::Scoreboard, ZOrder::Layer_1)
+   , mEventQueue(queue)
 {
-
+   mEventQueue.Register(this);
 }
 
 Scoreboard::~Scoreboard()
 {
-
+   mEventQueue.UnRegister(this);
 }
 
 void Scoreboard::Update(const int elapsed_time)
@@ -19,9 +22,34 @@ void Scoreboard::Update(const int elapsed_time)
    mGameTime += elapsed_time;
 }
 
-void Scoreboard::KeepTrackOf(const std::shared_ptr<Player>& player)
+void Scoreboard::OnEvent(const Event& event)
 {
-   mPlayers.push_back(player);
+   switch (event.GetType())
+   {
+      case EventType::SpawnPlayerStart:
+         OnSpawnPlayerStart(dynamic_cast<const SpawnPlayerStartEvent&>(event));
+         break;
+      case EventType::DestroyPlayerStart:
+         OnDestroyPlayerStart(dynamic_cast<const DestroyPlayerStartEvent&>(event));
+         break;
+//      case EventType::CreateBomb:
+//         OnCreateBomb(dynamic_cast<const CreateBombEvent&>(event));
+//         break;
+//      case EventType::CreateExplosion:
+//         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
+//         break;
+//      case EventType::Input:
+//         OnInput(dynamic_cast<const InputEvent&>(event));
+//         break;
+//      case EventType::MovePlayer:
+//         OnMovePlayer(dynamic_cast<const MovePlayerEvent&>(event));
+//         break;
+//      case EventType::PickupExtra:
+//         OnPickupExtra(dynamic_cast<const PickupExtraEvent&>(event));
+//         break;
+      default:
+         break;
+   }
 }
 
 std::vector<std::string> Scoreboard::GetScore() const
@@ -34,42 +62,47 @@ std::vector<std::string> Scoreboard::GetScore() const
    os.clear();
    os.str("");
 
-//   for (const auto& player : mPlayers)
-//   {
-//      lines.push_back("");
+   for (const auto& player : mPlayers)
+   {
+      lines.push_back("");
 
-//      const auto data = player->GetData();
+      os << "Player " << static_cast<int>(player.first) + 1 << ":";
+      lines.push_back(os.str());
+      os.clear();
+      os.str("");
 
-//      os << "Player " << static_cast<int>(player->GetType()) + 1 << ":";
-//      lines.push_back(os.str());
-//      os.clear();
-//      os.str("");
+      os << "  Alive: " << player.second.alive;
+      lines.push_back(os.str());
+      os.clear();
+      os.str("");
 
-//      os << "  Speed: " << data.speed;
-//      lines.push_back(os.str());
-//      os.clear();
-//      os.str("");
-
-//      os << "  Bombs: " << data.bombs;
-//      lines.push_back(os.str());
-//      os.clear();
-//      os.str("");
-
-//      os << "  Range: " << data.range;
-//      lines.push_back(os.str());
-//      os.clear();
-//      os.str("");
-
-//      os << "  Kills: " << data.kills;
-//      lines.push_back(os.str());
-//      os.clear();
-//      os.str("");
-
-//      os << "  Wins: " << data.wins;
-//      lines.push_back(os.str());
-//      os.clear();
-//      os.str("");
-//   }
+      os << "  Kills: " << player.second.kills;
+      lines.push_back(os.str());
+      os.clear();
+      os.str("");
+   }
 
    return lines;
+}
+
+void Scoreboard::OnSpawnPlayerStart(const SpawnPlayerStartEvent& event)
+{
+   mPlayers.insert({ event.GetPlayer(), PlayerInfo() });
+}
+
+void Scoreboard::OnDestroyPlayerStart(const DestroyPlayerStartEvent& event)
+{
+   for (auto& player : mPlayers)
+   {
+      if (event.GetPlayer() == player.first)
+      {
+         player.second.alive = false;
+         continue;
+      }
+
+      if (event.GetKiller() == player.first)
+      {
+         player.second.kills++;
+      }
+   }
 }

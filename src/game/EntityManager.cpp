@@ -51,6 +51,9 @@ void EntityManager::OnEvent(const Event& event)
       case EventType::CreatePlayer:
          OnCreatePlayer(dynamic_cast<const CreatePlayerEvent&>(event));
          break;
+      case EventType::RemovePlayer:
+         OnRemovePlayer(dynamic_cast<const RemovePlayerEvent&>(event));
+         break;
       default:
          break;
    }
@@ -103,7 +106,7 @@ void EntityManager::OnCreateArena(const CreateArenaEvent& event)
 
 void EntityManager::OnCreateScoreboard(const CreateScoreboardEvent& event)
 {
-   auto scoreboard = std::make_shared<Scoreboard>();
+   auto scoreboard = std::make_shared<Scoreboard>(mEventQueue);
    scoreboard->SetPosition(event.GetPosition());
    scoreboard->SetSize(event.GetSize());
 
@@ -192,9 +195,29 @@ void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
          break;
    }
    mArena->SetObjectPosition(*player, parent_cell);
-   player->SetSize({ DefaultValue::CELL_WIDTH, DefaultValue::CELL_HEIGHT });
+   mArena->SetObjectSize(*player);
 
    mEntities.insert(player);
+
+   // Let the player spawn after we created it.
+   mEventQueue.Add(std::make_shared<SpawnPlayerStartEvent>(event.GetPlayer()));
+}
+
+void EntityManager::OnRemovePlayer(const RemovePlayerEvent& event)
+{
+   // TODO: Remove the player from the 'to-be-rendered' list.
+
+   // HACK: Terrible hack because Arena does not yet support querying of player.
+   for (const auto& ent : mEntities)
+   {
+      if (const auto ptr = std::dynamic_pointer_cast<Player>(ent))
+      {
+         if (ptr->GetType() == event.GetPlayer())
+         {
+            ptr->Invalidate();
+         }
+      }
+   }
 }
 
 EntitySet EntityManager::GetEntities() const

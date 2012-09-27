@@ -10,11 +10,14 @@
 #include <vector>
 
 class EventQueue;
+class SpawnPlayerStartEvent;
+class SpawnPlayerEndEvent;
+class DestroyPlayerStartEvent;
+class DestroyPlayerEndEvent;
 class CreateBombEvent;
 class CreateExplosionEvent;
 class InputEvent;
 class MovePlayerEvent;
-class KillPlayerEvent;
 class PickupExtraEvent;
 
 enum class PlayerType
@@ -32,7 +35,8 @@ enum class PlayerSound
    Collect_Bombs,
    Collect_Range,
    Collect_InfiniteRange,
-   Die
+   Spawn,
+   Destroy
 //   Win
 };
 
@@ -51,7 +55,7 @@ enum class PlayerAnimation
    Spawn,
 //   Idle,
 //   Lockedin,
-   Dying
+   Destroy
 //   Win
 };
 
@@ -75,15 +79,17 @@ public:
    int GetDistance() const;
    PlayerSound GetSound(bool reset);
 
-protected:
+private:
+   void OnSpawnPlayerStart(const SpawnPlayerStartEvent& event);
+   void OnSpawnPlayerEnd(const SpawnPlayerEndEvent& event);
+   void OnDestroyPlayerStart(const DestroyPlayerStartEvent& event);
+   void OnDestroyPlayerEnd(const DestroyPlayerEndEvent& event);
    void OnCreateBomb(const CreateBombEvent& event);
    void OnCreateExplosion(const CreateExplosionEvent& event);
    void OnInput(const InputEvent& event);
    void OnMovePlayer(const MovePlayerEvent& event);
-   void OnKillPlayer(const KillPlayerEvent& event);
    void OnPickupExtra(const PickupExtraEvent& event);
 
-private:
    // Number of milliseconds the player has to wait to move another pixel.
    static const int MIN_SPEED = 12_ms;
    static const int MAX_SPEED = 2_ms;
@@ -115,7 +121,7 @@ private:
    bool mInputAction2 = false;
 
    // Animation:
-   PlayerAnimation mAnimation = PlayerAnimation::Spawn;
+   PlayerAnimation mAnimation = PlayerAnimation::StandDown;
 
    // Sound:
    PlayerSound mSound = PlayerSound::None;
