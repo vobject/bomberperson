@@ -38,6 +38,7 @@ void Bomb::Update(const int elapsed_time)
       mLifeTime += elapsed_time;
    }
 
+   // TODO: Why is the Update() method called for an invalid bomb object?!
    if (IsValid() && (mLifeTime >= DefaultValue::BOMB_ANIM_LEN))
    {
       // ... instead it creates some explosions around it.
@@ -49,35 +50,19 @@ void Bomb::Update(const int elapsed_time)
       return;
    }
 
-//   if (mIsMoving)
-//   {
-//      mMoveIdleTime += elapsed_time;
-//      if ((mMoveIdleTime >= mMoveSpeed) && CanMove(mMoveDirection, mMoveDistance))
-//      {
-//         switch (mMoveDirection)
-//         {
-//            case Direction::Up:
-//               SetPosition({ GetPosition().X, GetPosition().Y - 1 });
-//               break;
-//            case Direction::Down:
-//               SetPosition({ GetPosition().X, GetPosition().Y + 1 });
-//               break;
-//            case Direction::Left:
-//               SetPosition({ GetPosition().X - 1, GetPosition().Y });
-//               break;
-//            case Direction::Right:
-//               SetPosition({ GetPosition().X + 1, GetPosition().Y });
-//               break;
-//         }
-//         mMoveIdleTime = 0_ms;
-//      }
-//   }
+   if (mIsMoving)
+   {
+      UpdateMovement(elapsed_time);
+   }
 }
 
 void Bomb::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
+      case EventType::MoveBomb:
+         OnMoveBomb(dynamic_cast<const MoveBombEvent&>(event));
+         break;
       case EventType::CreateExplosion:
          OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
          break;
@@ -111,61 +96,54 @@ int Bomb::GetRange() const
 
 void Bomb::SetRange(const int range)
 {
-   mRange = range;
+    mRange = range;
 }
 
-//bool Bomb::CanMove(const Direction dir, const int distance) const
-//{
-//   // TODO: This code is basically copied from Player class.
-//   //  This might be a sign to outsource the whole collision detection
-//   //  stuff into its own class/subsytem.
+void Bomb::OnMoveBomb(const MoveBombEvent& event)
+{
+    if (event.GetBombInstance() != GetInstanceId()) {
+       // This event is not for us.
+       return;
+    }
 
-//   const auto parent_cell = GetArena()->GetCellFromObject(*this);
-//   const auto cell_size = GetArena()->GetCellSize();
-//   const auto cell_pos = GetArena()->GetCellPosition(parent_cell);
+    if (!event.GetDistance())
+    {
+        // This is a 'stop-moving' event.
+        mIsMoving = false;
+        return;
+    }
 
-//   // Check for movement inside the current cell.
-//   // Movement inside the current cell is always ok.
-//   switch (dir)
-//   {
-//      case Direction::Up:
-//         if ((GetPosition().Y - distance) >= cell_pos.Y)
-//            return true;
-//         break;
-//      case Direction::Down:
-//         if ((GetPosition().Y + GetSize().Height + distance) <= (cell_pos.Y + cell_size.Height))
-//            return true;
-//         break;
-//      case Direction::Left:
-//         if ((GetPosition().X - distance) >= cell_pos.X)
-//            return true;
-//         break;
-//      case Direction::Right:
-//         if ((GetPosition().X + GetSize().Width + distance) <= (cell_pos.X + cell_size.Width))
-//            return true;
-//         break;
-//   }
+    // Initialize the class members with the movement information from the event.
+    // We need this information because from now on the Bomb class will
+    //  issue its own bomb movement events after the idle time passed.
+    mSpeed = event.GetSpeed();
+    mDistance = event.GetDistance();
+    mDirection = event.GetDirection();
 
-//   // Bomb wants to move to another cell - check if that is allowed.
-//   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
-//   if ((-1 != neighbor_cell.X) &&
-//       (-1 != neighbor_cell.Y) &&
-//       !GetArena()->HasWall(neighbor_cell) &&
-//       !GetArena()->HasBomb(neighbor_cell))
-//   {
-//      // A cell exists and does not block the bomb.
-//      return true;
-//   }
-//   return false;
-//}
+    auto up = 0;
+    auto down = 0;
+    auto left = 0;
+    auto right = 0;
 
-//void Bomb::Move(const Direction dir, const int speed, const int distance)
-//{
-//   mMoveDirection = dir;
-//   mMoveSpeed = speed;
-//   mMoveDistance = distance;
-//   mIsMoving = true;
-//}
+    switch (mDirection)
+    {
+       case Direction::Up:
+          up += (mSpeed * mDistance);
+          break;
+       case Direction::Down:
+          down += (mSpeed * mDistance);
+          break;
+       case Direction::Left:
+          left += (mSpeed * mDistance);
+          break;
+       case Direction::Right:
+          right += (mSpeed * mDistance);
+          break;
+    }
+
+    SetPosition({ GetPosition().X - left + right, GetPosition().Y - up + down});
+    mMoveIdleTime = 0_ms;
+}
 
 void Bomb::OnCreateExplosion(const CreateExplosionEvent& event)
 {
@@ -192,6 +170,25 @@ void Bomb::OnDetonateRemoteBomb(const DetonateRemoteBombEvent& event)
    // This bomb is a remote bomb and belongs to the player
    //  who requested his remotes to detonate. Do so (indirectly).
    mLifeTime = DefaultValue::BOMB_ANIM_LEN;
+}
+
+void Bomb::UpdateMovement(const int elapsed_time)
+{
+    mMoveIdleTime += elapsed_time;
+    if (mMoveIdleTime < mSpeed) {
+       return;
+    }
+
+    auto distance = 0;
+    if (CanMove(mDirection, mDistance)) {
+        distance = mDistance;
+    }
+
+    // If CanMove() was successful, the bomb will be moved.
+    // But if CanMove() failed, the requested movement distance is 0. This means
+    //  that the MoveBombEvent will cause the bomb to stop.
+
+    mEventQueue.Add(std::make_shared<MoveBombEvent>(GetInstanceId(), mSpeed, distance, mDirection));
 }
 
 void Bomb::PlantCenterExplosion() const
@@ -259,6 +256,52 @@ void Bomb::PlantRangeExplosion(const Direction dir) const
    }
 }
 
+bool Bomb::CanMove(const Direction dir, const int distance) const
+{
+   // TODO: This code is basically copied from Player class.
+   //  This might be a sign to outsource the whole collision detection
+   //  stuff into its own class/subsytem.
+
+   const auto arena = GetArena();
+   const auto parent_cell = arena->GetCellFromObject(*this);
+   const auto cell_size = arena->GetCellSize();
+   const auto cell_pos = arena->GetCellPosition(parent_cell);
+
+   // Check for movement inside the current cell.
+   // Movement inside the current cell is always ok.
+   switch (dir)
+   {
+      case Direction::Up:
+         if ((GetPosition().Y - distance) >= cell_pos.Y)
+            return true;
+         break;
+      case Direction::Down:
+         if ((GetPosition().Y + GetSize().Height + distance) <= (cell_pos.Y + cell_size.Height))
+            return true;
+         break;
+      case Direction::Left:
+         if ((GetPosition().X - distance) >= cell_pos.X)
+            return true;
+         break;
+      case Direction::Right:
+         if ((GetPosition().X + GetSize().Width + distance) <= (cell_pos.X + cell_size.Width))
+            return true;
+         break;
+   }
+
+   // Bomb wants to move to another cell - check if that is allowed.
+   const auto neighbor_cell = arena->GetNeighborCell(parent_cell, dir);
+   if ((-1 != neighbor_cell.X) &&
+       (-1 != neighbor_cell.Y) &&
+       !arena->HasWall(neighbor_cell) &&
+       !arena->HasBomb(neighbor_cell))
+   {
+      // A cell exists and does not block the bomb.
+      return true;
+   }
+   return false;
+}
+
 ExplosionType Bomb::GetExplosionType(const Direction dir, const bool end) const
 {
    switch (dir)
@@ -272,6 +315,5 @@ ExplosionType Bomb::GetExplosionType(const Direction dir, const bool end) const
       case Direction::Right:
          return end ? ExplosionType::HorizontalRightEnd : ExplosionType::Horizontal;
    }
-
    throw "Could not find the correct explosion type";
 }

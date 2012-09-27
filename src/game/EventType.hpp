@@ -34,7 +34,6 @@ enum class EventType
    // DestroyExtra,
 //   DestroyBomb,
 //   DestroyExplosion,
-   // DestroyPlayer,
    DestroyPlayerStart,
    DestroyPlayerEnd,
 
@@ -43,6 +42,7 @@ enum class EventType
 
    Input,
 
+   MoveBomb,
    MovePlayer,
 
    PickupExtra,
@@ -335,22 +335,46 @@ private:
    const bool mAction2;
 };
 
+class MoveBombEvent : public Event
+{
+public:
+   MoveBombEvent(unsigned int bomb_instance, int speed, int distance, Direction dir)
+      : Event(EventType::MoveBomb)
+      , mBombInstance(bomb_instance)
+      , mSpeed(speed)
+      , mDistance(distance)
+      , mDirection(dir)
+   { }
+   virtual ~MoveBombEvent() { }
+
+   unsigned int GetBombInstance() const { return mBombInstance; }
+   int GetSpeed() const { return mSpeed; }
+   int GetDistance() const { return mDistance; }
+   Direction GetDirection() const { return mDirection; }
+
+private:
+   const unsigned int mBombInstance;
+   const int mSpeed;
+   const int mDistance;
+   const Direction mDirection;
+};
+
 class MovePlayerEvent : public Event
 {
 public:
-   MovePlayerEvent(PlayerType player, const std::vector<std::pair<Direction, int>>& dir)
-      : Event(EventType::MovePlayer)
-      , mPlayer(player)
-      , mDirectionDistancePair(dir)
-   { }
-   virtual ~MovePlayerEvent() { }
+  MovePlayerEvent(PlayerType player, const std::vector<std::pair<Direction, int>>& dir)
+     : Event(EventType::MovePlayer)
+     , mPlayer(player)
+     , mDirectionDistancePair(dir)
+  { }
+  virtual ~MovePlayerEvent() { }
 
-   PlayerType GetPlayer() const { return mPlayer; }
-   std::vector<std::pair<Direction, int>> GetMovementData() const { return mDirectionDistancePair; }
+  PlayerType GetPlayer() const { return mPlayer; }
+  std::vector<std::pair<Direction, int>> GetMovementData() const { return mDirectionDistancePair; }
 
 private:
-   const PlayerType mPlayer;
-   const std::vector<std::pair<Direction, int>> mDirectionDistancePair;
+  const PlayerType mPlayer;
+  const std::vector<std::pair<Direction, int>> mDirectionDistancePair;
 };
 
 class PickupExtraEvent : public Event

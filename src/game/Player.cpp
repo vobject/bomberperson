@@ -258,15 +258,12 @@ void Player::OnMovePlayer(const MovePlayerEvent& event)
       return;
    }
 
-   // The original animation - used to check if the player's
-   //  animation changed during movement.
-   const auto old_anim = mAnimation;
-
    auto up = 0;
    auto down = 0;
    auto left = 0;
    auto right = 0;
    const auto movement_data = event.GetMovementData();
+   const auto old_anim = mAnimation;
 
    for (const auto& dir_dist : movement_data)
    {
@@ -306,7 +303,7 @@ void Player::OnMovePlayer(const MovePlayerEvent& event)
    }
 
    if (old_anim != mAnimation) {
-      SetAnimationTime(0); // Start new animation.
+      SetAnimationTime(0); // Start a new animation.
    }
 }
 

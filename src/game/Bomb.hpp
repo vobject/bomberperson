@@ -6,6 +6,7 @@
 #include "../utils/Utils.hpp"
 
 class EventQueue;
+class MoveBombEvent;
 class CreateExplosionEvent;
 class DetonateRemoteBombEvent;
 
@@ -47,16 +48,16 @@ public:
    int GetRange() const;
    void SetRange(int range);
 
-//   bool CanMove(Direction dir, int distance) const;
-//   void Move(Direction dir, int speed, int distance);
-
-protected:
+private:
+   void OnMoveBomb(const MoveBombEvent& event);
    void OnCreateExplosion(const CreateExplosionEvent& event);
    void OnDetonateRemoteBomb(const DetonateRemoteBombEvent& event);
 
-private:
+   void UpdateMovement(int elapsed_time);
    void PlantCenterExplosion() const;
    void PlantRangeExplosion(Direction dir) const;
+
+   bool CanMove(Direction dir, int distance) const;
    ExplosionType GetExplosionType(Direction dir, bool end) const;
 
    const BombType mType;
@@ -68,11 +69,12 @@ private:
    int mRange = 1;
    BombSound mSound = BombSound::None;
 
-//   bool mIsMoving = false;
-//   int mMoveIdleTime = 0_ms;
-//   Direction mMoveDirection;
-//   int mMoveSpeed;
-//   int mMoveDistance;
+   bool mIsMoving = false;
+   int mMoveIdleTime = 0_ms;
+
+   int mSpeed = 0;
+   int mDistance = 0;
+   Direction mDirection = Direction::Up;
 };
 
 #endif // BOMB_HPP
