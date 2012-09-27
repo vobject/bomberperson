@@ -50,35 +50,6 @@ enum class PlayerAnimation
 //   Win
 };
 
-struct PlayerData
-{
-   constexpr PlayerData(const PlayerAnimation anim,
-                        const int speed,
-                        const int distance)
-      : anim(anim)
-      , speed(speed)
-      , distance(distance)
-      , bombs(1)
-      , range(1)
-      , remote_bombs(1)
-      , can_kick(false)
-      , kills(0)
-      , wins(0)
-   { }
-
-   PlayerAnimation anim;
-
-   int speed;
-   int distance;
-   int bombs;
-   int range;
-   int remote_bombs;
-   bool can_kick;
-
-   int kills;
-   int wins;
-};
-
 class Player : public ArenaObject, public EventListener
 {
 public:
@@ -94,16 +65,18 @@ public:
    void OnEvent(const Event& event) override;
 
    PlayerType GetType() const;
-   PlayerData GetData() const;
+   PlayerAnimation GetAnimation() const;
+   int GetSpeed() const;
+   int GetDistance() const;
    PlayerSound GetSound(bool reset);
-
-//   void IncrementKills(PlayerType type);
 
 protected:
    void OnCreateBomb(const CreateBombEvent& event);
    void OnCreateExplosion(const CreateExplosionEvent& event);
    void OnInput(const InputEvent& event);
    void OnMovePlayer(const MovePlayerEvent& event);
+   void OnKillPlayer(const KillPlayerEvent& event);
+   void OnPickupExtra(const PickupExtraEvent& event);
 
 private:
    // Number of milliseconds the player has to wait to move another pixel.
@@ -123,21 +96,35 @@ private:
 
    void IncreaseSpeed();
    PlayerAnimation GetStopWalkingState(PlayerAnimation anim) const;
-   Direction GetPlayerDirection() const;
 
    PlayerType mType;
-   PlayerData mData;
-   PlayerSound mSound;
-
    EventQueue& mEventQueue;
 
-//   InputCommands mCurrentCommands;
-   bool mInputUp;
-   bool mInputDown;
-   bool mInputLeft;
-   bool mInputRight;
-   bool mInputAction1;
-   bool mInputAction2;
+   // Input handling:
+   bool mInputUp = false;
+   bool mInputDown = false;
+   bool mInputLeft = false;
+   bool mInputRight = false;
+   bool mInputAction1 = false;
+   bool mInputAction2 = false;
+
+   // Animation:
+   PlayerAnimation mAnimation = PlayerAnimation::Spawn;
+
+   // Sound:
+   PlayerSound mSound = PlayerSound::None;
+
+   // Powerups:
+   int mSpeed = MIN_SPEED;
+   int mDistance = 1;
+   int mBombSupply = 1;
+   int mBombRange = 1;
+   int mRemoteBombs = 0;
+   bool mCanKick = false;
+
+   // Statistics:
+   int mBombsPlanted = 0;
+   std::vector<PlayerType> mKills;
 
    int mMoveIdleTime = 0_ms;
    int mBombIdleTime = 0_ms;
@@ -145,8 +132,6 @@ private:
    // Move this into the PlayerData object if we choose to make
    //  it alterable from the outside (game logic).
    int mPlantingSpeed = MIN_PLANTING_SPEED;
-//   std::vector<std::shared_ptr<Bomb>> mPlantedBombs;
-   int mBombsPlanted = 0;
 
    // HACK: Handle this properly!
 //   mutable bool mParentCellChanged = false;

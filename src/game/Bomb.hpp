@@ -47,7 +47,6 @@ public:
 
 //   bool CanMove(Direction dir, int distance) const;
 //   void Move(Direction dir, int speed, int distance);
-   void Detonate();
 
 protected:
    void OnCreateExplosion(const CreateExplosionEvent& event);

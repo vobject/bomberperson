@@ -150,11 +150,6 @@ void Arena::SetExtra(const Cell& cell, const std::shared_ptr<Extra>& extra)
    mCells.at(cell.X).at(cell.Y).second.extra = extra;
 }
 
-void Arena::DestroyExtra(const Cell& cell)
-{
-   mCells.at(cell.X).at(cell.Y).second.extra->Invalidate();
-}
-
 bool Arena::HasBomb(const Cell& cell) const
 {
    const auto obj = mCells.at(cell.X).at(cell.Y).second.bomb;
@@ -169,11 +164,6 @@ std::shared_ptr<Bomb> Arena::GetBomb(const Cell& cell) const
 void Arena::SetBomb(const Cell& cell, const std::shared_ptr<Bomb>& bomb)
 {
    mCells.at(cell.X).at(cell.Y).second.bomb = bomb;
-}
-
-void Arena::DetonateBomb(const Cell& cell)
-{
-   mCells.at(cell.X).at(cell.Y).second.bomb->Detonate();
 }
 
 bool Arena::HasExplosion(const Cell& cell) const

@@ -72,12 +72,10 @@ public:
    bool HasExtra(const Cell& cell) const;
    std::shared_ptr<Extra> GetExtra(const Cell& cell) const;
    void SetExtra(const Cell& cell, const std::shared_ptr<Extra>& extra);
-   void DestroyExtra(const Cell& cell);
 
    bool HasBomb(const Cell& cell) const;
    std::shared_ptr<Bomb> GetBomb(const Cell& cell) const;
    void SetBomb(const Cell& cell, const std::shared_ptr<Bomb>& bomb);
-   void DetonateBomb(const Cell& cell);
 
    bool HasExplosion(const Cell& cell) const;
    std::shared_ptr<Explosion> GetExplosion(const Cell& cell) const;

@@ -34,42 +34,42 @@ std::vector<std::string> Scoreboard::GetScore() const
    os.clear();
    os.str("");
 
-   for (const auto& player : mPlayers)
-   {
-      lines.push_back("");
+//   for (const auto& player : mPlayers)
+//   {
+//      lines.push_back("");
 
-      const auto data = player->GetData();
+//      const auto data = player->GetData();
 
-      os << "Player " << static_cast<int>(player->GetType()) + 1 << ":";
-      lines.push_back(os.str());
-      os.clear();
-      os.str("");
+//      os << "Player " << static_cast<int>(player->GetType()) + 1 << ":";
+//      lines.push_back(os.str());
+//      os.clear();
+//      os.str("");
 
-      os << "  Speed: " << data.speed;
-      lines.push_back(os.str());
-      os.clear();
-      os.str("");
+//      os << "  Speed: " << data.speed;
+//      lines.push_back(os.str());
+//      os.clear();
+//      os.str("");
 
-      os << "  Bombs: " << data.bombs;
-      lines.push_back(os.str());
-      os.clear();
-      os.str("");
+//      os << "  Bombs: " << data.bombs;
+//      lines.push_back(os.str());
+//      os.clear();
+//      os.str("");
 
-      os << "  Range: " << data.range;
-      lines.push_back(os.str());
-      os.clear();
-      os.str("");
+//      os << "  Range: " << data.range;
+//      lines.push_back(os.str());
+//      os.clear();
+//      os.str("");
 
-      os << "  Kills: " << data.kills;
-      lines.push_back(os.str());
-      os.clear();
-      os.str("");
+//      os << "  Kills: " << data.kills;
+//      lines.push_back(os.str());
+//      os.clear();
+//      os.str("");
 
-      os << "  Wins: " << data.wins;
-      lines.push_back(os.str());
-      os.clear();
-      os.str("");
-   }
+//      os << "  Wins: " << data.wins;
+//      lines.push_back(os.str());
+//      os.clear();
+//      os.str("");
+//   }
 
    return lines;
 }

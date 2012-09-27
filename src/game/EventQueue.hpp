@@ -26,10 +26,10 @@ enum class EventType
 
    Input,
 
-//   PickupExtra,
-//   PlayerDeath,
-
    MovePlayer,
+   KillPlayer,
+
+   PickupExtra,
 
    DetonateRemoteBomb,
 };
@@ -175,12 +175,48 @@ public:
    { }
    virtual ~MovePlayerEvent() { }
 
-   PlayerType GetPlayerType() const { return mPlayer; }
+   PlayerType GetPlayer() const { return mPlayer; }
    std::vector<std::pair<Direction, int>> GetMovementData() const { return mDirectionDistancePair; }
 
 private:
    const PlayerType mPlayer;
    const std::vector<std::pair<Direction, int>> mDirectionDistancePair;
+};
+
+class KillPlayerEvent : public Event
+{
+public:
+   KillPlayerEvent(PlayerType player, PlayerType killer)
+      : Event(EventType::KillPlayer)
+      , mPlayer(player)
+      , mKiller(killer)
+   { }
+   virtual ~KillPlayerEvent() { }
+
+   PlayerType GetPlayer() const { return mPlayer; }
+   PlayerType GetKiller() const { return mKiller; }
+
+private:
+   const PlayerType mPlayer;
+   const PlayerType mKiller;
+};
+
+class PickupExtraEvent : public Event
+{
+public:
+   PickupExtraEvent(PlayerType player, const Cell& cell)
+      : Event(EventType::PickupExtra)
+      , mPlayer(player)
+      , mCell(cell)
+   { }
+   virtual ~PickupExtraEvent() { }
+
+   PlayerType GetPlayer() const { return mPlayer; }
+   Cell GetCell() const { return mCell; }
+
+private:
+   const PlayerType mPlayer;
+   const Cell mCell;
 };
 
 class EventQueue

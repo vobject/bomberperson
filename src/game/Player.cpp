@@ -14,8 +14,6 @@ Player::Player(
 )
    : ArenaObject(EntityId::Player, ZOrder::Layer_6, arena)
    , mType(type)
-   , mData(PlayerAnimation::Spawn, MIN_SPEED, 1)
-   , mSound(PlayerSound::None)
    , mEventQueue(queue)
 {
    mEventQueue.Register(this);
@@ -28,7 +26,7 @@ Player::~Player()
 
 void Player::Update(const int elapsed_time)
 {
-   if (PlayerAnimation::Spawn == mData.anim)
+   if (PlayerAnimation::Spawn == mAnimation)
    {
       // The player is currently spawning. Nothing to do but wait.
       SetAnimationTime(GetAnimationTime() + elapsed_time);
@@ -36,12 +34,12 @@ void Player::Update(const int elapsed_time)
       if (GetAnimationTime() >= DefaultValue::PLAYER_SPAWN_ANIM_LEN)
       {
          // The spawning animation is over.
-         mData.anim = PlayerAnimation::StandDown;
+         mAnimation = PlayerAnimation::StandDown;
       }
       return;
    }
 
-   if (PlayerAnimation::Dying == mData.anim)
+   if (PlayerAnimation::Dying == mAnimation)
    {
       // The player is currently dying. Nothing to do but wait.
       SetAnimationTime(GetAnimationTime() + elapsed_time);
@@ -54,58 +52,20 @@ void Player::Update(const int elapsed_time)
       return;
    }
 
-   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+   const auto arena = GetArena();
+   const auto parent_cell = arena->GetCellFromObject(*this);
 
-   if (GetArena()->HasExplosion(parent_cell))
+   if (arena->HasExplosion(parent_cell))
    {
-      const auto explosion_owner = GetArena()->GetExplosion(parent_cell)->GetOwner();
-//      if (explosion_owner.get() != this) {
-//         // We did not commit suicide. Increase kill counter for the owner.
-//         explosion_owner->IncrementKills(GetType());
-//      }
-
       // Explosions kill the player. Prepare his death animation.
-      SetAnimationTime(0);
-      mData.anim = PlayerAnimation::Dying;
-      mData.speed = 0;
-      mSound = PlayerSound::Die;
+      const auto killer = arena->GetExplosion(parent_cell)->GetOwner();
+      mEventQueue.Add(std::make_shared<KillPlayerEvent>(GetType(), killer));
       return;
    }
 
-   if (GetArena()->HasExtra(parent_cell))
+   if (arena->HasExtra(parent_cell))
    {
-      switch (GetArena()->GetExtra(parent_cell)->GetType())
-      {
-         case ExtraType::Speed:
-            IncreaseSpeed();
-            mSound = PlayerSound::Collect_Speed;
-            break;
-         case ExtraType::Bombs:
-            mData.bombs = std::min(mData.bombs + 1, 99);
-            mSound = PlayerSound::Collect_Bombs;
-            break;
-         case ExtraType::Range:
-            mData.range = std::min(mData.range + 1, 99);
-            mSound = PlayerSound::Collect_Range;
-            break;
-         case ExtraType::InfiniteRange:
-            mData.range = 99;
-            mSound = PlayerSound::Collect_InfiniteRange;
-            break;
-         case ExtraType::Kick:
-            mData.can_kick = true;
-            mSound = PlayerSound::Collect_Speed;
-            break;
-         case ExtraType::RemoteBombs:
-            mData.remote_bombs += 5;
-            mSound = PlayerSound::Collect_Bombs;
-            break;
-         default:
-            break;
-      }
-      // An extra should no longer exist after it was picked
-      //  up by a player.
-      GetArena()->DestroyExtra(parent_cell);
+      mEventQueue.Add(std::make_shared<PickupExtraEvent>(GetType(), parent_cell));
    }
 
    UpdateMovement(elapsed_time);
@@ -130,6 +90,12 @@ void Player::OnEvent(const Event& event)
       case EventType::MovePlayer:
          OnMovePlayer(dynamic_cast<const MovePlayerEvent&>(event));
          break;
+      case EventType::KillPlayer:
+         OnKillPlayer(dynamic_cast<const KillPlayerEvent&>(event));
+         break;
+      case EventType::PickupExtra:
+         OnPickupExtra(dynamic_cast<const PickupExtraEvent&>(event));
+         break;
       default:
          break;
    }
@@ -143,7 +109,7 @@ void Player::OnCreateBomb(const CreateBombEvent& event)
    }
 
    if (BombType::Remote == event.GetBombType()) {
-      mData.remote_bombs--;
+      mRemoteBombs--;
    }
 
    mBombsPlanted++;
@@ -184,14 +150,14 @@ void Player::OnInput(const InputEvent& event)
 
 void Player::OnMovePlayer(const MovePlayerEvent& event)
 {
-   if (event.GetPlayerType() != GetType()) {
+   if (event.GetPlayer() != GetType()) {
       // This event is not for us.
       return;
    }
 
    // The original animation - used to check if the player's
    //  animation changed during movement.
-   const auto old_anim = mData.anim;
+   const auto old_anim = mAnimation;
 
    auto up = 0;
    auto down = 0;
@@ -204,19 +170,19 @@ void Player::OnMovePlayer(const MovePlayerEvent& event)
       switch (dir_dist.first)
       {
          case Direction::Up:
-            mData.anim = PlayerAnimation::WalkUp;
+            mAnimation = PlayerAnimation::WalkUp;
             up += dir_dist.second;
             break;
          case Direction::Down:
-            mData.anim = PlayerAnimation::WalkDown;
+            mAnimation = PlayerAnimation::WalkDown;
             down += dir_dist.second;
             break;
          case Direction::Left:
-            mData.anim = PlayerAnimation::WalkLeft;
+            mAnimation = PlayerAnimation::WalkLeft;
             left += dir_dist.second;
             break;
          case Direction::Right:
-            mData.anim = PlayerAnimation::WalkRight;
+            mAnimation = PlayerAnimation::WalkRight;
             right += dir_dist.second;
             break;
       }
@@ -227,7 +193,7 @@ void Player::OnMovePlayer(const MovePlayerEvent& event)
    if (movement_data.empty())
    {
       // Select the right stand-still animation in case we did not move.
-      mData.anim = GetStopWalkingState(mData.anim);
+      mAnimation = GetStopWalkingState(mAnimation);
    }
    else
    {
@@ -236,9 +202,77 @@ void Player::OnMovePlayer(const MovePlayerEvent& event)
       mMoveIdleTime = 0_ms;
    }
 
-   if (old_anim != mData.anim) {
+   if (old_anim != mAnimation) {
       SetAnimationTime(0); // Start new animation.
    }
+}
+
+void Player::OnKillPlayer(const KillPlayerEvent& event)
+{
+   // Check if we were killed.
+   if (event.GetPlayer() == GetType())
+   {
+      SetAnimationTime(0);
+      mAnimation = PlayerAnimation::Dying;
+      mSound = PlayerSound::Die;
+      mSpeed = 0; // This might be used as a factor of the animation speed.
+   }
+
+   // We were not the victim of this kill-event.
+   // Check if we actually killed another player.
+   if (event.GetKiller() == GetType())
+   {
+      // Keep track of the player we killed.
+      mKills.push_back(event.GetPlayer());
+   }
+}
+
+void Player::OnPickupExtra(const PickupExtraEvent& event)
+{
+   if (event.GetPlayer() != GetType()) {
+      // This event is not for us.
+      return;
+   }
+
+   if (!GetArena()->HasExtra(event.GetCell())) {
+      // The extra has already disappeared.
+      return;
+   }
+
+   auto extra = GetArena()->GetExtra(event.GetCell());
+
+   switch (extra->GetType())
+   {
+      case ExtraType::Speed:
+         IncreaseSpeed();
+         mSound = PlayerSound::Collect_Speed;
+         break;
+      case ExtraType::Bombs:
+         mBombSupply = std::min(mBombSupply + 1, 99);
+         mSound = PlayerSound::Collect_Bombs;
+         break;
+      case ExtraType::Range:
+         mBombRange = std::min(mBombRange + 1, 99);
+         mSound = PlayerSound::Collect_Range;
+         break;
+      case ExtraType::InfiniteRange:
+         mBombRange = 99;
+         mSound = PlayerSound::Collect_InfiniteRange;
+         break;
+      case ExtraType::Kick:
+         mCanKick = true;
+         mSound = PlayerSound::Collect_Speed;
+         break;
+      case ExtraType::RemoteBombs:
+         mRemoteBombs += 5;
+         mSound = PlayerSound::Collect_Bombs;
+         break;
+      default:
+         break;
+   }
+
+   // An extra should no longer exist after it was picked up by a player.
+   extra->Invalidate();
 }
 
 PlayerType Player::GetType() const
@@ -246,9 +280,19 @@ PlayerType Player::GetType() const
    return mType;
 }
 
-PlayerData Player::GetData() const
+PlayerAnimation Player::GetAnimation() const
 {
-   return mData;
+   return mAnimation;
+}
+
+int Player::GetSpeed() const
+{
+   return mSpeed;
+}
+
+int Player::GetDistance() const
+{
+   return mDistance;
 }
 
 PlayerSound Player::GetSound(const bool reset)
@@ -261,18 +305,10 @@ PlayerSound Player::GetSound(const bool reset)
    return ret;
 }
 
-//void Player::IncrementKills(const PlayerType type)
-//{
-//   // Ignore which player was killed by now.
-//   (void) type;
-
-//   mData.kills++;
-//}
-
 void Player::UpdateMovement(const int elapsed_time)
 {
    mMoveIdleTime += elapsed_time;
-   if (mMoveIdleTime < mData.speed) {
+   if (mMoveIdleTime < mSpeed) {
       return;
    }
 
@@ -281,8 +317,8 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInputUp)
    {
       auto distance = 0;
-      if (CanMove(Direction::Up, mData.distance)) {
-         distance = mData.distance;
+      if (CanMove(Direction::Up, mDistance)) {
+         distance = mDistance;
       }
       dir_dist.push_back({ Direction::Up, distance });
    }
@@ -290,8 +326,8 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInputDown)
    {
       auto distance = 0;
-      if (CanMove(Direction::Down, mData.distance)) {
-         distance = mData.distance;
+      if (CanMove(Direction::Down, mDistance)) {
+         distance = mDistance;
       }
       dir_dist.push_back({ Direction::Down, distance });
    }
@@ -299,8 +335,8 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInputLeft)
    {
       auto distance = 0;
-      if (CanMove(Direction::Left, mData.distance)) {
-         distance = mData.distance;
+      if (CanMove(Direction::Left, mDistance)) {
+         distance = mDistance;
       }
       dir_dist.push_back({ Direction::Left, distance });
    }
@@ -308,17 +344,17 @@ void Player::UpdateMovement(const int elapsed_time)
    if (mInputRight)
    {
       auto distance = 0;
-      if (CanMove(Direction::Right, mData.distance)) {
-         distance = mData.distance;
+      if (CanMove(Direction::Right, mDistance)) {
+         distance = mDistance;
       }
       dir_dist.push_back({ Direction::Right, distance });
    }
 
    if (!dir_dist.empty() ||
-         ((mData.anim != PlayerAnimation::StandUp) &&
-          (mData.anim != PlayerAnimation::StandDown) &&
-          (mData.anim != PlayerAnimation::StandLeft) &&
-          (mData.anim != PlayerAnimation::StandRight)))
+         ((mAnimation != PlayerAnimation::StandUp) &&
+          (mAnimation != PlayerAnimation::StandDown) &&
+          (mAnimation != PlayerAnimation::StandLeft) &&
+          (mAnimation != PlayerAnimation::StandRight)))
    {
       // Create an event in case:
       //  1. The player requested to move.
@@ -338,11 +374,11 @@ void Player::UpdateBombing(const int elapsed_time)
 
    if (mInputAction1 && // User pressed the right button.
        !GetArena()->HasBomb(parent_cell) && // No bomb in this cell yet.
-       (mData.bombs > mBombsPlanted)) // Player did not run out of bomb supply.
+       (mBombSupply > mBombsPlanted)) // Player did not run out of bomb supply.
    {
       auto bomb_type = BombType::Countdown; // The default bomb type.
 
-      if (mData.remote_bombs)
+      if (mRemoteBombs)
       {
          // Always plant remote controlled bombs if the player has them.
          bomb_type = BombType::Remote;
@@ -350,7 +386,7 @@ void Player::UpdateBombing(const int elapsed_time)
 
       mEventQueue.Add(std::make_shared<CreateBombEvent>(parent_cell,
                                                         bomb_type,
-                                                        mData.range,
+                                                        mBombRange,
                                                         GetType()));
    }
 
@@ -413,25 +449,6 @@ bool Player::CanMove(const Direction dir, const int distance) const
    return false;
 }
 
-bool Player::CanPlantBomb()
-{
-   int bombs_alive = 0;
-//   for (const auto& bomb : mPlantedBombs)
-//   {
-//      if (bomb->IsValid())
-//      {
-//         bombs_alive++;
-//      }
-//   }
-
-//   // Garbage collection of the planted-bombs-vector.
-//   if (!bombs_alive) {
-//      mPlantedBombs.clear();
-//   }
-
-   return (mData.bombs > bombs_alive);
-}
-
 //void Player::KickBomb(const Direction dir) const
 //{
 //   if (!mParentCellChanged || !mData.can_kick) {
@@ -451,15 +468,15 @@ bool Player::CanPlantBomb()
 
 void Player::IncreaseSpeed()
 {
-   if (mData.speed > MAX_SPEED)
+   if (mSpeed > MAX_SPEED)
    {
-      mData.speed -= 2_ms;
+      mSpeed -= 2_ms;
    }
    else
    {
       // The player will now move an additional pixel per interval
       //  if he really got this fast.
-      mData.distance++;
+      mDistance++;
    }
 }
 
@@ -478,26 +495,4 @@ PlayerAnimation Player::GetStopWalkingState(const PlayerAnimation anim) const
       default:
          return anim;
    }
-}
-
-Direction Player::GetPlayerDirection() const
-{
-   switch (mData.anim)
-   {
-      case PlayerAnimation::WalkUp:
-      case PlayerAnimation::StandUp:
-         return Direction::Up;
-      case PlayerAnimation::WalkDown:
-      case PlayerAnimation::StandDown:
-         return Direction::Down;
-      case PlayerAnimation::WalkLeft:
-      case PlayerAnimation::StandLeft:
-         return Direction::Left;
-      case PlayerAnimation::WalkRight:
-      case PlayerAnimation::StandRight:
-         return Direction::Right;
-      default:
-         break;
-   }
-   throw "Player: Invalid player direction.";
 }

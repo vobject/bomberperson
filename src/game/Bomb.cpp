@@ -2,6 +2,7 @@
 #include "EventQueue.hpp"
 #include "Arena.hpp"
 #include "Wall.hpp"
+#include "Extra.hpp"
 #include "Explosion.hpp"
 #include "../Options.hpp"
 
@@ -164,11 +165,6 @@ void Bomb::SetRange(const int range)
 //   mIsMoving = true;
 //}
 
-void Bomb::Detonate()
-{
-   mLifeTime = DefaultValue::BOMB_ANIM_LEN;
-}
-
 void Bomb::OnCreateExplosion(const CreateExplosionEvent& event)
 {
    const auto parent_cell = GetArena()->GetCellFromObject(*this);
@@ -207,25 +203,26 @@ void Bomb::PlantCenterExplosion() const
 
 void Bomb::PlantRangeExplosion(const Direction dir) const
 {
-   const auto parent = GetArena()->GetCellFromObject(*this);
-   auto range_cell = GetArena()->GetNeighborCell(parent, dir);
+   const auto arena = GetArena();
+   const auto parent = arena->GetCellFromObject(*this);
+   auto range_cell = arena->GetNeighborCell(parent, dir);
    auto range_to_go = GetRange();
 
    while ((-1 != range_cell.X) && (-1 != range_cell.Y) && range_to_go)
    {
-      if (GetArena()->HasWall(range_cell) &&
-          !GetArena()->GetWall(range_cell)->IsDestructible())
+      if (arena->HasWall(range_cell) &&
+          !arena->GetWall(range_cell)->IsDestructible())
       {
          // A wall that is not destructible is, well ... indestructible.
          // Do not spread the explosion in this direction any further.
          break;
       }
 
-      if (GetArena()->HasBomb(range_cell))
+      if (arena->HasBomb(range_cell))
       {
          // A bombs explosion range ends if it hits another bomb it its way.
          // But it causes the other bomb to explode.
-         GetArena()->DetonateBomb(range_cell);
+         arena->GetBomb(range_cell)->mLifeTime = DefaultValue::BOMB_ANIM_LEN;
          break;
       }
 
@@ -235,27 +232,27 @@ void Bomb::PlantRangeExplosion(const Direction dir) const
                                                              exp_type,
                                                              mOwner));
 
-      if (GetArena()->HasWall(range_cell) &&
-          GetArena()->GetWall(range_cell)->IsDestructible())
+      if (arena->HasWall(range_cell) &&
+          arena->GetWall(range_cell)->IsDestructible())
       {
          // FIXME: This has a minor problem: when the exploding bomb destroys
          //  a wall and triggers another bomb with a greater range,
          //  the wall behind the first wall would also be destroyed
          //  at the same time.
          // Maybe this could be avoided by introducing an ExplodingWall type.
-         GetArena()->DestroyWall(range_cell);
+         arena->DestroyWall(range_cell);
          break;
       }
 
-      if (GetArena()->HasExtra(range_cell))
+      if (arena->HasExtra(range_cell))
       {
          // The explosion can destroy an extra item but it will be stopped
          //  when doing so.
-         GetArena()->DestroyExtra(range_cell);
+         arena->GetExtra(range_cell)->Invalidate();
          break;
       }
 
-      range_cell = GetArena()->GetNeighborCell(range_cell, dir);
+      range_cell = arena->GetNeighborCell(range_cell, dir);
       range_to_go--;
    }
 }
