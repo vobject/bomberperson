@@ -1,4 +1,5 @@
 #include "EventQueue.hpp"
+#include "EventListener.hpp"
 
 EventQueue::EventQueue()
 {

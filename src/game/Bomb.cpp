@@ -1,5 +1,7 @@
 #include "Bomb.hpp"
 #include "EventQueue.hpp"
+#include "EventType.hpp"
+
 #include "Arena.hpp"
 #include "Wall.hpp"
 #include "Extra.hpp"
@@ -220,7 +222,7 @@ void Bomb::PlantRangeExplosion(const Direction dir) const
 
       if (arena->HasBomb(range_cell))
       {
-         // A bombs explosion range ends if it hits another bomb it its way.
+         // A bombs explosion range ends if it hits another bomb in its way.
          // But it causes the other bomb to explode.
          arena->GetBomb(range_cell)->mLifeTime = DefaultValue::BOMB_ANIM_LEN;
          break;

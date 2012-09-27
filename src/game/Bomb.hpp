@@ -3,10 +3,12 @@
 
 #include "ArenaObject.hpp"
 #include "EventListener.hpp"
-#include "EventQueue.hpp"
 #include "../utils/Utils.hpp"
 
+class EventQueue;
 class CreateExplosionEvent;
+class DetonateRemoteBombEvent;
+
 enum class ExplosionType;
 enum class PlayerType;
 

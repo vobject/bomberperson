@@ -1,8 +1,6 @@
 #include "Match.hpp"
-#include "Arena.hpp"
-#include "ArenaGenerator.hpp"
+#include "EventType.hpp"
 #include "Player.hpp"
-#include "Scoreboard.hpp"
 #include "../input/KeyboardInput.hpp"
 #include "../input/MouseInput.hpp"
 #include "../utils/Utils.hpp"
@@ -15,10 +13,8 @@ Match::Match(const MatchSettings& settings)
    , mEntityManager(mEventQueue)
 {
    // The arena is needed for the creation of the players.
-   mEntityManager.CreateArena(mSettings.players.size());
-   mEntityManager.CreateScoreboard();
-
-   CreateInputDevices();
+   CreateArenaAndScoreboard();
+   CreateInputDevicesAndPlayers();
 }
 
 Match::~Match()
@@ -118,21 +114,27 @@ EntitySet Match::GetEntities() const
    return mEntityManager.GetEntities();
 }
 
-void Match::UpdateEntities(int elapsed_time)
+void Match::CreateArenaAndScoreboard()
 {
-   for (auto& ent : mEntityManager.GetEntities())
-   {
-//      if (!ent->IsValid()) {
-//         continue;
-//      }
-      ent->Update(elapsed_time);
-   }
+   const Point pos = { DefaultValue::ARENA_POS_X, DefaultValue::ARENA_POS_Y };
+   const Size size = { DefaultValue::ARENA_WIDTH, DefaultValue::ARENA_HEIGHT };
+   const Size borders = { DefaultValue::ARENA_BORDER_WIDTH, DefaultValue::ARENA_BORDER_HEIGHT };
+   const auto cells_x = DefaultValue::ARENA_CELLS_X;
+   const auto cells_y = DefaultValue::ARENA_CELLS_Y;
+   const auto players = mSettings.players.size();
 
-   // TODO: NOW is the time for collision detection.
-   // TODO: Update all entities againg after collisions were detected.
+   // This is the very first event that must be created. The arena object is
+   //  used internally to help create other ArenaObject-derived classes.
+   mEventQueue.Add(std::make_shared<CreateArenaEvent>(pos, size, borders,
+                                                      cells_x, cells_y, players));
+
+   const Point sb_pos = { DefaultValue::SCOREBOARD_POS_X, DefaultValue::SCOREBOARD_POS_Y };
+   const Size sb_size = { DefaultValue::SCOREBOARD_WIDTH, DefaultValue::SCOREBOARD_HEIGHT };
+
+   mEventQueue.Add(std::make_shared<CreateScoreboardEvent>(sb_pos, sb_size));
 }
 
-void Match::CreateInputDevices()
+void Match::CreateInputDevicesAndPlayers()
 {
    for (const auto& p2i : mSettings.players)
    {
@@ -169,7 +171,7 @@ void Match::CreateInputDevices()
          throw "Kinect input device is not yet supported.";
       }
 
-      mEntityManager.CreatePlayer(player_type);
+      mEventQueue.Add(std::make_shared<CreatePlayerEvent>(player_type));
    }
 }
 
@@ -198,6 +200,20 @@ void Match::CreateInputEvents()
                                                 mMouse_1.second->TestRight(),
                                                 mMouse_1.second->TestAction1(),
                                                 mMouse_1.second->TestAction2()));
+}
+
+void Match::UpdateEntities(int elapsed_time)
+{
+   for (auto& ent : mEntityManager.GetEntities())
+   {
+//      if (!ent->IsValid()) {
+//         continue;
+//      }
+      ent->Update(elapsed_time);
+   }
+
+   // TODO: NOW is the time for collision detection.
+   // TODO: Update all entities againg after collisions were detected.
 }
 
 PlayerType Match::PlayerTypeFromPlayerId(const PlayerId id)

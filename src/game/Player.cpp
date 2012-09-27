@@ -1,5 +1,7 @@
 #include "Player.hpp"
 #include "EventQueue.hpp"
+#include "EventType.hpp"
+
 #include "Arena.hpp"
 #include "Extra.hpp"
 #include "Bomb.hpp"
@@ -26,11 +28,11 @@ Player::~Player()
 
 void Player::Update(const int elapsed_time)
 {
+   SetAnimationTime(GetAnimationTime() + elapsed_time);
+
    if (PlayerAnimation::Spawn == mAnimation)
    {
       // The player is currently spawning. Nothing to do but wait.
-      SetAnimationTime(GetAnimationTime() + elapsed_time);
-
       if (GetAnimationTime() >= DefaultValue::PLAYER_SPAWN_ANIM_LEN)
       {
          // The spawning animation is over.
@@ -42,8 +44,6 @@ void Player::Update(const int elapsed_time)
    if (PlayerAnimation::Dying == mAnimation)
    {
       // The player is currently dying. Nothing to do but wait.
-      SetAnimationTime(GetAnimationTime() + elapsed_time);
-
       if (GetAnimationTime() >= DefaultValue::PLAYER_DEATH_ANIM_LEN)
       {
          // The death animation is over.
@@ -70,8 +70,6 @@ void Player::Update(const int elapsed_time)
 
    UpdateMovement(elapsed_time);
    UpdateBombing(elapsed_time);
-
-   SetAnimationTime(GetAnimationTime() + elapsed_time);
 }
 
 void Player::OnEvent(const Event& event)

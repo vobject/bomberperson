@@ -3,14 +3,19 @@
 
 #include "ArenaObject.hpp"
 #include "EventListener.hpp"
-#include "EventQueue.hpp"
 #include "../input/InputDevice.hpp"
 #include "../utils/Utils.hpp"
 
 #include <memory>
 #include <vector>
 
-class Bomb;
+class EventQueue;
+class CreateBombEvent;
+class CreateExplosionEvent;
+class InputEvent;
+class MovePlayerEvent;
+class KillPlayerEvent;
+class PickupExtraEvent;
 
 enum class PlayerType
 {
@@ -98,6 +103,7 @@ private:
    PlayerAnimation GetStopWalkingState(PlayerAnimation anim) const;
 
    PlayerType mType;
+
    EventQueue& mEventQueue;
 
    // Input handling:

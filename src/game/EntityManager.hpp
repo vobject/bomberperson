@@ -7,30 +7,21 @@
 #include <set>
 
 class EventQueue;
+class CreateArenaEvent;
+class CreateScoreboardEvent;
+class CreateWallEvent;
+class CreateExtraEvent;
 class CreateBombEvent;
 class CreateExplosionEvent;
+class CreatePlayerEvent;
 
 class SceneObject;
 class MainMenu;
 class MenuItem;
 class MenuItemSelector;
 class Arena;
-class Scoreboard;
-class Wall;
-class Extra;
-class Bomb;
-class Explosion;
-class Player;
-struct Cell;
 
-enum class EntityId;
 enum class UiItemId;
-
-enum class WallType;
-enum class ExtraType;
-enum class BombType;
-enum class ExplosionType;
-enum class PlayerType;
 
 template<class T>
 struct Sort_Dereferenced_SharedPtr
@@ -56,17 +47,6 @@ public:
    std::shared_ptr<MenuItem> CreateMenuItem(UiItemId id);
    std::shared_ptr<MenuItemSelector> CreateMenuItemSelector();
 
-   // A valid arena object should be created before any other ArenaObject
-   //  derivatives (wall, extra, explosion, player) are created because
-   //  they will use the reference to arena object.
-   std::shared_ptr<Arena> CreateArena(int player_count);
-   std::shared_ptr<Scoreboard> CreateScoreboard();
-
-   std::shared_ptr<Wall> CreateWall(const Cell& cell, WallType type);
-   std::shared_ptr<Extra> CreateExtra(const Cell& cell, ExtraType type);
-   void OnCreateBomb(const CreateBombEvent& event);
-   void OnCreateExplosion(const CreateExplosionEvent& event);
-   std::shared_ptr<Player> CreatePlayer(PlayerType type);
 
    EntitySet GetEntities() const;
 
@@ -74,9 +54,21 @@ public:
    void Reset();
 
 private:
+   void OnCreateArena(const CreateArenaEvent& event);
+   void OnCreateScoreboard(const CreateScoreboardEvent& event);
+   void OnCreateWall(const CreateWallEvent& event);
+   void OnCreateExtra(const CreateExtraEvent& event);
+   void OnCreateBomb(const CreateBombEvent& event);
+   void OnCreateExplosion(const CreateExplosionEvent& event);
+   void OnCreatePlayer(const CreatePlayerEvent& event);
+
    EventQueue& mEventQueue;
-   std::shared_ptr<Arena> mArena;
    EntitySet mEntities;
+
+   // A valid arena object must be created before any other ArenaObject
+   //  derivatives (wall, extra, explosion, player) are created because
+   //  they will use the reference to arena object.
+   std::shared_ptr<Arena> mArena;
 };
 
 #endif // ENTITYMANAGER_HPP
