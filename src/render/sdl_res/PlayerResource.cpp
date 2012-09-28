@@ -35,7 +35,7 @@ void PlayerResource::SetFrames(
       throw "PlayerResource: Invalid sprite textures.";
    }
 
-   mFrames[anim] = { textures, length };
+   mFrames.insert({ anim, { textures, length }});
 }
 
 SDL_Surface* PlayerResource::GetFrame(

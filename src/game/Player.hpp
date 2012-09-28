@@ -132,7 +132,7 @@ private:
    int mDistance = 1;
    int mBombSupply = 1;
    int mBombRange = 1;
-   int mRemoteBombs = 10;
+   int mRemoteBombs = 0;
    bool mCanKick = false;
 
    // Statistics:

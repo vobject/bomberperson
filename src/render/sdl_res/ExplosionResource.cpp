@@ -36,7 +36,7 @@ void ExplosionResource::SetFrames(
       throw "ExplosionResource: Invalid sprite textures.";
    }
 
-   mFrames[anim] = { textures, length };
+   mFrames.insert({ anim, { textures, length }});
 }
 
 SDL_Surface* ExplosionResource::GetFrame(

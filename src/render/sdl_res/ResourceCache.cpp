@@ -159,14 +159,23 @@ void ResourceCache::LoadExtraResources()
 
 void ResourceCache::LoadBombResources()
 {
-   const auto id1 = BombType::Countdown;
-   const auto id2 = BombType::Remote;
    const Size size = { DefaultValue::BOMB_WIDTH,
                        DefaultValue::BOMB_HEIGHT };
+   const auto spawn_len = DefaultValue::BOMB_SPAWN_ANIM_LEN;
+   const auto tick_len = DefaultValue::BOMB_BURN_ANIM_LEN;
+   const auto destroy_len = DefaultValue::BOMB_DESTROY_ANIM_LEN;
 
-   // TODO: Align animation speed and bomb lifetime.
-   mBombRes.insert({ id1, { id1, 2500_ms, { LoadTexture("bomb_1.png", size), LoadTexture("bomb_2.png", size), LoadTexture("bomb_3.png", size) } } });
-   mBombRes.insert({ id2, { id2, 1000_ms, { LoadTexture("bomb_remote_1.png", size), LoadTexture("bomb_remote_2.png", size) } } });
+   BombResource countdown(BombType::Countdown);
+   countdown.SetFrames(BombAnimation::Spawn, spawn_len, { LoadTexture("bomb_1.png", size) });
+   countdown.SetFrames(BombAnimation::Tick, tick_len, { LoadTexture("bomb_2.png", size), LoadTexture("bomb_3.png", size), LoadTexture("bomb_1.png", size), LoadTexture("bomb_2.png", size), LoadTexture("bomb_3.png", size) });
+   countdown.SetFrames(BombAnimation::Destroy, destroy_len, { LoadTexture("bomb_3.png", size) });
+   mBombRes.insert({ countdown.GetType(), countdown });
+
+   BombResource remote(BombType::Remote);
+   remote.SetFrames(BombAnimation::Spawn, spawn_len, { LoadTexture("bomb_remote_1.png", size) });
+   remote.SetFrames(BombAnimation::Tick, tick_len, { LoadTexture("bomb_remote_2.png", size), LoadTexture("bomb_remote_1.png", size), LoadTexture("bomb_remote_2.png", size), LoadTexture("bomb_remote_1.png", size), LoadTexture("bomb_remote_2.png", size) });
+   remote.SetFrames(BombAnimation::Destroy, destroy_len, { LoadTexture("bomb_remote_2.png", size) });
+   mBombRes.insert({ remote.GetType(), remote });
 }
 
 void ResourceCache::LoadExplosionResources()
