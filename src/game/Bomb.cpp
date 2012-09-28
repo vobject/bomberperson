@@ -20,8 +20,6 @@ Bomb::Bomb(
    , mEventQueue(queue)
 {
    mEventQueue.Register(this);
-
-   mSound = BombSound::Planted;
 }
 
 Bomb::~Bomb()
@@ -33,36 +31,58 @@ void Bomb::Update(const int elapsed_time)
 {
    SetAnimationTime(GetAnimationTime() + elapsed_time);
 
-   if (BombType::Remote != mType) {
-      // The lifetime of a remote controlled bomb does not decline over time.
-      mLifeTime += elapsed_time;
+   if ((BombAnimation::Spawn == mAnimation) &&
+       (GetAnimationTime() >= DefaultValue::BOMB_SPAWN_ANIM_LEN))
+   {
+      // The explosion was just done spawning.
+      mEventQueue.Add(std::make_shared<SpawnBombEndEvent>(GetInstanceId()));
    }
 
-   if (mLifeTime >= DefaultValue::BOMB_ANIM_LEN)
+   if (BombAnimation::Tick == mAnimation)
    {
-      PlantCenterExplosion();
-      PlantRangeExplosion(Direction::Up);
-      PlantRangeExplosion(Direction::Down);
-      PlantRangeExplosion(Direction::Left);
-      PlantRangeExplosion(Direction::Right);
-      return;
+      if (BombType::Remote != mType) {
+         // The lifetime of a remote controlled bomb does not decline over time.
+         mLifeTime += elapsed_time;
+      }
+
+      if (mLifeTime >= DefaultValue::BOMB_BURN_ANIM_LEN)
+      {
+         const auto parent_cell = GetArena()->GetCellFromObject(*this);
+         mEventQueue.Add(std::make_shared<DestroyBombStartEvent>(GetInstanceId(),
+                                                                 parent_cell));
+      }
    }
 
-   if (mIsMoving)
+   if ((BombAnimation::Destroy == mAnimation) &&
+       (GetAnimationTime() >= DefaultValue::BOMB_DESTROY_ANIM_LEN))
    {
-      UpdateMovement(elapsed_time);
+      const auto parent_cell = GetArena()->GetCellFromObject(*this);
+      mEventQueue.Add(std::make_shared<DestroyBombEndEvent>(GetInstanceId(),
+                                                            parent_cell,
+                                                            mOwner));
    }
+
+   UpdateMovement(elapsed_time);
 }
 
 void Bomb::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
+      case EventType::SpawnBombStart:
+         OnSpawnBombStart(dynamic_cast<const SpawnBombStartEvent&>(event));
+         break;
+      case EventType::SpawnBombEnd:
+         OnSpawnBombEnd(dynamic_cast<const SpawnBombEndEvent&>(event));
+         break;
+      case EventType::DestroyBombStart:
+         OnDestroyBombStart(dynamic_cast<const DestroyBombStartEvent&>(event));
+         break;
+      case EventType::DestroyBombEnd:
+         OnDestroyBombEnd(dynamic_cast<const DestroyBombEndEvent&>(event));
+         break;
       case EventType::MoveBomb:
          OnMoveBomb(dynamic_cast<const MoveBombEvent&>(event));
-         break;
-      case EventType::CreateExplosion:
-         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
          break;
       case EventType::DetonateRemoteBomb:
          OnDetonateRemoteBomb(dynamic_cast<const DetonateRemoteBombEvent&>(event));
@@ -75,6 +95,11 @@ void Bomb::OnEvent(const Event& event)
 BombType Bomb::GetType() const
 {
    return mType;
+}
+
+BombAnimation Bomb::GetAnimation() const
+{
+   return mAnimation;
 }
 
 BombSound Bomb::GetSound(const bool reset)
@@ -97,8 +122,66 @@ void Bomb::SetRange(const int range)
     mRange = range;
 }
 
+void Bomb::OnSpawnBombStart(const SpawnBombStartEvent& event)
+{
+   if (event.GetSender() != GetInstanceId()) {
+      return;
+   }
+
+   SetAnimationTime(0);
+   mAnimation = BombAnimation::Spawn;
+   mSound = BombSound::Planted;
+   SetVisible(true);
+}
+
+void Bomb::OnSpawnBombEnd(const SpawnBombEndEvent& event)
+{
+   if (event.GetSender() != GetInstanceId()) {
+      return;
+   }
+
+   SetAnimationTime(0);
+   mAnimation = BombAnimation::Tick;
+}
+
+void Bomb::OnDestroyBombStart(const DestroyBombStartEvent& event)
+{
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+
+   if (event.GetCell() != parent_cell) {
+      return;
+   }
+
+   SetAnimationTime(0);
+   mAnimation = BombAnimation::Destroy;
+}
+
+void Bomb::OnDestroyBombEnd(const DestroyBombEndEvent& event)
+{
+   if (event.GetSender() != GetInstanceId()) {
+      return;
+   }
+
+   SetVisible(false);
+   Invalidate();
+
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+   mEventQueue.Add(std::make_shared<RemoveBombEvent>(event.GetSender(),
+                                                     parent_cell));
+
+   PlantCenterExplosion();
+   PlantRangeExplosion(Direction::Up);
+   PlantRangeExplosion(Direction::Down);
+   PlantRangeExplosion(Direction::Left);
+   PlantRangeExplosion(Direction::Right);
+}
+
 void Bomb::OnMoveBomb(const MoveBombEvent& event)
 {
+   if (mMoveIdleTime < mSpeed) {
+      return;
+   }
+
    if (event.GetBombInstance() != GetInstanceId()) {
       // This event is not for us.
       return;
@@ -167,33 +250,22 @@ void Bomb::OnMoveBomb(const MoveBombEvent& event)
    }
 }
 
-void Bomb::OnCreateExplosion(const CreateExplosionEvent& event)
-{
-   if (event.GetSender() != GetInstanceId()) {
-      return;
-   }
-
-   if (event.GetExplosionType() != ExplosionType::Center) {
-      return;
-   }
-
-   // The bomb just exploded.
-   Invalidate();
-}
-
 void Bomb::OnDetonateRemoteBomb(const DetonateRemoteBombEvent& event)
 {
    if (event.GetOwner() != mOwner) {
       // This event is not for us.
+      return;
    }
 
    if (BombType::Remote != mType) {
       // This object is not a remote bomb.
+      return;
    }
 
    // This bomb is a remote bomb and belongs to the player
-   //  who requested his remotes to detonate. Do so (indirectly).
-   mLifeTime = DefaultValue::BOMB_ANIM_LEN;
+   //  who requested his remotes to detonate.
+   SetAnimationTime(0);
+   mAnimation = BombAnimation::Destroy;
 }
 
 void Bomb::UpdateMovement(const int elapsed_time)
@@ -245,7 +317,8 @@ void Bomb::PlantRangeExplosion(const Direction dir) const
       {
          // A bombs explosion range ends if it hits another bomb in its way.
          // But it causes the other bomb to explode.
-         arena->GetBomb(range_cell)->mLifeTime = DefaultValue::BOMB_ANIM_LEN;
+         mEventQueue.Add(std::make_shared<DestroyBombStartEvent>(GetInstanceId(),
+                                                                 range_cell));
          break;
       }
 

@@ -51,6 +51,9 @@ void EntityManager::OnEvent(const Event& event)
       case EventType::CreatePlayer:
          OnCreatePlayer(dynamic_cast<const CreatePlayerEvent&>(event));
          break;
+      case EventType::RemoveBomb:
+         OnRemoveBomb(dynamic_cast<const RemoveBombEvent&>(event));
+         break;
       case EventType::RemoveExplosion:
          OnRemoveExplosion(dynamic_cast<const RemoveExplosionEvent&>(event));
          break;
@@ -155,9 +158,14 @@ void EntityManager::OnCreateBomb(const CreateBombEvent& event)
 
    mArena->SetObjectPosition(*bomb, event.GetCell());
    mArena->SetObjectSize(*bomb);
-   mArena->SetBomb(event.GetCell(), bomb);
 
    mEntities.insert(bomb);
+
+   // Spawn the explosion after we created it.
+   mEventQueue.Add(std::make_shared<SpawnBombStartEvent>(bomb->GetInstanceId(),
+                                                         event.GetCell(),
+                                                         event.GetBombType(),
+                                                         event.GetOwner()));
 }
 
 void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
@@ -169,11 +177,8 @@ void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
 
    mArena->SetObjectPosition(*explosion, event.GetCell());
    mArena->SetObjectSize(*explosion);
-//   mArena->SetExplosion(event.GetCell(), explosion);
 
    mEntities.insert(explosion);
-
-   // TODO: Create a RemoveBombEvent!
 
    // Spawn the explosion after we created it.
    mEventQueue.Add(std::make_shared<SpawnExplosionStartEvent>(explosion->GetInstanceId(),
@@ -215,6 +220,11 @@ void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
    // Let the player spawn after we created it.
    mEventQueue.Add(std::make_shared<SpawnPlayerStartEvent>(player->GetInstanceId(),
                                                            event.GetPlayer()));
+}
+
+void EntityManager::OnRemoveBomb(const RemoveBombEvent& event)
+{
+   (void) event;
 }
 
 void EntityManager::OnRemoveExplosion(const RemoveExplosionEvent& event)

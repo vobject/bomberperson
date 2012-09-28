@@ -14,7 +14,8 @@ class SpawnPlayerStartEvent;
 class SpawnPlayerEndEvent;
 class DestroyPlayerStartEvent;
 class DestroyPlayerEndEvent;
-class CreateBombEvent;
+class SpawnBombStartEvent;
+class DestroyBombEndEvent;
 class SpawnExplosionStartEvent;
 class InputEvent;
 class MovePlayerEvent;
@@ -84,7 +85,8 @@ private:
    void OnSpawnPlayerEnd(const SpawnPlayerEndEvent& event);
    void OnDestroyPlayerStart(const DestroyPlayerStartEvent& event);
    void OnDestroyPlayerEnd(const DestroyPlayerEndEvent& event);
-   void OnCreateBomb(const CreateBombEvent& event);
+   void OnSpawnBombStart(const SpawnBombStartEvent& event);
+   void OnDestroyBombEnd(const DestroyBombEndEvent& event);
    void OnSpawnExplosionStart(const SpawnExplosionStartEvent& event);
    void OnInput(const InputEvent& event);
    void OnMovePlayer(const MovePlayerEvent& event);
@@ -103,7 +105,6 @@ private:
 
    bool CanMove(Direction dir, int distance) const;
    bool CanPlantBomb();
-//   void KickBomb(Direction dir) const;
 
    void IncreaseSpeed();
    PlayerAnimation GetStopWalkingState(PlayerAnimation anim) const;
@@ -131,7 +132,7 @@ private:
    int mDistance = 1;
    int mBombSupply = 1;
    int mBombRange = 1;
-   int mRemoteBombs = 0;
+   int mRemoteBombs = 10;
    bool mCanKick = false;
 
    // Statistics:

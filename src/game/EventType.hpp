@@ -24,6 +24,8 @@ enum class EventType
    CreatePlayer,
 
    // Spawn animation to show the object on the scene.
+   SpawnBombStart,
+   SpawnBombEnd,
    SpawnExplosionStart,
    SpawnExplosionEnd,
    SpawnPlayerStart,
@@ -34,13 +36,15 @@ enum class EventType
    // DestroyScoreboard,
    // DestroyWall,
    // DestroyExtra,
-//   DestroyBomb,
+   DestroyBombStart,
+   DestroyBombEnd,
    DestroyExplosionStart,
    DestroyExplosionEnd,
    DestroyPlayerStart,
    DestroyPlayerEnd,
 
    // Remove the object from the game logic.
+   RemoveBomb,
    RemoveExplosion,
    RemovePlayer,
 
@@ -158,12 +162,12 @@ private:
 class CreateBombEvent : public Event
 {
 public:
-   CreateBombEvent(unsigned int sender, const Cell& cell, BombType type, int range, PlayerType owner)
+   CreateBombEvent(unsigned int sender, const Cell& cell, BombType type, PlayerType owner, int range)
       : Event(EventType::CreateBomb, sender)
       , mCell(cell)
       , mBombType(type)
-      , mRange(range)
       , mOwner(owner)
+      , mRange(range)
    { }
    virtual ~CreateBombEvent() { }
 
@@ -175,8 +179,8 @@ public:
 private:
    const Cell mCell;
    const BombType mBombType;
-   const int mRange;
    const PlayerType mOwner;
+   const int mRange;
 };
 
 class CreateExplosionEvent : public Event
@@ -217,11 +221,42 @@ private:
 
 
 
+class SpawnBombStartEvent : public Event
+{
+public:
+   SpawnBombStartEvent(unsigned int sender, const Cell& cell, BombType type, PlayerType owner)
+      : Event(EventType::SpawnBombStart, sender)
+      , mCell(cell)
+      , mBombType(type)
+      , mOwner(owner)
+   { }
+   virtual ~SpawnBombStartEvent() { }
+
+   Cell GetCell() const { return mCell; }
+   BombType GetBombType() const { return mBombType; }
+   PlayerType GetOwner() const { return mOwner; }
+
+private:
+   const Cell mCell;
+   const BombType mBombType;
+   const PlayerType mOwner;
+};
+
+class SpawnBombEndEvent : public Event
+{
+public:
+   SpawnBombEndEvent(unsigned int sender)
+      : Event(EventType::SpawnBombEnd, sender)
+   { }
+   virtual ~SpawnBombEndEvent() { }
+};
+
+
 class SpawnExplosionStartEvent : public Event
 {
 public:
    SpawnExplosionStartEvent(unsigned int sender, const Cell& cell,
-                       ExplosionType type, PlayerType owner)
+                            ExplosionType type, PlayerType owner)
       : Event(EventType::SpawnExplosionStart, sender)
       , mCell(cell)
       , mExplosionType(type)
@@ -274,6 +309,39 @@ public:
 };
 
 
+class DestroyBombStartEvent : public Event
+{
+public:
+   DestroyBombStartEvent(unsigned int sender, const Cell& cell)
+      : Event(EventType::DestroyBombStart, sender)
+      , mCell(cell)
+   { }
+   virtual ~DestroyBombStartEvent() { }
+
+   Cell GetCell() const { return mCell; }
+
+private:
+   const Cell mCell;
+};
+
+class DestroyBombEndEvent : public Event
+{
+public:
+   DestroyBombEndEvent(unsigned int sender, const Cell& cell, PlayerType owner)
+      : Event(EventType::DestroyBombEnd, sender)
+      , mCell(cell)
+      , mOwner(owner)
+   { }
+   virtual ~DestroyBombEndEvent() { }
+
+   Cell GetCell() const { return mCell; }
+   PlayerType GetOwner() const { return mOwner; }
+
+private:
+   const Cell mCell;
+   const PlayerType mOwner;
+};
+
 
 class DestroyExplosionStartEvent : public Event
 {
@@ -323,19 +391,28 @@ public:
 
 
 
-class RemoveExplosionEvent : public Event
+class RemoveBombEvent : public Event
 {
 public:
-   RemoveExplosionEvent(unsigned int sender, const Cell& cell)
-      : Event(EventType::RemoveExplosion, sender)
+   RemoveBombEvent(unsigned int sender, const Cell& cell)
+      : Event(EventType::RemoveBomb, sender)
       , mCell(cell)
    { }
-   virtual ~RemoveExplosionEvent() { }
+   virtual ~RemoveBombEvent() { }
 
    Cell GetCell() const { return mCell; }
 
 private:
    const Cell mCell;
+};
+
+class RemoveExplosionEvent : public Event
+{
+public:
+   RemoveExplosionEvent(unsigned int sender)
+      : Event(EventType::RemoveExplosion, sender)
+   { }
+   virtual ~RemoveExplosionEvent() { }
 };
 
 class RemovePlayerEvent : public Event

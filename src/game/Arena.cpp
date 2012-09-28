@@ -59,11 +59,11 @@ void Arena::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
-      case EventType::CreateExplosion:
-         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
+      case EventType::SpawnBombStart:
+         OnSpawnBombStart(dynamic_cast<const SpawnBombStartEvent&>(event));
          break;
-      case EventType::RemoveExplosion:
-         OnRemoveExplosion(dynamic_cast<const RemoveExplosionEvent&>(event));
+      case EventType::DestroyBombEnd:
+         OnDestroyBombEnd(dynamic_cast<const DestroyBombEndEvent&>(event));
          break;
       case EventType::ParentCellChanged:
          OnParentCellChanged(dynamic_cast<const ParentCellChangedEvent&>(event));
@@ -169,67 +169,52 @@ void Arena::SetExtra(const Cell& cell, const std::shared_ptr<Extra>& extra)
 
 bool Arena::HasBomb(const Cell& cell) const
 {
-   const auto obj = mCells.at(cell.X).at(cell.Y).second.bomb;
-   return (obj != nullptr) && obj->IsValid();
+   return mCells.at(cell.X).at(cell.Y).second.bomb_instance;
 }
 
-std::shared_ptr<Bomb> Arena::GetBomb(const Cell& cell) const
+unsigned int Arena::GetBombInstanceId(const Cell& cell) const
 {
-   return mCells.at(cell.X).at(cell.Y).second.bomb;
+   return mCells.at(cell.X).at(cell.Y).second.bomb_instance;
 }
 
-void Arena::SetBomb(const Cell& cell, const std::shared_ptr<Bomb>& bomb)
+void Arena::OnSpawnBombStart(const SpawnBombStartEvent& event)
 {
-   mCells.at(cell.X).at(cell.Y).second.bomb = bomb;
-}
+   const auto cell = event.GetCell();
 
-//bool Arena::HasExplosion(const Cell& cell) const
-//{
-////   const auto obj = mCells.at(cell.X).at(cell.Y).second.explosion;
-////   return (obj != nullptr) && obj->IsValid();
-//   return mCells.at(cell.X).at(cell.Y).second.explosions;
-//}
-
-//std::shared_ptr<Explosion> Arena::GetExplosion(const Cell& cell) const
-//{
-//   return mCells.at(cell.X).at(cell.Y).second.explosion;
-//}
-
-void Arena::OnCreateExplosion(const CreateExplosionEvent& event)
-{
-   const Cell cell = event.GetCell();
-   mCells.at(cell.X).at(cell.Y).second.explosions++;
-}
-
-void Arena::OnRemoveExplosion(const RemoveExplosionEvent& event)
-{
-   const Cell cell = event.GetCell();
-   if (!mCells.at(cell.X).at(cell.Y).second.explosions) {
-      throw "Trying to remove a non-existent explosion from an arena cell.";
+   if (HasBomb(cell)) {
+      throw "Trying to create a bomb on a cell that already contains one.";
    }
-   mCells.at(cell.X).at(cell.Y).second.explosions--;
+   mCells.at(cell.X).at(cell.Y).second.bomb_instance = event.GetSender();
 }
 
-//void Arena::SetExplosion(const Cell& cell, const std::shared_ptr<Explosion>& explosion)
-//{
-//   mCells.at(cell.X).at(cell.Y).second.explosion = explosion;
-//}
+void Arena::OnDestroyBombEnd(const DestroyBombEndEvent& event)
+{
+   const auto cell = event.GetCell();
+
+   if (!HasBomb(cell)) {
+      throw "Trying to remove a non-existent bomb from an arena cell.";
+   }
+   mCells.at(cell.X).at(cell.Y).second.bomb_instance = 0;
+}
 
 void Arena::OnParentCellChanged(const ParentCellChangedEvent& event)
 {
    // Currently only bombs can change their parent cell.
 
-   if (!HasBomb(event.GetOldCell())) {
+   const auto old_cell = event.GetOldCell();
+   const auto new_cell = event.GetNewCell();
+
+   if (!HasBomb(old_cell)) {
       throw "Cannot change the parent cell for a non-existend bomb.";
    }
 
-   if (HasBomb(event.GetNewCell())) {
+   if (HasBomb(new_cell)) {
       throw "The new parent cell already contains a bomb.";
    }
 
-   const auto bomb = GetBomb(event.GetOldCell());
-   SetBomb(event.GetOldCell(), nullptr);
-   SetBomb(event.GetNewCell(), bomb);
+   const auto bomb = GetBombInstanceId(old_cell);
+   mCells.at(old_cell.X).at(old_cell.Y).second.bomb_instance = 0;
+   mCells.at(new_cell.X).at(new_cell.Y).second.bomb_instance = bomb;
 }
 
 Cell Arena::GetCellAboveOf(const int cell_x, const int cell_y) const

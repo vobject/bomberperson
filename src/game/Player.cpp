@@ -81,8 +81,11 @@ void Player::OnEvent(const Event& event)
       case EventType::DestroyPlayerEnd:
          OnDestroyPlayerEnd(dynamic_cast<const DestroyPlayerEndEvent&>(event));
          break;
-      case EventType::CreateBomb:
-         OnCreateBomb(dynamic_cast<const CreateBombEvent&>(event));
+      case EventType::SpawnBombStart:
+         OnSpawnBombStart(dynamic_cast<const SpawnBombStartEvent&>(event));
+         break;
+      case EventType::DestroyBombEnd:
+         OnDestroyBombEnd(dynamic_cast<const DestroyBombEndEvent&>(event));
          break;
       case EventType::SpawnExplosionStart:
          OnSpawnExplosionStart(dynamic_cast<const SpawnExplosionStartEvent&>(event));
@@ -194,8 +197,7 @@ void Player::OnDestroyPlayerEnd(const DestroyPlayerEndEvent& event)
    mEventQueue.Add(std::make_shared<RemovePlayerEvent>(GetInstanceId()));
 }
 
-// TODO: Replace with SpawnBombEvent
-void Player::OnCreateBomb(const CreateBombEvent& event)
+void Player::OnSpawnBombStart(const SpawnBombStartEvent& event)
 {
    if (event.GetOwner() != GetType()) {
       // This event is not for us.
@@ -210,23 +212,17 @@ void Player::OnCreateBomb(const CreateBombEvent& event)
    mBombIdleTime = 0_ms;
 }
 
-// TODO: DestroyBombEvent:
-// => if we_are_owner and center then mBombsPlanted--;
-/*
+void Player::OnDestroyBombEnd(const DestroyBombEndEvent& event)
+{
    if (event.GetOwner() != GetType()) {
       // This event is not for us.
-      return;
-   }
-
-   if (event.GetExplosionType() != ExplosionType::Center) {
-      // Not the explosion type we are looking for.
       return;
    }
 
    // This is the center explosion of a bomb we planted some time ago.
    // It did explosde and does not cound as 'planted' anymore.
    mBombsPlanted--;
- */
+}
 
 void Player::OnSpawnExplosionStart(const SpawnExplosionStartEvent& event)
 {
@@ -445,8 +441,8 @@ void Player::UpdateBombing(const int elapsed_time)
       mEventQueue.Add(std::make_shared<CreateBombEvent>(GetInstanceId(),
                                                         parent_cell,
                                                         bomb_type,
-                                                        mBombRange,
-                                                        GetType()));
+                                                        GetType(),
+                                                        mBombRange));
    }
 
    if (mInputAction2)
@@ -512,9 +508,9 @@ bool Player::CanMove(const Direction dir, const int distance) const
    {
       // A bomb blocks the player path but we can try to kick it.
       // In any way, return false, because the bomb first has to move.
-      const auto bomb = arena->GetBomb(neighbor_cell);
+      const auto bomb = arena->GetBombInstanceId(neighbor_cell);
       mEventQueue.Add(std::make_shared<MoveBombEvent>(GetInstanceId(),
-                                                      bomb->GetInstanceId(),
+                                                      bomb,
                                                       mSpeed,
                                                       mDistance,
                                                       dir));

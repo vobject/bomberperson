@@ -39,7 +39,9 @@ struct DefaultValue
 
    static const int BOMB_WIDTH              = CELL_WIDTH;
    static const int BOMB_HEIGHT             = CELL_HEIGHT;
-   static const int BOMB_ANIM_LEN           = 2500_ms;
+   static const int BOMB_SPAWN_ANIM_LEN     =  400_ms;
+   static const int BOMB_BURN_ANIM_LEN      = 2000_ms;
+   static const int BOMB_DESTROY_ANIM_LEN   =  8_ms;
 
    static const int EXPLOSION_WIDTH             = CELL_WIDTH;
    static const int EXPLOSION_HEIGHT            = CELL_HEIGHT;

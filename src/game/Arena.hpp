@@ -10,8 +10,8 @@
 #include <vector>
 
 class EventQueue;
-class CreateExplosionEvent;
-class RemoveExplosionEvent;
+class SpawnBombStartEvent;
+class DestroyBombEndEvent;
 class ParentCellChangedEvent;
 
 class ArenaObject;
@@ -93,25 +93,18 @@ public:
    void SetExtra(const Cell& cell, const std::shared_ptr<Extra>& extra);
 
    bool HasBomb(const Cell& cell) const;
-   std::shared_ptr<Bomb> GetBomb(const Cell& cell) const;
-   void SetBomb(const Cell& cell, const std::shared_ptr<Bomb>& bomb);
-
-//   bool HasExplosion(const Cell& cell) const;
-//   std::shared_ptr<Explosion> GetExplosion(const Cell& cell) const;
-//   void SetExplosion(const Cell& cell, const std::shared_ptr<Explosion>& explosion);
+   unsigned int GetBombInstanceId(const Cell& cell) const;
 
 private:
-   void OnCreateExplosion(const CreateExplosionEvent& event);
-   void OnRemoveExplosion(const RemoveExplosionEvent& event);
+   void OnSpawnBombStart(const SpawnBombStartEvent& event);
+   void OnDestroyBombEnd(const DestroyBombEndEvent& event);
    void OnParentCellChanged(const ParentCellChangedEvent& event);
 
    struct CellContent
    {
       std::shared_ptr<Wall> wall;
       std::shared_ptr<Extra> extra;
-      std::shared_ptr<Bomb> bomb;
-//      std::shared_ptr<Explosion> explosion;
-      int explosions = 0;
+      unsigned int bomb_instance = 0;
 //      std::list<std::shared_ptr<Player>> players;
    };
    // TODO: CellContent => std::list<ArenaObject>!

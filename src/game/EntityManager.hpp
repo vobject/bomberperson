@@ -14,6 +14,7 @@ class CreateExtraEvent;
 class CreateBombEvent;
 class CreateExplosionEvent;
 class CreatePlayerEvent;
+class RemoveBombEvent;
 class RemoveExplosionEvent;
 class RemovePlayerEvent;
 
@@ -49,7 +50,6 @@ public:
    std::shared_ptr<MenuItem> CreateMenuItem(UiItemId id);
    std::shared_ptr<MenuItemSelector> CreateMenuItemSelector();
 
-
    EntitySet GetEntities() const;
 
    void Cleanup();
@@ -63,6 +63,8 @@ private:
    void OnCreateBomb(const CreateBombEvent& event);
    void OnCreateExplosion(const CreateExplosionEvent& event);
    void OnCreatePlayer(const CreatePlayerEvent& event);
+
+   void OnRemoveBomb(const RemoveBombEvent& event);
    void OnRemoveExplosion(const RemoveExplosionEvent& event);
    void OnRemovePlayer(const RemovePlayerEvent& event);
 

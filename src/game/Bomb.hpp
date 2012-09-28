@@ -6,8 +6,12 @@
 #include "../utils/Utils.hpp"
 
 class EventQueue;
+class SpawnBombStartEvent;
+class SpawnBombEndEvent;
+class DestroyBombStartEvent;
+class DestroyBombEndEvent;
 class MoveBombEvent;
-class CreateExplosionEvent;
+//class CreateExplosionEvent;
 class DetonateRemoteBombEvent;
 
 enum class ExplosionType;
@@ -27,6 +31,13 @@ enum class BombSound
    Planted
 };
 
+enum class BombAnimation
+{
+   Spawn,
+   Tick,
+   Destroy
+};
+
 class Bomb : public ArenaObject, public EventListener
 {
 public:
@@ -43,14 +54,19 @@ public:
    void OnEvent(const Event& event) override;
 
    BombType GetType() const;
+   BombAnimation GetAnimation() const;
    BombSound GetSound(bool reset);
 
    int GetRange() const;
    void SetRange(int range);
 
 private:
+   void OnSpawnBombStart(const SpawnBombStartEvent& event);
+   void OnSpawnBombEnd(const SpawnBombEndEvent& event);
+   void OnDestroyBombStart(const DestroyBombStartEvent& event);
+   void OnDestroyBombEnd(const DestroyBombEndEvent& event);
    void OnMoveBomb(const MoveBombEvent& event);
-   void OnCreateExplosion(const CreateExplosionEvent& event);
+//   void OnCreateExplosion(const CreateExplosionEvent& event);
    void OnDetonateRemoteBomb(const DetonateRemoteBombEvent& event);
 
    void UpdateMovement(int elapsed_time);
@@ -65,9 +81,11 @@ private:
 
    EventQueue& mEventQueue;
 
+   BombAnimation mAnimation = BombAnimation::Spawn;
+   BombSound mSound = BombSound::None;
+
    int mLifeTime = 0_ms;
    int mRange = 1;
-   BombSound mSound = BombSound::None;
 
    bool mIsMoving = false;
    int mMoveIdleTime = 0_ms;

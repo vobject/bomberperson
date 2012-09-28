@@ -73,6 +73,31 @@ void Explosion::OnEvent(const Event& event)
    }
 }
 
+ExplosionType Explosion::GetType() const
+{
+   return mType;
+}
+
+ExplosionAnimation Explosion::GetAnimation() const
+{
+   return mAnimation;
+}
+
+PlayerType Explosion::GetOwner() const
+{
+   return mOwner;
+}
+
+ExplosionSound Explosion::GetSound(const bool reset)
+{
+   const auto ret = mSound;
+
+   if (reset) {
+      mSound = ExplosionSound::None;
+   }
+   return ret;
+}
+
 void Explosion::OnSpawnExplosionStart(const SpawnExplosionStartEvent& event)
 {
    SetAnimationTime(0);
@@ -102,32 +127,5 @@ void Explosion::OnDestroyExplosionEnd(const DestroyExplosionEndEvent& event)
    SetVisible(false);
    Invalidate();
 
-   const auto parent_cell = GetArena()->GetCellFromObject(*this);
-   mEventQueue.Add(std::make_shared<RemoveExplosionEvent>(event.GetSender(),
-                                                          parent_cell));
-}
-
-ExplosionType Explosion::GetType() const
-{
-   return mType;
-}
-
-ExplosionAnimation Explosion::GetAnimation() const
-{
-   return mAnimation;
-}
-
-PlayerType Explosion::GetOwner() const
-{
-   return mOwner;
-}
-
-ExplosionSound Explosion::GetSound(const bool reset)
-{
-   const auto ret = mSound;
-
-   if (reset) {
-      mSound = ExplosionSound::None;
-   }
-   return ret;
+   mEventQueue.Add(std::make_shared<RemoveExplosionEvent>(event.GetSender()));
 }
