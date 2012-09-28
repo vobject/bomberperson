@@ -89,6 +89,7 @@ void Match::Update(const int elapsed_time)
    CreateInputEvents();
    UpdateEntities(elapsed_time);
    mEventQueue.ProcessEvents();
+   mEventQueue.ProcessEvents();
 
    // TODO: Query Scoreboard for game state.
 //   mIsGameOver = (active_player_count <= 1) ? true : false;

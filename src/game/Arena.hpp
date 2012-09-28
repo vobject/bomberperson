@@ -5,10 +5,13 @@
 #include "EventListener.hpp"
 
 #include <list>
+#include <map>
 #include <memory>
 #include <vector>
 
 class EventQueue;
+class CreateExplosionEvent;
+class RemoveExplosionEvent;
 class ParentCellChangedEvent;
 
 class ArenaObject;
@@ -93,11 +96,13 @@ public:
    std::shared_ptr<Bomb> GetBomb(const Cell& cell) const;
    void SetBomb(const Cell& cell, const std::shared_ptr<Bomb>& bomb);
 
-   bool HasExplosion(const Cell& cell) const;
-   std::shared_ptr<Explosion> GetExplosion(const Cell& cell) const;
-   void SetExplosion(const Cell& cell, const std::shared_ptr<Explosion>& explosion);
+//   bool HasExplosion(const Cell& cell) const;
+//   std::shared_ptr<Explosion> GetExplosion(const Cell& cell) const;
+//   void SetExplosion(const Cell& cell, const std::shared_ptr<Explosion>& explosion);
 
 private:
+   void OnCreateExplosion(const CreateExplosionEvent& event);
+   void OnRemoveExplosion(const RemoveExplosionEvent& event);
    void OnParentCellChanged(const ParentCellChangedEvent& event);
 
    struct CellContent
@@ -105,8 +110,9 @@ private:
       std::shared_ptr<Wall> wall;
       std::shared_ptr<Extra> extra;
       std::shared_ptr<Bomb> bomb;
-      std::shared_ptr<Explosion> explosion;
-      std::list<std::shared_ptr<Player>> players;
+//      std::shared_ptr<Explosion> explosion;
+      int explosions = 0;
+//      std::list<std::shared_ptr<Player>> players;
    };
    // TODO: CellContent => std::list<ArenaObject>!
 
@@ -120,6 +126,10 @@ private:
    const Size mBorders; // Size of the arenas borders in pixel.
    const Size mCellSize;
    std::vector<std::vector<std::pair<Cell, CellContent>>> mCells;
+
+//   std::vector<
+//   // All object currently active in the arena.
+//   std::map<unsigned int, SceneObject> mObjects;
 
    EventQueue& mEventQueue;
 };

@@ -15,7 +15,6 @@ Explosion::Explosion(
    , mEventQueue(queue)
 {
    mEventQueue.Register(this);
-   SetVisible(false);
 }
 
 Explosion::~Explosion()
@@ -46,15 +45,6 @@ void Explosion::Update(const int elapsed_time)
       // The explosion was just done burning out.
       mEventQueue.Add(std::make_shared<DestroyExplosionEndEvent>(GetInstanceId()));
    }
-
-   const auto arena = GetArena();
-   const auto parent_cell = arena->GetCellFromObject(*this);
-
-//   // TODO: Now handle the explosions deadlyness:
-//   if (arena->HasPlayer(parent_cell))
-//   {
-
-//   }
 }
 
 void Explosion::OnEvent(const Event& event)
@@ -110,7 +100,11 @@ void Explosion::OnDestroyExplosionStart(const DestroyExplosionStartEvent& event)
 void Explosion::OnDestroyExplosionEnd(const DestroyExplosionEndEvent& event)
 {
    SetVisible(false);
-   mEventQueue.Add(std::make_shared<RemoveExplosionEvent>(GetInstanceId()));
+   Invalidate();
+
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+   mEventQueue.Add(std::make_shared<RemoveExplosionEvent>(event.GetSender(),
+                                                          parent_cell));
 }
 
 ExplosionType Explosion::GetType() const

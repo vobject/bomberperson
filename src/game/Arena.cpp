@@ -59,6 +59,12 @@ void Arena::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
+      case EventType::CreateExplosion:
+         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
+         break;
+      case EventType::RemoveExplosion:
+         OnRemoveExplosion(dynamic_cast<const RemoveExplosionEvent&>(event));
+         break;
       case EventType::ParentCellChanged:
          OnParentCellChanged(dynamic_cast<const ParentCellChangedEvent&>(event));
          break;
@@ -177,21 +183,37 @@ void Arena::SetBomb(const Cell& cell, const std::shared_ptr<Bomb>& bomb)
    mCells.at(cell.X).at(cell.Y).second.bomb = bomb;
 }
 
-bool Arena::HasExplosion(const Cell& cell) const
+//bool Arena::HasExplosion(const Cell& cell) const
+//{
+////   const auto obj = mCells.at(cell.X).at(cell.Y).second.explosion;
+////   return (obj != nullptr) && obj->IsValid();
+//   return mCells.at(cell.X).at(cell.Y).second.explosions;
+//}
+
+//std::shared_ptr<Explosion> Arena::GetExplosion(const Cell& cell) const
+//{
+//   return mCells.at(cell.X).at(cell.Y).second.explosion;
+//}
+
+void Arena::OnCreateExplosion(const CreateExplosionEvent& event)
 {
-   const auto obj = mCells.at(cell.X).at(cell.Y).second.explosion;
-   return (obj != nullptr) && obj->IsValid();
+   const Cell cell = event.GetCell();
+   mCells.at(cell.X).at(cell.Y).second.explosions++;
 }
 
-std::shared_ptr<Explosion> Arena::GetExplosion(const Cell& cell) const
+void Arena::OnRemoveExplosion(const RemoveExplosionEvent& event)
 {
-   return mCells.at(cell.X).at(cell.Y).second.explosion;
+   const Cell cell = event.GetCell();
+   if (!mCells.at(cell.X).at(cell.Y).second.explosions) {
+      throw "Trying to remove a non-existent explosion from an arena cell.";
+   }
+   mCells.at(cell.X).at(cell.Y).second.explosions--;
 }
 
-void Arena::SetExplosion(const Cell& cell, const std::shared_ptr<Explosion>& explosion)
-{
-   mCells.at(cell.X).at(cell.Y).second.explosion = explosion;
-}
+//void Arena::SetExplosion(const Cell& cell, const std::shared_ptr<Explosion>& explosion)
+//{
+//   mCells.at(cell.X).at(cell.Y).second.explosion = explosion;
+//}
 
 void Arena::OnParentCellChanged(const ParentCellChangedEvent& event)
 {

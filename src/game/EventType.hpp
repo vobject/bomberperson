@@ -220,10 +220,23 @@ private:
 class SpawnExplosionStartEvent : public Event
 {
 public:
-   SpawnExplosionStartEvent(unsigned int sender)
+   SpawnExplosionStartEvent(unsigned int sender, const Cell& cell,
+                       ExplosionType type, PlayerType owner)
       : Event(EventType::SpawnExplosionStart, sender)
+      , mCell(cell)
+      , mExplosionType(type)
+      , mOwner(owner)
    { }
    virtual ~SpawnExplosionStartEvent() { }
+
+   Cell GetCell() const { return mCell; }
+   ExplosionType GetExplosionType() const { return mExplosionType; }
+   PlayerType GetOwner() const { return mOwner; }
+
+private:
+   const Cell mCell;
+   const ExplosionType mExplosionType;
+   const PlayerType mOwner;
 };
 
 class SpawnExplosionEndEvent : public Event
@@ -313,10 +326,16 @@ public:
 class RemoveExplosionEvent : public Event
 {
 public:
-   RemoveExplosionEvent(unsigned int sender)
+   RemoveExplosionEvent(unsigned int sender, const Cell& cell)
       : Event(EventType::RemoveExplosion, sender)
+      , mCell(cell)
    { }
    virtual ~RemoveExplosionEvent() { }
+
+   Cell GetCell() const { return mCell; }
+
+private:
+   const Cell mCell;
 };
 
 class RemovePlayerEvent : public Event

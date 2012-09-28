@@ -66,8 +66,6 @@ private:
    void OnRemoveExplosion(const RemoveExplosionEvent& event);
    void OnRemovePlayer(const RemovePlayerEvent& event);
 
-   void RemoveEntity(unsigned int instance);
-
    EventQueue& mEventQueue;
    EntitySet mEntities;
 

@@ -15,7 +15,7 @@ class SpawnPlayerEndEvent;
 class DestroyPlayerStartEvent;
 class DestroyPlayerEndEvent;
 class CreateBombEvent;
-class CreateExplosionEvent;
+class SpawnExplosionStartEvent;
 class InputEvent;
 class MovePlayerEvent;
 class PickupExtraEvent;
@@ -85,7 +85,7 @@ private:
    void OnDestroyPlayerStart(const DestroyPlayerStartEvent& event);
    void OnDestroyPlayerEnd(const DestroyPlayerEndEvent& event);
    void OnCreateBomb(const CreateBombEvent& event);
-   void OnCreateExplosion(const CreateExplosionEvent& event);
+   void OnSpawnExplosionStart(const SpawnExplosionStartEvent& event);
    void OnInput(const InputEvent& event);
    void OnMovePlayer(const MovePlayerEvent& event);
    void OnPickupExtra(const PickupExtraEvent& event);

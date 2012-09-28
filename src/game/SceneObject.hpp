@@ -61,7 +61,7 @@ private:
    const EntityId mId;
    const ZOrder mZOrder;
    bool mIsValid = true;
-   bool mIsVisible = true; // TODO: Change this to false when all spawn-events are implemented.
+   bool mIsVisible = false;
    Point mPos = { 0, 0 };
    Size mSize = { 0, 0 };
    int mAnimationTime = 0; // No animation by default.

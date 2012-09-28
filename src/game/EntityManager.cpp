@@ -169,12 +169,17 @@ void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
 
    mArena->SetObjectPosition(*explosion, event.GetCell());
    mArena->SetObjectSize(*explosion);
-   mArena->SetExplosion(event.GetCell(), explosion);
+//   mArena->SetExplosion(event.GetCell(), explosion);
 
    mEntities.insert(explosion);
 
+   // TODO: Create a RemoveBombEvent!
+
    // Spawn the explosion after we created it.
-   mEventQueue.Add(std::make_shared<SpawnExplosionStartEvent>(explosion->GetInstanceId()));
+   mEventQueue.Add(std::make_shared<SpawnExplosionStartEvent>(explosion->GetInstanceId(),
+                                                              event.GetCell(),
+                                                              event.GetExplosionType(),
+                                                              event.GetOwner()));
 }
 
 void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
@@ -214,29 +219,12 @@ void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
 
 void EntityManager::OnRemoveExplosion(const RemoveExplosionEvent& event)
 {
-   RemoveEntity(event.GetSender());
+   (void) event;
 }
 
 void EntityManager::OnRemovePlayer(const RemovePlayerEvent& event)
 {
-   RemoveEntity(event.GetSender());
-}
-
-void EntityManager::RemoveEntity(const unsigned int instance)
-{
-   // TODO: Remove the player from the 'to-be-rendered' list.
-
-   // HACK: Terrible hack because Arena does not yet support querying of player.
-   for (const auto& ent : mEntities)
-   {
-      // Remove-events will only be send by the objects themself.
-      if (ent->GetInstanceId() == instance)
-      {
-         ent->Invalidate();
-         return;
-      }
-   }
-   throw "Unable to find the player that should be removed.";
+   (void) event;
 }
 
 EntitySet EntityManager::GetEntities() const

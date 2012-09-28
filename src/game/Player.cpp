@@ -19,7 +19,6 @@ Player::Player(
    , mEventQueue(queue)
 {
    mEventQueue.Register(this);
-   SetVisible(false);
 }
 
 Player::~Player()
@@ -56,16 +55,6 @@ void Player::Update(const int elapsed_time)
    const auto arena = GetArena();
    const auto parent_cell = arena->GetCellFromObject(*this);
 
-   if (arena->HasExplosion(parent_cell))
-   {
-      // Explosions kill the player. Prepare his death animation.
-      const auto killer = arena->GetExplosion(parent_cell)->GetOwner();
-      mEventQueue.Add(std::make_shared<DestroyPlayerStartEvent>(GetInstanceId(),
-                                                                GetType(),
-                                                                killer));
-      return;
-   }
-
    if (arena->HasExtra(parent_cell))
    {
       mEventQueue.Add(std::make_shared<PickupExtraEvent>(GetInstanceId(),
@@ -95,8 +84,8 @@ void Player::OnEvent(const Event& event)
       case EventType::CreateBomb:
          OnCreateBomb(dynamic_cast<const CreateBombEvent&>(event));
          break;
-      case EventType::CreateExplosion:
-         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
+      case EventType::SpawnExplosionStart:
+         OnSpawnExplosionStart(dynamic_cast<const SpawnExplosionStartEvent&>(event));
          break;
       case EventType::Input:
          OnInput(dynamic_cast<const InputEvent&>(event));
@@ -181,7 +170,6 @@ void Player::OnDestroyPlayerStart(const DestroyPlayerStartEvent& event)
          // Keep track of the player we killed.
          mKills.push_back(event.GetPlayer());
       }
-
       return;
    }
 
@@ -200,11 +188,13 @@ void Player::OnDestroyPlayerEnd(const DestroyPlayerEndEvent& event)
    }
 
    SetVisible(false);
+   Invalidate();
 
    // The death animation is over. Remove the player from the game.
    mEventQueue.Add(std::make_shared<RemovePlayerEvent>(GetInstanceId()));
 }
 
+// TODO: Replace with SpawnBombEvent
 void Player::OnCreateBomb(const CreateBombEvent& event)
 {
    if (event.GetOwner() != GetType()) {
@@ -220,8 +210,9 @@ void Player::OnCreateBomb(const CreateBombEvent& event)
    mBombIdleTime = 0_ms;
 }
 
-void Player::OnCreateExplosion(const CreateExplosionEvent& event)
-{
+// TODO: DestroyBombEvent:
+// => if we_are_owner and center then mBombsPlanted--;
+/*
    if (event.GetOwner() != GetType()) {
       // This event is not for us.
       return;
@@ -235,6 +226,21 @@ void Player::OnCreateExplosion(const CreateExplosionEvent& event)
    // This is the center explosion of a bomb we planted some time ago.
    // It did explosde and does not cound as 'planted' anymore.
    mBombsPlanted--;
+ */
+
+void Player::OnSpawnExplosionStart(const SpawnExplosionStartEvent& event)
+{
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+
+   if (parent_cell != event.GetCell()) {
+      // The explosion does not affect us.
+      return;
+   }
+
+   // Explosions kill the player. Prepare his death animation.
+   mEventQueue.Add(std::make_shared<DestroyPlayerStartEvent>(GetInstanceId(),
+                                                             GetType(),
+                                                             event.GetOwner()));
 }
 
 void Player::OnInput(const InputEvent& event)
