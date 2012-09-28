@@ -19,8 +19,6 @@ Player::Player(
    , mEventQueue(queue)
 {
    mEventQueue.Register(this);
-
-   // The player is only visible as soon as it starts to spawn.
    SetVisible(false);
 }
 
@@ -35,12 +33,12 @@ void Player::Update(const int elapsed_time)
 
    if (PlayerAnimation::Spawn == mAnimation)
    {
-      // The player is currently spawning. Nothing to do but wait.
       if (GetAnimationTime() >= DefaultValue::PLAYER_SPAWN_ANIM_LEN)
       {
          // The spawning animation is over.
-         mEventQueue.Add(std::make_shared<SpawnPlayerEndEvent>(GetType()));
+         mEventQueue.Add(std::make_shared<SpawnPlayerEndEvent>(GetInstanceId()));
       }
+      // The player is currently spawning. Nothing to do but wait.
       return;
    }
 
@@ -50,7 +48,7 @@ void Player::Update(const int elapsed_time)
       if (GetAnimationTime() >= DefaultValue::PLAYER_DEATH_ANIM_LEN)
       {
          // The death animation is over.
-         mEventQueue.Add(std::make_shared<DestroyPlayerEndEvent>(GetType()));
+         mEventQueue.Add(std::make_shared<DestroyPlayerEndEvent>(GetInstanceId()));
       }
       return;
    }
@@ -62,13 +60,16 @@ void Player::Update(const int elapsed_time)
    {
       // Explosions kill the player. Prepare his death animation.
       const auto killer = arena->GetExplosion(parent_cell)->GetOwner();
-      mEventQueue.Add(std::make_shared<DestroyPlayerStartEvent>(GetType(), killer));
+      mEventQueue.Add(std::make_shared<DestroyPlayerStartEvent>(GetInstanceId(),
+                                                                GetType(),
+                                                                killer));
       return;
    }
 
    if (arena->HasExtra(parent_cell))
    {
-      mEventQueue.Add(std::make_shared<PickupExtraEvent>(GetType(), parent_cell));
+      mEventQueue.Add(std::make_shared<PickupExtraEvent>(GetInstanceId(),
+                                                         parent_cell));
    }
 
    UpdateMovement(elapsed_time);
@@ -157,7 +158,7 @@ void Player::OnSpawnPlayerStart(const SpawnPlayerStartEvent& event)
 
 void Player::OnSpawnPlayerEnd(const SpawnPlayerEndEvent& event)
 {
-   if (event.GetPlayer() != GetType()) {
+   if (event.GetSender() != GetInstanceId()) {
       // This event is not for us.
       return;
    }
@@ -193,7 +194,7 @@ void Player::OnDestroyPlayerStart(const DestroyPlayerStartEvent& event)
 
 void Player::OnDestroyPlayerEnd(const DestroyPlayerEndEvent& event)
 {
-   if (event.GetPlayer() != GetType()) {
+   if (event.GetSender() != GetInstanceId()) {
       // This event is not for us.
       return;
    }
@@ -201,7 +202,7 @@ void Player::OnDestroyPlayerEnd(const DestroyPlayerEndEvent& event)
    SetVisible(false);
 
    // The death animation is over. Remove the player from the game.
-   mEventQueue.Add(std::make_shared<RemovePlayerEvent>(GetType()));
+   mEventQueue.Add(std::make_shared<RemovePlayerEvent>(GetInstanceId()));
 }
 
 void Player::OnCreateBomb(const CreateBombEvent& event)
@@ -253,7 +254,7 @@ void Player::OnInput(const InputEvent& event)
 
 void Player::OnMovePlayer(const MovePlayerEvent& event)
 {
-   if (event.GetPlayer() != GetType()) {
+   if (event.GetSender() != GetInstanceId()) {
       // This event is not for us.
       return;
    }
@@ -309,7 +310,7 @@ void Player::OnMovePlayer(const MovePlayerEvent& event)
 
 void Player::OnPickupExtra(const PickupExtraEvent& event)
 {
-   if (event.GetPlayer() != GetType()) {
+   if (event.GetSender() != GetInstanceId()) {
       // This event is not for us.
       return;
    }
@@ -409,7 +410,8 @@ void Player::UpdateMovement(const int elapsed_time)
       // Create an event in case:
       //  1. The player requested to move.
       //  2. The player was moving before (results in a stand-still event).
-      mEventQueue.Add(std::make_shared<MovePlayerEvent>(GetType(), dir_dist));
+      mEventQueue.Add(std::make_shared<MovePlayerEvent>(GetInstanceId(),
+                                                        dir_dist));
    }
 }
 
@@ -434,7 +436,8 @@ void Player::UpdateBombing(const int elapsed_time)
          bomb_type = BombType::Remote;
       }
 
-      mEventQueue.Add(std::make_shared<CreateBombEvent>(parent_cell,
+      mEventQueue.Add(std::make_shared<CreateBombEvent>(GetInstanceId(),
+                                                        parent_cell,
                                                         bomb_type,
                                                         mBombRange,
                                                         GetType()));
@@ -443,7 +446,8 @@ void Player::UpdateBombing(const int elapsed_time)
    if (mInputAction2)
    {
       // Detonate all remote controlled bombs that the player planted.
-      mEventQueue.Add(std::make_shared<DetonateRemoteBombEvent>(GetType()));
+      mEventQueue.Add(std::make_shared<DetonateRemoteBombEvent>(GetInstanceId(),
+                                                                GetType()));
    }
 }
 
@@ -503,7 +507,8 @@ bool Player::CanMove(const Direction dir, const int distance) const
       // A bomb blocks the player path but we can try to kick it.
       // In any way, return false, because the bomb first has to move.
       const auto bomb = arena->GetBomb(neighbor_cell);
-      mEventQueue.Add(std::make_shared<MoveBombEvent>(bomb->GetInstanceId(),
+      mEventQueue.Add(std::make_shared<MoveBombEvent>(GetInstanceId(),
+                                                      bomb->GetInstanceId(),
                                                       mSpeed,
                                                       mDistance,
                                                       dir));
@@ -513,23 +518,6 @@ bool Player::CanMove(const Direction dir, const int distance) const
    // No Wall, no bomb - movement is fine.
    return true;
 }
-
-//void Player::KickBomb(const Direction dir) const
-//{
-//   if (!mParentCellChanged || !mData.can_kick) {
-//      return;
-//   }
-
-//   const auto parent_cell = GetArena()->GetCellFromObject(*this);
-//   const auto neighbor_cell = GetArena()->GetNeighborCell(parent_cell, dir);
-
-//   if ((-1 != neighbor_cell.X) &&
-//       (-1 != neighbor_cell.Y) &&
-//       GetArena()->HasBomb(neighbor_cell))
-//   {
-//      GetArena()->GetBomb(neighbor_cell)->Move(dir, mData.speed, mData.distance);
-//   }
-//}
 
 void Player::IncreaseSpeed()
 {

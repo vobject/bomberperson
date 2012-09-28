@@ -24,6 +24,8 @@ enum class EventType
    CreatePlayer,
 
    // Spawn animation to show the object on the scene.
+   SpawnExplosionStart,
+   SpawnExplosionEnd,
    SpawnPlayerStart,
    SpawnPlayerEnd,
 
@@ -33,11 +35,13 @@ enum class EventType
    // DestroyWall,
    // DestroyExtra,
 //   DestroyBomb,
-//   DestroyExplosion,
+   DestroyExplosionStart,
+   DestroyExplosionEnd,
    DestroyPlayerStart,
    DestroyPlayerEnd,
 
    // Remove the object from the game logic.
+   RemoveExplosion,
    RemovePlayer,
 
    Input,
@@ -55,13 +59,15 @@ enum class EventType
 class Event
 {
 public:
-   Event(EventType type) : mType(type) { }
+   Event(EventType type, unsigned int sender) : mType(type), mSender(sender) { }
    virtual ~Event() { }
 
    EventType GetType() const { return mType; }
+   unsigned int GetSender() const { return mSender; }
 
 private:
    const EventType mType;
+   const unsigned int mSender;
 };
 
 class CreateArenaEvent : public Event
@@ -69,7 +75,7 @@ class CreateArenaEvent : public Event
 public:
    CreateArenaEvent(Point pos, Size size, Size boder_size,
                     int cells_x, int cells_y, int player_count)
-      : Event(EventType::CreateArena)
+      : Event(EventType::CreateArena, 0)
       , mPosition(pos)
       , mSize(size)
       , mBoderSize(boder_size)
@@ -99,7 +105,7 @@ class CreateScoreboardEvent : public Event
 {
 public:
    CreateScoreboardEvent(Point pos, Size size)
-      : Event(EventType::CreateScoreboard)
+      : Event(EventType::CreateScoreboard, 0)
       , mPosition(pos)
       , mSize(size)
    { }
@@ -116,8 +122,8 @@ private:
 class CreateWallEvent : public Event
 {
 public:
-   CreateWallEvent(const Cell& cell, WallType type)
-      : Event(EventType::CreateWall)
+   CreateWallEvent(unsigned int sender, const Cell& cell, WallType type)
+      : Event(EventType::CreateWall, sender)
       , mCell(cell)
       , mWall(type)
    { }
@@ -134,8 +140,8 @@ private:
 class CreateExtraEvent : public Event
 {
 public:
-   CreateExtraEvent(const Cell& cell, ExtraType type)
-      : Event(EventType::CreateExtra)
+   CreateExtraEvent(unsigned int sender, const Cell& cell, ExtraType type)
+      : Event(EventType::CreateExtra, sender)
       , mCell(cell)
       , mExtra(type)
    { }
@@ -152,8 +158,8 @@ private:
 class CreateBombEvent : public Event
 {
 public:
-   CreateBombEvent(const Cell& cell, BombType type, int range, PlayerType owner)
-      : Event(EventType::CreateBomb)
+   CreateBombEvent(unsigned int sender, const Cell& cell, BombType type, int range, PlayerType owner)
+      : Event(EventType::CreateBomb, sender)
       , mCell(cell)
       , mBombType(type)
       , mRange(range)
@@ -176,8 +182,8 @@ private:
 class CreateExplosionEvent : public Event
 {
 public:
-   CreateExplosionEvent(const Cell& cell, ExplosionType type, PlayerType owner)
-      : Event(EventType::CreateExplosion)
+   CreateExplosionEvent(unsigned int sender, const Cell& cell, ExplosionType type, PlayerType owner)
+      : Event(EventType::CreateExplosion, sender)
       , mCell(cell)
       , mExplosionType(type)
       , mOwner(owner)
@@ -198,7 +204,7 @@ class CreatePlayerEvent : public Event
 {
 public:
    CreatePlayerEvent(PlayerType type)
-      : Event(EventType::CreatePlayer)
+      : Event(EventType::CreatePlayer, 0)
       , mPlayer(type)
    { }
    virtual ~CreatePlayerEvent() { }
@@ -209,11 +215,32 @@ private:
    const PlayerType mPlayer;
 };
 
+
+
+class SpawnExplosionStartEvent : public Event
+{
+public:
+   SpawnExplosionStartEvent(unsigned int sender)
+      : Event(EventType::SpawnExplosionStart, sender)
+   { }
+   virtual ~SpawnExplosionStartEvent() { }
+};
+
+class SpawnExplosionEndEvent : public Event
+{
+public:
+   SpawnExplosionEndEvent(unsigned int sender)
+      : Event(EventType::SpawnExplosionEnd, sender)
+   { }
+   virtual ~SpawnExplosionEndEvent() { }
+};
+
+
 class SpawnPlayerStartEvent : public Event
 {
 public:
-   SpawnPlayerStartEvent(PlayerType type)
-      : Event(EventType::SpawnPlayerStart)
+   SpawnPlayerStartEvent(unsigned int sender, PlayerType type)
+      : Event(EventType::SpawnPlayerStart, sender)
       , mPlayer(type)
    { }
    virtual ~SpawnPlayerStartEvent() { }
@@ -227,23 +254,38 @@ private:
 class SpawnPlayerEndEvent : public Event
 {
 public:
-   SpawnPlayerEndEvent(PlayerType type)
-      : Event(EventType::SpawnPlayerEnd)
-      , mPlayer(type)
+   SpawnPlayerEndEvent(unsigned int sender)
+      : Event(EventType::SpawnPlayerEnd, sender)
    { }
    virtual ~SpawnPlayerEndEvent() { }
-
-   PlayerType GetPlayer() const { return mPlayer; }
-
-private:
-   const PlayerType mPlayer;
 };
+
+
+
+class DestroyExplosionStartEvent : public Event
+{
+public:
+   DestroyExplosionStartEvent(unsigned int sender)
+      : Event(EventType::DestroyExplosionStart, sender)
+   { }
+   virtual ~DestroyExplosionStartEvent() { }
+};
+
+class DestroyExplosionEndEvent : public Event
+{
+public:
+   DestroyExplosionEndEvent(unsigned int sender)
+      : Event(EventType::DestroyExplosionEnd, sender)
+   { }
+   virtual ~DestroyExplosionEndEvent() { }
+};
+
 
 class DestroyPlayerStartEvent : public Event
 {
 public:
-   DestroyPlayerStartEvent(PlayerType player, PlayerType killer)
-      : Event(EventType::DestroyPlayerStart)
+   DestroyPlayerStartEvent(unsigned int sender, PlayerType player, PlayerType killer)
+      : Event(EventType::DestroyPlayerStart, sender)
       , mPlayer(player)
       , mKiller(killer)
    { }
@@ -260,38 +302,39 @@ private:
 class DestroyPlayerEndEvent : public Event
 {
 public:
-   DestroyPlayerEndEvent(PlayerType player)
-      : Event(EventType::DestroyPlayerEnd)
-      , mPlayer(player)
+   DestroyPlayerEndEvent(unsigned int sender)
+      : Event(EventType::DestroyPlayerEnd, sender)
    { }
    virtual ~DestroyPlayerEndEvent() { }
+};
 
-   PlayerType GetPlayer() const { return mPlayer; }
 
-private:
-   const PlayerType mPlayer;
+
+class RemoveExplosionEvent : public Event
+{
+public:
+   RemoveExplosionEvent(unsigned int sender)
+      : Event(EventType::RemoveExplosion, sender)
+   { }
+   virtual ~RemoveExplosionEvent() { }
 };
 
 class RemovePlayerEvent : public Event
 {
 public:
-   RemovePlayerEvent(PlayerType player)
-      : Event(EventType::RemovePlayer)
-      , mPlayer(player)
+   RemovePlayerEvent(unsigned int sender)
+      : Event(EventType::RemovePlayer, sender)
    { }
    virtual ~RemovePlayerEvent() { }
-
-   PlayerType GetPlayer() const { return mPlayer; }
-
-private:
-   const PlayerType mPlayer;
 };
+
+
 
 class DetonateRemoteBombEvent : public Event
 {
 public:
-   DetonateRemoteBombEvent(PlayerType owner)
-      : Event(EventType::DetonateRemoteBomb)
+   DetonateRemoteBombEvent(unsigned int sender, PlayerType owner)
+      : Event(EventType::DetonateRemoteBomb, sender)
       , mOwner(owner)
    { }
    virtual ~DetonateRemoteBombEvent() { }
@@ -308,7 +351,7 @@ public:
    InputEvent(PlayerType player, bool up, bool down,
                                  bool left, bool right,
                                  bool action1, bool action2)
-      : Event(EventType::Input)
+      : Event(EventType::Input, 0)
       , mPlayer(player)
       , mUp(up)
       , mDown(down)
@@ -340,9 +383,9 @@ private:
 class MoveBombEvent : public Event
 {
 public:
-   MoveBombEvent(unsigned int bomb_instance, int speed, int distance, Direction dir)
-      : Event(EventType::MoveBomb)
-      , mBombInstance(bomb_instance)
+   MoveBombEvent(unsigned int sender, unsigned int bomb, int speed, int distance, Direction dir)
+      : Event(EventType::MoveBomb, sender)
+      , mBombInstance(bomb)
       , mSpeed(speed)
       , mDistance(distance)
       , mDirection(dir)
@@ -364,38 +407,32 @@ private:
 class MovePlayerEvent : public Event
 {
 public:
-   MovePlayerEvent(PlayerType player, const std::vector<std::pair<Direction, int>>& dir)
-      : Event(EventType::MovePlayer)
-      , mPlayer(player)
+   MovePlayerEvent(unsigned int sender, const std::vector<std::pair<Direction, int>>& dir)
+      : Event(EventType::MovePlayer, sender)
       , mDirectionDistancePair(dir)
    { }
    virtual ~MovePlayerEvent() { }
 
-   PlayerType GetPlayer() const { return mPlayer; }
    std::vector<std::pair<Direction, int>> GetMovementData() const { return mDirectionDistancePair; }
 
 private:
-   const PlayerType mPlayer;
    const std::vector<std::pair<Direction, int>> mDirectionDistancePair;
 };
 
 class ParentCellChangedEvent : public Event
 {
 public:
-   ParentCellChangedEvent(unsigned int instance, const Cell& old_parent, const Cell& new_parent)
-      : Event(EventType::ParentCellChanged)
-      , mInstance(instance)
+   ParentCellChangedEvent(unsigned int sender, const Cell& old_parent, const Cell& new_parent)
+      : Event(EventType::ParentCellChanged, sender)
       , mOldCell(old_parent)
       , mNewCell(new_parent)
    { }
    virtual ~ParentCellChangedEvent() { }
 
-   unsigned int GetInstance() const { return mInstance; }
    Cell GetOldCell() const { return mOldCell; }
    Cell GetNewCell() const { return mNewCell; }
 
 private:
-   const unsigned int mInstance;
    const Cell mOldCell;
    const Cell mNewCell;
 };
@@ -403,18 +440,15 @@ private:
 class PickupExtraEvent : public Event
 {
 public:
-   PickupExtraEvent(PlayerType player, const Cell& cell)
-      : Event(EventType::PickupExtra)
-      , mPlayer(player)
+   PickupExtraEvent(unsigned int sender, const Cell& cell)
+      : Event(EventType::PickupExtra, sender)
       , mCell(cell)
    { }
    virtual ~PickupExtraEvent() { }
 
-   PlayerType GetPlayer() const { return mPlayer; }
    Cell GetCell() const { return mCell; }
 
 private:
-   const PlayerType mPlayer;
    const Cell mCell;
 };
 

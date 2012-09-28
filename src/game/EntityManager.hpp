@@ -14,6 +14,7 @@ class CreateExtraEvent;
 class CreateBombEvent;
 class CreateExplosionEvent;
 class CreatePlayerEvent;
+class RemoveExplosionEvent;
 class RemovePlayerEvent;
 
 class SceneObject;
@@ -62,7 +63,10 @@ private:
    void OnCreateBomb(const CreateBombEvent& event);
    void OnCreateExplosion(const CreateExplosionEvent& event);
    void OnCreatePlayer(const CreatePlayerEvent& event);
+   void OnRemoveExplosion(const RemoveExplosionEvent& event);
    void OnRemovePlayer(const RemovePlayerEvent& event);
+
+   void RemoveEntity(unsigned int instance);
 
    EventQueue& mEventQueue;
    EntitySet mEntities;

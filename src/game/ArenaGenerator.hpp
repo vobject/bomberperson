@@ -11,7 +11,7 @@ class Cell;
 class ArenaGenerator
 {
 public:
-   ArenaGenerator(EventQueue& queue);
+   ArenaGenerator(unsigned int id, EventQueue& queue);
    ~ArenaGenerator();
 
    ArenaGenerator(const ArenaGenerator&) = delete;
@@ -30,6 +30,8 @@ private:
    bool IsPatternCell(const Cell& cell) const;
    bool IsSpawningCell(const Cell& cell) const;
    bool ShouldCreateItem() const;
+
+   const unsigned int mArenaId;
 
    EventQueue& mEventQueue;
 

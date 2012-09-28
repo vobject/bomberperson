@@ -10,8 +10,9 @@
 #include <cstdlib>
 #include <ctime>
 
-ArenaGenerator::ArenaGenerator(EventQueue& queue)
-   : mEventQueue(queue)
+ArenaGenerator::ArenaGenerator(unsigned int id, EventQueue& queue)
+   : mArenaId(id)
+   , mEventQueue(queue)
 {
    srand(time(nullptr));
 }
@@ -88,7 +89,7 @@ void ArenaGenerator::CreateDefaultWall(const Cell& cell) const
       type = WallType::Indestructible;
    }
 
-   mEventQueue.Add(std::make_shared<CreateWallEvent>(cell, type));
+   mEventQueue.Add(std::make_shared<CreateWallEvent>(mArenaId, cell, type));
 }
 
 void ArenaGenerator::CreateDefaultExtra(const Cell& cell) const
@@ -122,7 +123,7 @@ void ArenaGenerator::CreateDefaultExtra(const Cell& cell) const
       }
    }
 
-   mEventQueue.Add(std::make_shared<CreateExtraEvent>(cell, type));
+   mEventQueue.Add(std::make_shared<CreateExtraEvent>(mArenaId, cell, type));
 }
 
 bool ArenaGenerator::IsPatternCell(const Cell& cell) const

@@ -44,6 +44,7 @@ enum class PlayerSound
 //  Because it is not really useful for the game logic.
 enum class PlayerAnimation
 {
+   Spawn,
    StandUp,
    StandDown,
    StandLeft,
@@ -52,11 +53,10 @@ enum class PlayerAnimation
    WalkDown,
    WalkLeft,
    WalkRight,
-   Spawn,
 //   Idle,
 //   Lockedin,
+//   Win,
    Destroy
-//   Win
 };
 
 class Player : public ArenaObject, public EventListener

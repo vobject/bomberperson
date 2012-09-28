@@ -1,39 +1,126 @@
 #include "Explosion.hpp"
+#include "EventQueue.hpp"
+#include "EventType.hpp"
 #include "../Options.hpp"
 
 Explosion::Explosion(
    const std::shared_ptr<Arena>& arena,
    const ExplosionType type,
-   const PlayerType owner
+   const PlayerType owner,
+   EventQueue& queue
 )
    : ArenaObject(EntityId::Explosion, ZOrder::Layer_5, arena)
    , mType(type)
    , mOwner(owner)
+   , mEventQueue(queue)
 {
-   if (ExplosionType::Center == mType) {
-      mSound = ExplosionSound::Booom;
-   }
+   mEventQueue.Register(this);
+   SetVisible(false);
 }
 
 Explosion::~Explosion()
 {
-
+   mEventQueue.UnRegister(this);
 }
 
 void Explosion::Update(const int elapsed_time)
 {
    SetAnimationTime(GetAnimationTime() + elapsed_time);
 
-   if (GetAnimationTime() >= DefaultValue::EXPLOSION_ANIM_LEN)
+   if ((ExplosionAnimation::Spawn == mAnimation) &&
+       (GetAnimationTime() >= DefaultValue::EXPLOSION_SPAWN_ANIM_LEN))
    {
-      // The explosion has burned out.
-      Invalidate();
+      // The explosion was just done spawning.
+      mEventQueue.Add(std::make_shared<SpawnExplosionEndEvent>(GetInstanceId()));
    }
+
+   if ((ExplosionAnimation::Burn == mAnimation) &&
+       (GetAnimationTime() >= DefaultValue::EXPLOSION_BURN_ANIM_LEN))
+   {
+      mEventQueue.Add(std::make_shared<DestroyExplosionStartEvent>(GetInstanceId()));
+   }
+
+   if ((ExplosionAnimation::Destroy == mAnimation) &&
+       (GetAnimationTime() >= DefaultValue::EXPLOSION_DESTROY_ANIM_LEN))
+   {
+      // The explosion was just done burning out.
+      mEventQueue.Add(std::make_shared<DestroyExplosionEndEvent>(GetInstanceId()));
+   }
+
+   const auto arena = GetArena();
+   const auto parent_cell = arena->GetCellFromObject(*this);
+
+//   // TODO: Now handle the explosions deadlyness:
+//   if (arena->HasPlayer(parent_cell))
+//   {
+
+//   }
+}
+
+void Explosion::OnEvent(const Event& event)
+{
+   if (event.GetSender() != GetInstanceId()) {
+      // Explosions process only events that they send themself.
+      return;
+   }
+
+   switch (event.GetType())
+   {
+      case EventType::SpawnExplosionStart:
+         OnSpawnExplosionStart(dynamic_cast<const SpawnExplosionStartEvent&>(event));
+         break;
+      case EventType::SpawnExplosionEnd:
+         OnSpawnExplosionEnd(dynamic_cast<const SpawnExplosionEndEvent&>(event));
+         break;
+      case EventType::DestroyExplosionStart:
+         OnDestroyExplosionStart(dynamic_cast<const DestroyExplosionStartEvent&>(event));
+         break;
+      case EventType::DestroyExplosionEnd:
+         OnDestroyExplosionEnd(dynamic_cast<const DestroyExplosionEndEvent&>(event));
+         break;
+      default:
+         break;
+   }
+}
+
+void Explosion::OnSpawnExplosionStart(const SpawnExplosionStartEvent& event)
+{
+   SetAnimationTime(0);
+   mAnimation = ExplosionAnimation::Spawn;
+
+   if (ExplosionType::Center == mType) {
+      mSound = ExplosionSound::Booom;
+   }
+
+   SetVisible(true);
+}
+
+void Explosion::OnSpawnExplosionEnd(const SpawnExplosionEndEvent& event)
+{
+   SetAnimationTime(0);
+   mAnimation = ExplosionAnimation::Burn;
+}
+
+void Explosion::OnDestroyExplosionStart(const DestroyExplosionStartEvent& event)
+{
+   SetAnimationTime(0);
+   mAnimation = ExplosionAnimation::Destroy;
+}
+
+void Explosion::OnDestroyExplosionEnd(const DestroyExplosionEndEvent& event)
+{
+   SetVisible(false);
+   mEventQueue.Add(std::make_shared<RemoveExplosionEvent>(GetInstanceId()));
 }
 
 ExplosionType Explosion::GetType() const
 {
    return mType;
+}
+
+ExplosionAnimation Explosion::GetAnimation() const
+{
+   return mAnimation;
 }
 
 PlayerType Explosion::GetOwner() const

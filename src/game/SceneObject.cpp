@@ -1,6 +1,7 @@
 #include "SceneObject.hpp"
 
-unsigned int SceneObject::sCurrentInstanceId;
+// Do not start at 0.
+unsigned int SceneObject::sCurrentInstanceId = 1024;
 
 SceneObject::SceneObject(const EntityId id, const ZOrder zorder)
    : mInstanceId(sCurrentInstanceId++)

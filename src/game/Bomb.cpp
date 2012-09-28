@@ -169,14 +169,16 @@ void Bomb::OnMoveBomb(const MoveBombEvent& event)
 
 void Bomb::OnCreateExplosion(const CreateExplosionEvent& event)
 {
-   const auto parent_cell = GetArena()->GetCellFromObject(*this);
-
-   if ((event.GetCell() == parent_cell) &&
-       (event.GetExplosionType() == ExplosionType::Center))
-   {
-      // Lifetime of this bomb object ended...
-      Invalidate();
+   if (event.GetSender() != GetInstanceId()) {
+      return;
    }
+
+   if (event.GetExplosionType() != ExplosionType::Center) {
+      return;
+   }
+
+   // The bomb just exploded.
+   Invalidate();
 }
 
 void Bomb::OnDetonateRemoteBomb(const DetonateRemoteBombEvent& event)
@@ -206,6 +208,7 @@ void Bomb::UpdateMovement(const int elapsed_time)
     //  bomb will stop moving.
 
     mEventQueue.Add(std::make_shared<MoveBombEvent>(GetInstanceId(),
+                                                    GetInstanceId(),
                                                     mSpeed,
                                                     mDistance,
                                                     mDirection));
@@ -215,7 +218,8 @@ void Bomb::PlantCenterExplosion() const
 {
    const auto parent_cell = GetArena()->GetCellFromObject(*this);
 
-   mEventQueue.Add(std::make_shared<CreateExplosionEvent>(parent_cell,
+   mEventQueue.Add(std::make_shared<CreateExplosionEvent>(GetInstanceId(),
+                                                          parent_cell,
                                                           ExplosionType::Center,
                                                           mOwner));
 }
@@ -247,7 +251,8 @@ void Bomb::PlantRangeExplosion(const Direction dir) const
 
       const auto exp_type = GetExplosionType(dir, (range_to_go == 1));
 
-      mEventQueue.Add(std::make_shared<CreateExplosionEvent>(range_cell,
+      mEventQueue.Add(std::make_shared<CreateExplosionEvent>(GetInstanceId(),
+                                                             range_cell,
                                                              exp_type,
                                                              mOwner));
 

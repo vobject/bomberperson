@@ -4,6 +4,7 @@
 #include "SceneObject.hpp"
 #include "EventListener.hpp"
 
+#include <list>
 #include <memory>
 #include <vector>
 
@@ -15,6 +16,7 @@ class Wall;
 class Extra;
 class Bomb;
 class Explosion;
+class Player;
 struct Point;
 struct Size;
 
@@ -42,6 +44,12 @@ struct Cell
    int X;
    int Y;
 };
+
+// TODO: Arena class should keep track of every ArenaObject created and
+//  destroyed in the Arena. Then all Has/Get/SetXYZ() can be implemented
+//  the same way.
+// For this to work Spawn/Destroy events have to be implemented for all
+//  ArenaObjects. And Player has to send ParentCellChangedEvents.
 
 class Arena : public SceneObject, public EventListener
 {
@@ -98,8 +106,9 @@ private:
       std::shared_ptr<Extra> extra;
       std::shared_ptr<Bomb> bomb;
       std::shared_ptr<Explosion> explosion;
-//      std::vector<std::shared_ptr<Player>> players;
+      std::list<std::shared_ptr<Player>> players;
    };
+   // TODO: CellContent => std::list<ArenaObject>!
 
    Cell GetCellAboveOf(int cell_x, int cell_y) const;
    Cell GetCellBelowOf(int cell_x, int cell_y) const;

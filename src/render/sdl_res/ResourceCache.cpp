@@ -171,24 +171,53 @@ void ResourceCache::LoadBombResources()
 
 void ResourceCache::LoadExplosionResources()
 {
-   const auto id1 = ExplosionType::Center;
-   const auto id2 = ExplosionType::Horizontal;
-   const auto id3 = ExplosionType::HorizontalLeftEnd;
-   const auto id4 = ExplosionType::HorizontalRightEnd;
-   const auto id5 = ExplosionType::Vertical;
-   const auto id6 = ExplosionType::VerticalUpEnd;
-   const auto id7 = ExplosionType::VerticalDownEnd;
    const Size size = { DefaultValue::EXPLOSION_WIDTH,
                        DefaultValue::EXPLOSION_HEIGHT };
+   const auto spawn_len = DefaultValue::EXPLOSION_SPAWN_ANIM_LEN;
+   const auto burn_len = DefaultValue::EXPLOSION_BURN_ANIM_LEN;
+   const auto destroy_len = DefaultValue::EXPLOSION_DESTROY_ANIM_LEN;
 
-   // TODO: Align animation speed and explosion lifetime.
-   mExplosionRes.insert({ id1, { id1, 750_ms, { LoadTexture("explosion_center_1.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_4.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_1.png", size) } } });
-   mExplosionRes.insert({ id2, { id2, 750_ms, { LoadTexture("explosion_horizontal_1.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_4.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_1.png", size) } } });
-   mExplosionRes.insert({ id3, { id3, 750_ms, { LoadTexture("explosion_horizontal_leftend_1.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_4.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_1.png", size) } } });
-   mExplosionRes.insert({ id4, { id4, 750_ms, { LoadTexture("explosion_horizontal_rightend_1.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_4.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_1.png", size) } } });
-   mExplosionRes.insert({ id5, { id5, 750_ms, { LoadTexture("explosion_vertical_1.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_4.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_1.png", size) } } });
-   mExplosionRes.insert({ id6, { id6, 750_ms, { LoadTexture("explosion_vertical_upend_1.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_4.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_1.png", size) } } });
-   mExplosionRes.insert({ id7, { id7, 750_ms, { LoadTexture("explosion_vertical_downend_1.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_4.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_1.png", size) } } });
+   ExplosionResource center(ExplosionType::Center);
+   center.SetFrames(ExplosionAnimation::Spawn, spawn_len, { LoadTexture("explosion_center_1.png", size), LoadTexture("explosion_center_2.png", size) });
+   center.SetFrames(ExplosionAnimation::Burn, burn_len, { LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_4.png", size), LoadTexture("explosion_center_3.png", size) });
+   center.SetFrames(ExplosionAnimation::Destroy, destroy_len, { LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_1.png", size) });
+   mExplosionRes.insert({ center.GetType(), center });
+
+   ExplosionResource horizontal(ExplosionType::Horizontal);
+   horizontal.SetFrames(ExplosionAnimation::Spawn, spawn_len, { LoadTexture("explosion_horizontal_1.png", size), LoadTexture("explosion_horizontal_2.png", size) });
+   horizontal.SetFrames(ExplosionAnimation::Burn, burn_len, { LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_4.png", size), LoadTexture("explosion_horizontal_3.png", size) });
+   horizontal.SetFrames(ExplosionAnimation::Destroy, destroy_len, { LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_1.png", size) });
+   mExplosionRes.insert({ horizontal.GetType(), horizontal });
+
+   ExplosionResource horizontal_leftend(ExplosionType::HorizontalLeftEnd);
+   horizontal_leftend.SetFrames(ExplosionAnimation::Spawn, spawn_len, { LoadTexture("explosion_horizontal_leftend_1.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size) });
+   horizontal_leftend.SetFrames(ExplosionAnimation::Burn, burn_len, { LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_4.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size) });
+   horizontal_leftend.SetFrames(ExplosionAnimation::Destroy, destroy_len, { LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_1.png", size) });
+   mExplosionRes.insert({ horizontal_leftend.GetType(), horizontal_leftend });
+
+   ExplosionResource horizontal_rightend(ExplosionType::HorizontalRightEnd);
+   horizontal_rightend.SetFrames(ExplosionAnimation::Spawn, spawn_len, { LoadTexture("explosion_horizontal_rightend_1.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size) });
+   horizontal_rightend.SetFrames(ExplosionAnimation::Burn, burn_len, { LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_4.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size) });
+   horizontal_rightend.SetFrames(ExplosionAnimation::Destroy, destroy_len, { LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_1.png", size) });
+   mExplosionRes.insert({ horizontal_rightend.GetType(), horizontal_rightend });
+
+   ExplosionResource vertical(ExplosionType::Vertical);
+   vertical.SetFrames(ExplosionAnimation::Spawn, spawn_len, { LoadTexture("explosion_vertical_1.png", size), LoadTexture("explosion_vertical_2.png", size) });
+   vertical.SetFrames(ExplosionAnimation::Burn, burn_len, { LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_4.png", size), LoadTexture("explosion_vertical_3.png", size) });
+   vertical.SetFrames(ExplosionAnimation::Destroy, destroy_len, { LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_1.png", size) });
+   mExplosionRes.insert({ vertical.GetType(), vertical });
+
+   ExplosionResource vertical_upend(ExplosionType::VerticalUpEnd);
+   vertical_upend.SetFrames(ExplosionAnimation::Spawn, spawn_len, { LoadTexture("explosion_vertical_upend_1.png", size), LoadTexture("explosion_vertical_upend_2.png", size) });
+   vertical_upend.SetFrames(ExplosionAnimation::Burn, burn_len, { LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_4.png", size), LoadTexture("explosion_vertical_upend_3.png", size) });
+   vertical_upend.SetFrames(ExplosionAnimation::Destroy, destroy_len, { LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_1.png", size) });
+   mExplosionRes.insert({ vertical_upend.GetType(), vertical_upend });
+
+   ExplosionResource vertical_downend(ExplosionType::VerticalDownEnd);
+   vertical_downend.SetFrames(ExplosionAnimation::Spawn, spawn_len, { LoadTexture("explosion_vertical_downend_1.png", size), LoadTexture("explosion_vertical_downend_2.png", size) });
+   vertical_downend.SetFrames(ExplosionAnimation::Burn, burn_len, { LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_4.png", size), LoadTexture("explosion_vertical_downend_3.png", size) });
+   vertical_downend.SetFrames(ExplosionAnimation::Destroy, destroy_len, { LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_1.png", size) });
+   mExplosionRes.insert({ vertical_downend.GetType(), vertical_downend });
 }
 
 void ResourceCache::LoadPlayerResources()
@@ -199,7 +228,6 @@ void ResourceCache::LoadPlayerResources()
    const auto spawn_len = DefaultValue::PLAYER_SPAWN_ANIM_LEN;
    const auto death_len = DefaultValue::PLAYER_DEATH_ANIM_LEN;
 
-   // TODO: align player speed and animation speed!!
    PlayerResource player_1(PlayerType::Player_1);
    player_1.SetFrames(PlayerAnimation::StandUp, walk_len, { LoadTexture("player_1_up.png", size) });
    player_1.SetFrames(PlayerAnimation::StandDown, walk_len, { LoadTexture("player_1_down.png", size) });
