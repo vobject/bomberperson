@@ -1,7 +1,7 @@
 #include "Extra.hpp"
 
 Extra::Extra(const std::shared_ptr<Arena>& arena, const ExtraType type)
-   : ArenaObject(EntityId::Extra, ZOrder::Layer_2, arena)
+   : ArenaObject(EntityId::Extra, ZOrder::Layer_6, arena)
    , mType(type)
 {
 

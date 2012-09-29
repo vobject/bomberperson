@@ -67,10 +67,6 @@ public:
    void Update(int elapsed_time) override;
    void OnEvent(const Event& event) override;
 
-   // TODO?
-   // GetBorderSize();
-   // GetDimensions();
-
    void SetObjectPosition(ArenaObject& obj, const Cell& cell) const;
    void SetObjectSize(ArenaObject& obj) const;
 

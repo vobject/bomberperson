@@ -12,6 +12,25 @@ enum class BombType;
 enum class ExplosionType;
 enum class PlayerType;
 
+/*
+ *TODO: May this be more sensible:
+ * - RequestCreationBomb
+ * - RequestCreationPlayer
+ * - ...
+ * - RequestRemovalBomb
+ * - RequestRemovalPlayer
+ * - ...
+ * - CreateBomb
+ * - CreatePlayer
+ * - ...
+ * - RemoveBomb
+ * - RemovePlayer
+ * - ...
+ *
+ *That would take the animation-switching out of the standard events.
+ *Class specific animation event classes could still be created in another file.
+ */
+
 enum class EventType
 {
    // Create new objects internally
