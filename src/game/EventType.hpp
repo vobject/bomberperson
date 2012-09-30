@@ -28,12 +28,12 @@ enum class EventType
    RemoveExplosion,
    RemovePlayer,
 
-   Input,
-   KillPlayer,
-   DetonateBomb,
-   DetonateRemoteBomb,
-   BombCellChanged,
-   MoveBomb
+   Input,               // From Match to the players.
+   KillPlayer,          // From Player to other players and itself.
+   DetonateBomb,        // From Bomb to other bombs to get a chain reaction.
+   DetonateRemoteBomb,  // From Player to bombs.
+   BombCellChanged,     // From Bomb to Arena when bomb is moving.
+   MoveBomb             // From Player on kick and from Bomb itself when moving.
 };
 
 class Event

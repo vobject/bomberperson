@@ -139,14 +139,13 @@ void Bomb::OnMoveBomb(const MoveBombEvent& event)
       return;
    }
 
-   if (mMoveIdleTime < mSpeed) {
-      return;
-   }
-
-   if (!event.GetDistance())
+   if ((event.GetSender() == GetInstanceId()) && (mMoveIdleTime < mSpeed))
    {
-      // This is a 'stop-moving' event.
-      mIsMoving = false;
+      // Override waiting for the next valid point in time to move when the
+      //  MoveBombEvent did not come from the object itself, but probably
+      //  from another player. This is necessary to enable a bombs movement
+      //  and direction to change if a player with different speed kicks
+      //  the bomb while it is already moving.
       return;
    }
 
@@ -206,6 +205,10 @@ void Bomb::OnMoveBomb(const MoveBombEvent& event)
 void Bomb::UpdateMovement(const int elapsed_time)
 {
    mMoveIdleTime += elapsed_time;
+
+   if (!mIsMoving) {
+      return;
+   }
 
    // The receiving handler will not blindly execute the movement.
    // It will check if the movement is valid. If it is not, the
