@@ -6,13 +6,10 @@
 #include "../utils/Utils.hpp"
 
 class EventQueue;
-class SpawnBombStartEvent;
-class SpawnBombEndEvent;
-class DestroyBombStartEvent;
-class DestroyBombEndEvent;
-class MoveBombEvent;
-//class CreateExplosionEvent;
+class RemoveBombEvent;
+class DetonateBombEvent;
 class DetonateRemoteBombEvent;
+class MoveBombEvent;
 
 enum class ExplosionType;
 enum class PlayerType;
@@ -31,12 +28,12 @@ enum class BombSound
    Planted
 };
 
-enum class BombAnimation
-{
-   Spawn,
-   Tick,
-   Destroy
-};
+//enum class BombAnimation
+//{
+//   Spawn,
+//   Tick,
+//   Destroy
+//};
 
 class Bomb : public ArenaObject, public EventListener
 {
@@ -54,22 +51,20 @@ public:
    void OnEvent(const Event& event) override;
 
    BombType GetType() const;
-   BombAnimation GetAnimation() const;
+//   BombAnimation GetAnimation() const;
    BombSound GetSound(bool reset);
 
    int GetRange() const;
    void SetRange(int range);
 
 private:
-   void OnSpawnBombStart(const SpawnBombStartEvent& event);
-   void OnSpawnBombEnd(const SpawnBombEndEvent& event);
-   void OnDestroyBombStart(const DestroyBombStartEvent& event);
-   void OnDestroyBombEnd(const DestroyBombEndEvent& event);
-   void OnMoveBomb(const MoveBombEvent& event);
-//   void OnCreateExplosion(const CreateExplosionEvent& event);
+   void OnRemoveBomb(const RemoveBombEvent& event);
+   void OnDetonateBomb(const DetonateBombEvent& event);
    void OnDetonateRemoteBomb(const DetonateRemoteBombEvent& event);
+   void OnMoveBomb(const MoveBombEvent& event);
 
    void UpdateMovement(int elapsed_time);
+   void Detonate();
    void PlantCenterExplosion() const;
    void PlantRangeExplosion(Direction dir) const;
 
@@ -81,7 +76,6 @@ private:
 
    EventQueue& mEventQueue;
 
-   BombAnimation mAnimation = BombAnimation::Spawn;
    BombSound mSound = BombSound::None;
 
    int mLifeTime = 0_ms;

@@ -10,18 +10,30 @@
 #include <vector>
 
 class EventQueue;
-class SpawnBombStartEvent;
-class DestroyBombEndEvent;
-class ParentCellChangedEvent;
+
+class RemoveArenaEvent;
+class CreateWallEvent;
+class CreateExtraEvent;
+class CreateBombEvent;
+class CreateExplosionEvent;
+class RemoveWallEvent;
+class RemoveExtraEvent;
+class RemoveBombEvent;
+class RemoveExplosionEvent;
+class BombCellChangedEvent;
 
 class ArenaObject;
 class Wall;
 class Extra;
 class Bomb;
-class Explosion;
 class Player;
 struct Point;
 struct Size;
+
+enum class WallType;
+enum class ExtraType;
+enum class BombType;
+enum class PlayerType;
 
 //enum class ArenaType
 //{
@@ -38,26 +50,20 @@ struct Cell
 {
    constexpr Cell(const int x, const int y) : X(x), Y(y) { }
 
-   constexpr bool operator==(const Cell& other)
+   constexpr bool operator==(const Cell other)
    { return ((X == other.X) && (Y == other.Y)); }
 
-   constexpr bool operator!=(const Cell& other)
+   constexpr bool operator!=(const Cell other)
    { return !(*this == other); }
 
    int X;
    int Y;
 };
 
-// TODO: Arena class should keep track of every ArenaObject created and
-//  destroyed in the Arena. Then all Has/Get/SetXYZ() can be implemented
-//  the same way.
-// For this to work Spawn/Destroy events have to be implemented for all
-//  ArenaObjects. And Player has to send ParentCellChangedEvents.
-
 class Arena : public SceneObject, public EventListener
 {
 public:
-   Arena(const Point& pos, const Size& size, const Size& borders,
+   Arena(const Point pos, const Size size, const Size borders,
          int cells_x, int cells_y, EventQueue& queue);
    virtual ~Arena();
 
@@ -79,46 +85,66 @@ public:
 
    Cell GetNeighborCell(const Cell& cell, Direction dir) const;
 
-   bool HasWall(const Cell& cell) const;
-   std::shared_ptr<Wall> GetWall(const Cell& cell) const;
-   void SetWall(const Cell& cell, const std::shared_ptr<Wall>& wall);
-   void DestroyWall(const Cell& cell); // TODO: Get rid of this.
+   bool HasWall(Cell cell) const;
+   WallType GetWallType(Cell cell) const;
 
-   bool HasExtra(const Cell& cell) const;
-   std::shared_ptr<Extra> GetExtra(const Cell& cell) const;
-   void SetExtra(const Cell& cell, const std::shared_ptr<Extra>& extra);
+   bool HasExtra(Cell cell) const;
+   ExtraType GetExtraType(Cell cell) const;
 
-   bool HasBomb(const Cell& cell) const;
-   unsigned int GetBombInstanceId(const Cell& cell) const;
+   bool HasBomb(Cell cell) const;
+   BombType GetBombType(Cell cell) const;
+
+   bool HasExplosion(Cell cell) const;
+   PlayerType GetExplosionOwner(Cell cell) const;
 
 private:
-   void OnSpawnBombStart(const SpawnBombStartEvent& event);
-   void OnDestroyBombEnd(const DestroyBombEndEvent& event);
-   void OnParentCellChanged(const ParentCellChangedEvent& event);
+   void OnRemoveArena(const RemoveArenaEvent& event);
 
-   struct CellContent
-   {
-      std::shared_ptr<Wall> wall;
-      std::shared_ptr<Extra> extra;
-      unsigned int bomb_instance = 0;
-//      std::list<std::shared_ptr<Player>> players;
-   };
-   // TODO: CellContent => std::list<ArenaObject>!
+   void OnCreateWall(const CreateWallEvent& event);
+   void OnCreateExtra(const CreateExtraEvent& event);
+   void OnCreateBomb(const CreateBombEvent& event);
+   void OnCreateExplosion(const CreateExplosionEvent& event);
+
+   void OnRemoveWall(const RemoveWallEvent& event);
+   void OnRemoveExtra(const RemoveExtraEvent& event);
+   void OnRemoveBomb(const RemoveBombEvent& event);
+   void OnRemoveExplosion(const RemoveExplosionEvent& event);
+
+   void OnBombCellChanged(const BombCellChangedEvent& event);
 
    Cell GetCellAboveOf(int cell_x, int cell_y) const;
    Cell GetCellBelowOf(int cell_x, int cell_y) const;
    Cell GetCellLeftOf(int cell_x, int cell_y) const;
    Cell GetCellRightOf(int cell_x, int cell_y) const;
 
+   void CreateWall(Cell cell, WallType type);
+   void CreateExtra(Cell cell, ExtraType type);
+   void CreateBomb(Cell cell, BombType type);
+   void CreateExplosion(Cell cell, PlayerType owner);
+
+   void RemoveWall(Cell cell);
+   void RemoveExtra(Cell cell);
+   void RemoveBomb(Cell cell);
+   void RemoveExplosion(Cell cell);
+
+   struct CellContent
+   {
+      bool wall = false;
+      bool extra = false;
+      bool bomb = false;
+      bool explosion = false;
+
+      WallType wall_type;
+      ExtraType extra_type;
+      BombType bomb_type;
+      PlayerType explosion_owner;
+   };
+
    const int mXCells; // Number of horizontal cells.
    const int mYCells; // Number of vertical cells.
    const Size mBorders; // Size of the arenas borders in pixel.
    const Size mCellSize;
    std::vector<std::vector<std::pair<Cell, CellContent>>> mCells;
-
-//   std::vector<
-//   // All object currently active in the arena.
-//   std::map<unsigned int, SceneObject> mObjects;
 
    EventQueue& mEventQueue;
 };

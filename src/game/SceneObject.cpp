@@ -41,15 +41,15 @@ ZOrder SceneObject::GetZOrder() const
    return mZOrder;
 }
 
-bool SceneObject::IsVisible() const
-{
-   return mIsVisible;
-}
+//bool SceneObject::IsVisible() const
+//{
+//   return mIsVisible;
+//}
 
-void SceneObject::SetVisible(const bool status)
-{
-   mIsVisible = status;
-}
+//void SceneObject::SetVisible(const bool status)
+//{
+//   mIsVisible = status;
+//}
 
 Point SceneObject::GetPosition() const
 {

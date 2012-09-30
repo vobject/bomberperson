@@ -26,27 +26,15 @@ void Scoreboard::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
-      case EventType::SpawnPlayerStart:
-         OnSpawnPlayerStart(dynamic_cast<const SpawnPlayerStartEvent&>(event));
+      case EventType::RemoveScoreboard:
+         OnRemoveScoreboard(dynamic_cast<const RemoveScoreboardEvent&>(event));
          break;
-      case EventType::DestroyPlayerStart:
-         OnDestroyPlayerStart(dynamic_cast<const DestroyPlayerStartEvent&>(event));
+      case EventType::CreatePlayer:
+         OnCreatePlayer(dynamic_cast<const CreatePlayerEvent&>(event));
          break;
-//      case EventType::CreateBomb:
-//         OnCreateBomb(dynamic_cast<const CreateBombEvent&>(event));
-//         break;
-//      case EventType::CreateExplosion:
-//         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
-//         break;
-//      case EventType::Input:
-//         OnInput(dynamic_cast<const InputEvent&>(event));
-//         break;
-//      case EventType::MovePlayer:
-//         OnMovePlayer(dynamic_cast<const MovePlayerEvent&>(event));
-//         break;
-//      case EventType::PickupExtra:
-//         OnPickupExtra(dynamic_cast<const PickupExtraEvent&>(event));
-//         break;
+      case EventType::KillPlayer:
+         OnKillPlayer(dynamic_cast<const KillPlayerEvent&>(event));
+         break;
       default:
          break;
    }
@@ -85,19 +73,26 @@ std::vector<std::string> Scoreboard::GetScore() const
    return lines;
 }
 
-void Scoreboard::OnSpawnPlayerStart(const SpawnPlayerStartEvent& event)
+void Scoreboard::OnRemoveScoreboard(const RemoveScoreboardEvent& event)
+{
+   (void) event;
+
+   Invalidate();
+}
+
+void Scoreboard::OnCreatePlayer(const CreatePlayerEvent& event)
 {
    mPlayers.insert({ event.GetPlayer(), PlayerInfo() });
 }
 
-void Scoreboard::OnDestroyPlayerStart(const DestroyPlayerStartEvent& event)
+void Scoreboard::OnKillPlayer(const KillPlayerEvent& event)
 {
    for (auto& player : mPlayers)
    {
-      if (event.GetPlayer() == player.first)
+      if (event.GetVictim() == player.first)
       {
          player.second.alive = false;
-         continue;
+         continue; // Suicide does not count as kill.
       }
 
       if (event.GetKiller() == player.first)

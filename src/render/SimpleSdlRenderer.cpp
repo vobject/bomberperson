@@ -124,7 +124,7 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<Wall>& wall)
 
    int color = 0;
 
-   if (wall->IsDestructible())
+   if (WallType::Destructible == wall->GetType())
    {
       color = 0x7f7f7f;
    }

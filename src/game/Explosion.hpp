@@ -5,10 +5,7 @@
 #include "EventListener.hpp"
 
 class EventQueue;
-class SpawnExplosionStartEvent;
-class SpawnExplosionEndEvent;
-class DestroyExplosionStartEvent;
-class DestroyExplosionEndEvent;
+class RemoveExplosionEvent;
 
 enum class PlayerType;
 
@@ -29,12 +26,12 @@ enum class ExplosionSound
    Booom
 };
 
-enum class ExplosionAnimation
-{
-   Spawn,
-   Burn,
-   Destroy
-};
+//enum class ExplosionAnimation
+//{
+////   Spawn,
+////   Burn,
+////   Destroy
+//};
 
 class Explosion : public ArenaObject, public EventListener
 {
@@ -52,22 +49,17 @@ public:
    void OnEvent(const Event& event) override;
 
    ExplosionType GetType() const;
-   ExplosionAnimation GetAnimation() const;
    PlayerType GetOwner() const;
    ExplosionSound GetSound(bool reset);
 
 private:
-   void OnSpawnExplosionStart(const SpawnExplosionStartEvent& event);
-   void OnSpawnExplosionEnd(const SpawnExplosionEndEvent& event);
-   void OnDestroyExplosionStart(const DestroyExplosionStartEvent& event);
-   void OnDestroyExplosionEnd(const DestroyExplosionEndEvent& event);
+   void OnRemoveExplosion(const RemoveExplosionEvent& event);
 
    const ExplosionType mType;
    const PlayerType mOwner;
 
    EventQueue& mEventQueue;
 
-   ExplosionAnimation mAnimation = ExplosionAnimation::Spawn;
    ExplosionSound mSound = ExplosionSound::None;
 };
 

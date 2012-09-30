@@ -11,8 +11,9 @@
 #include <vector>
 
 class EventQueue;
-class SpawnPlayerStartEvent;
-class DestroyPlayerStartEvent;
+class RemoveScoreboardEvent;
+class CreatePlayerEvent;
+class KillPlayerEvent;
 enum class PlayerType;
 
 //enum class ScoreboardType
@@ -35,8 +36,9 @@ public:
    std::vector<std::string> GetScore() const;
 
 private:
-   void OnSpawnPlayerStart(const SpawnPlayerStartEvent& event);
-   void OnDestroyPlayerStart(const DestroyPlayerStartEvent& event);
+   void OnRemoveScoreboard(const RemoveScoreboardEvent& event);
+   void OnCreatePlayer(const CreatePlayerEvent& event);
+   void OnKillPlayer(const KillPlayerEvent& event);
 
    struct PlayerInfo
    {

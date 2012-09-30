@@ -6,13 +6,12 @@
 #include "Wall.hpp"
 #include "Extra.hpp"
 #include "Bomb.hpp"
-#include "Explosion.hpp"
 #include "../utils/Utils.hpp"
 
 Arena::Arena(
-   const Point& pos,
-   const Size& size,
-   const Size& borders,
+   const Point pos,
+   const Size size,
+   const Size borders,
    const int cells_x,
    const int cells_y,
    EventQueue& queue
@@ -59,14 +58,38 @@ void Arena::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
-      case EventType::SpawnBombStart:
-         OnSpawnBombStart(dynamic_cast<const SpawnBombStartEvent&>(event));
+      case EventType::RemoveArena:
+         OnRemoveArena(dynamic_cast<const RemoveArenaEvent&>(event));
          break;
-      case EventType::DestroyBombEnd:
-         OnDestroyBombEnd(dynamic_cast<const DestroyBombEndEvent&>(event));
+
+      case EventType::CreateWall:
+         OnCreateWall(dynamic_cast<const CreateWallEvent&>(event));
          break;
-      case EventType::ParentCellChanged:
-         OnParentCellChanged(dynamic_cast<const ParentCellChangedEvent&>(event));
+      case EventType::CreateExtra:
+         OnCreateExtra(dynamic_cast<const CreateExtraEvent&>(event));
+         break;
+      case EventType::CreateBomb:
+         OnCreateBomb(dynamic_cast<const CreateBombEvent&>(event));
+         break;
+      case EventType::CreateExplosion:
+         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
+         break;
+
+      case EventType::RemoveWall:
+         OnRemoveWall(dynamic_cast<const RemoveWallEvent&>(event));
+         break;
+      case EventType::RemoveExtra:
+         OnRemoveExtra(dynamic_cast<const RemoveExtraEvent&>(event));
+         break;
+      case EventType::RemoveBomb:
+         OnRemoveBomb(dynamic_cast<const RemoveBombEvent&>(event));
+         break;
+      case EventType::RemoveExplosion:
+         OnRemoveExplosion(dynamic_cast<const RemoveExplosionEvent&>(event));
+         break;
+
+      case EventType::BombCellChanged:
+         OnBombCellChanged(dynamic_cast<const BombCellChangedEvent&>(event));
          break;
       default:
          break;
@@ -130,77 +153,109 @@ Cell Arena::GetNeighborCell(const Cell& cell, const Direction dir) const
    return { -1, -1 };
 }
 
-bool Arena::HasWall(const Cell& cell) const
-{
-   const auto obj = mCells.at(cell.X).at(cell.Y).second.wall;
-   return (obj != nullptr) && obj->IsValid();
-}
-
-std::shared_ptr<Wall> Arena::GetWall(const Cell& cell) const
+bool Arena::HasWall(const Cell cell) const
 {
    return mCells.at(cell.X).at(cell.Y).second.wall;
 }
 
-void Arena::SetWall(const Cell& cell, const std::shared_ptr<Wall>& wall)
+WallType Arena::GetWallType(const Cell cell) const
 {
-   mCells.at(cell.X).at(cell.Y).second.wall = wall;
+   return mCells.at(cell.X).at(cell.Y).second.wall_type;
 }
 
-void Arena::DestroyWall(const Cell& cell)
-{
-   mCells.at(cell.X).at(cell.Y).second.wall->Invalidate();
-}
-
-bool Arena::HasExtra(const Cell& cell) const
-{
-   const auto obj = mCells.at(cell.X).at(cell.Y).second.extra;
-   return (obj != nullptr) && obj->IsValid();
-}
-
-std::shared_ptr<Extra> Arena::GetExtra(const Cell& cell) const
+bool Arena::HasExtra(const Cell cell) const
 {
    return mCells.at(cell.X).at(cell.Y).second.extra;
 }
 
-void Arena::SetExtra(const Cell& cell, const std::shared_ptr<Extra>& extra)
+ExtraType Arena::GetExtraType(const Cell cell) const
 {
-   mCells.at(cell.X).at(cell.Y).second.extra = extra;
+   return mCells.at(cell.X).at(cell.Y).second.extra_type;
 }
 
-bool Arena::HasBomb(const Cell& cell) const
+bool Arena::HasBomb(const Cell cell) const
 {
-   return mCells.at(cell.X).at(cell.Y).second.bomb_instance;
+   return mCells.at(cell.X).at(cell.Y).second.bomb;
 }
 
-unsigned int Arena::GetBombInstanceId(const Cell& cell) const
+BombType Arena::GetBombType(const Cell cell) const
 {
-   return mCells.at(cell.X).at(cell.Y).second.bomb_instance;
+   return mCells.at(cell.X).at(cell.Y).second.bomb_type;
 }
 
-void Arena::OnSpawnBombStart(const SpawnBombStartEvent& event)
+bool Arena::HasExplosion(const Cell cell) const
 {
-   const auto cell = event.GetCell();
+   return mCells.at(cell.X).at(cell.Y).second.explosion;
+}
 
-   if (HasBomb(cell)) {
-      throw "Trying to create a bomb on a cell that already contains one.";
+PlayerType Arena::GetExplosionOwner(const Cell cell) const
+{
+   return mCells.at(cell.X).at(cell.Y).second.explosion_owner;
+}
+
+void Arena::OnRemoveArena(const RemoveArenaEvent& event)
+{
+   (void) event;
+
+   Invalidate();
+}
+
+void Arena::OnCreateWall(const CreateWallEvent& event)
+{
+   if (HasWall(event.GetCell())) {
+      throw "Trying to create a wall on a cell that already has one.";
    }
-   mCells.at(cell.X).at(cell.Y).second.bomb_instance = event.GetSender();
+   CreateWall(event.GetCell(), event.GetWall());
 }
 
-void Arena::OnDestroyBombEnd(const DestroyBombEndEvent& event)
+void Arena::OnCreateExtra(const CreateExtraEvent& event)
 {
-   const auto cell = event.GetCell();
-
-   if (!HasBomb(cell)) {
-      throw "Trying to remove a non-existent bomb from an arena cell.";
+   if (HasExtra(event.GetCell())) {
+      throw "Trying to create an extra on a cell that already has one.";
    }
-   mCells.at(cell.X).at(cell.Y).second.bomb_instance = 0;
+   CreateExtra(event.GetCell(), event.GetExtra());
 }
 
-void Arena::OnParentCellChanged(const ParentCellChangedEvent& event)
+void Arena::OnCreateBomb(const CreateBombEvent& event)
 {
-   // Currently only bombs can change their parent cell.
+   if (HasBomb(event.GetCell())) {
+      throw "Trying to create a bomb on a cell that already has one.";
+   }
+   CreateBomb(event.GetCell(), event.GetBomb());
+}
 
+void Arena::OnCreateExplosion(const CreateExplosionEvent& event)
+{
+   // Explosions may overlap.
+   // This behaviour favours the latest explosion. This might not be fair
+   //  (no first-come-first-served) but is easier to implement. The latest
+   //  explosion on a cell is guarantied to burn the longest and therefore
+   //  kill players as long as there is an explosion on the cell.
+   CreateExplosion(event.GetCell(), event.GetOwner());
+}
+
+void Arena::OnRemoveWall(const RemoveWallEvent& event)
+{
+   RemoveWall(event.GetCell());
+}
+
+void Arena::OnRemoveExtra(const RemoveExtraEvent& event)
+{
+   RemoveExtra(event.GetCell());
+}
+
+void Arena::OnRemoveBomb(const RemoveBombEvent& event)
+{
+   RemoveBomb(event.GetCell());
+}
+
+void Arena::OnRemoveExplosion(const RemoveExplosionEvent& event)
+{
+   RemoveExplosion(event.GetCell());
+}
+
+void Arena::OnBombCellChanged(const BombCellChangedEvent& event)
+{
    const auto old_cell = event.GetOldCell();
    const auto new_cell = event.GetNewCell();
 
@@ -212,9 +267,53 @@ void Arena::OnParentCellChanged(const ParentCellChangedEvent& event)
       throw "The new parent cell already contains a bomb.";
    }
 
-   const auto bomb = GetBombInstanceId(old_cell);
-   mCells.at(old_cell.X).at(old_cell.Y).second.bomb_instance = 0;
-   mCells.at(new_cell.X).at(new_cell.Y).second.bomb_instance = bomb;
+   const auto type = GetBombType(old_cell);
+   RemoveBomb(old_cell);
+   CreateBomb(new_cell, type);
+}
+
+void Arena::CreateWall(const Cell cell, const WallType type)
+{
+   mCells.at(cell.X).at(cell.Y).second.wall = true;
+   mCells.at(cell.X).at(cell.Y).second.wall_type = type;
+}
+
+void Arena::CreateExtra(const Cell cell, const ExtraType type)
+{
+   mCells.at(cell.X).at(cell.Y).second.extra = true;
+   mCells.at(cell.X).at(cell.Y).second.extra_type = type;
+}
+
+void Arena::CreateBomb(const Cell cell, const BombType type)
+{
+   mCells.at(cell.X).at(cell.Y).second.bomb = true;
+   mCells.at(cell.X).at(cell.Y).second.bomb_type = type;
+}
+
+void Arena::CreateExplosion(const Cell cell, const PlayerType owner)
+{
+   mCells.at(cell.X).at(cell.Y).second.explosion = true;
+   mCells.at(cell.X).at(cell.Y).second.explosion_owner = owner;
+}
+
+void Arena::RemoveWall(const Cell cell)
+{
+   mCells.at(cell.X).at(cell.Y).second.wall = false;
+}
+
+void Arena::RemoveExtra(const Cell cell)
+{
+   mCells.at(cell.X).at(cell.Y).second.extra = false;
+}
+
+void Arena::RemoveBomb(const Cell cell)
+{
+   mCells.at(cell.X).at(cell.Y).second.bomb = false;
+}
+
+void Arena::RemoveExplosion(const Cell cell)
+{
+   mCells.at(cell.X).at(cell.Y).second.explosion = false;
 }
 
 Cell Arena::GetCellAboveOf(const int cell_x, const int cell_y) const
@@ -246,5 +345,5 @@ Cell Arena::GetCellRightOf(const int cell_x, const int cell_y) const
    if (cell_x == (mXCells - 1)) {
       return { -1, -1 };
    }
-   return GetCellFromCoordinates(cell_x + 1, cell_y);
+return GetCellFromCoordinates(cell_x + 1, cell_y);
 }

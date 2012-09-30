@@ -78,18 +78,18 @@ void Match::Input(const SDL_MouseButtonEvent& button)
 
 void Match::Update(const int elapsed_time)
 {
-   mCleanupIdleTime += elapsed_time;
-   if (mCleanupIdleTime >= 1000_ms)
-   {
-      // Remove dead sprites every second.
-      mEntityManager.Cleanup();
-      mCleanupIdleTime = 0_ms;
-   }
+//   mCleanupIdleTime += elapsed_time;
+//   if (mCleanupIdleTime >= 1000_ms)
+//   {
+//      // Remove dead sprites every second.
+//      mEntityManager.Cleanup();
+//      mCleanupIdleTime = 0_ms;
+//   }
 
    CreateInputEvents();
    UpdateEntities(elapsed_time);
    mEventQueue.ProcessEvents();
-   mEventQueue.ProcessEvents();
+   mEntityManager.Cleanup();
 
    // TODO: Query Scoreboard for game state.
 //   mIsGameOver = (active_player_count <= 1) ? true : false;

@@ -10,16 +10,11 @@
 #include <vector>
 
 class EventQueue;
-class SpawnPlayerStartEvent;
-class SpawnPlayerEndEvent;
-class DestroyPlayerStartEvent;
-class DestroyPlayerEndEvent;
-class SpawnBombStartEvent;
-class DestroyBombEndEvent;
-class SpawnExplosionStartEvent;
+class RemovePlayerEvent;
 class InputEvent;
-class MovePlayerEvent;
-class PickupExtraEvent;
+class RemoveBombEvent;
+class KillPlayerEvent;
+struct Cell;
 
 enum class PlayerType
 {
@@ -81,16 +76,10 @@ public:
    PlayerSound GetSound(bool reset);
 
 private:
-   void OnSpawnPlayerStart(const SpawnPlayerStartEvent& event);
-   void OnSpawnPlayerEnd(const SpawnPlayerEndEvent& event);
-   void OnDestroyPlayerStart(const DestroyPlayerStartEvent& event);
-   void OnDestroyPlayerEnd(const DestroyPlayerEndEvent& event);
-   void OnSpawnBombStart(const SpawnBombStartEvent& event);
-   void OnDestroyBombEnd(const DestroyBombEndEvent& event);
-   void OnSpawnExplosionStart(const SpawnExplosionStartEvent& event);
+   void OnRemovePlayer(const RemovePlayerEvent& event);
    void OnInput(const InputEvent& event);
-   void OnMovePlayer(const MovePlayerEvent& event);
-   void OnPickupExtra(const PickupExtraEvent& event);
+   void OnRemoveBomb(const RemoveBombEvent& event);
+   void OnKillPlayer(const KillPlayerEvent& event);
 
    // Number of milliseconds the player has to wait to move another pixel.
    static const int MIN_SPEED = 12_ms;
@@ -99,6 +88,7 @@ private:
    // Number of milliseconds the player has to wait to plant another bomb.
    static const int MIN_PLANTING_SPEED = 250_ms;
 
+   void PickupExtra(Cell cell);
    void UpdateMovement(int elapsed_time);
    void UpdateBombing(int elapsed_time);
    void UpdateAnimation(int elapsed_time);

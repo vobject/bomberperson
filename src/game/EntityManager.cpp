@@ -51,6 +51,19 @@ void EntityManager::OnEvent(const Event& event)
       case EventType::CreatePlayer:
          OnCreatePlayer(dynamic_cast<const CreatePlayerEvent&>(event));
          break;
+
+      case EventType::RemoveArena:
+         OnRemoveArena(dynamic_cast<const RemoveArenaEvent&>(event));
+         break;
+      case EventType::RemoveScoreboard:
+         OnRemoveScoreboard(dynamic_cast<const RemoveScoreboardEvent&>(event));
+         break;
+      case EventType::RemoveWall:
+         OnRemoveWall(dynamic_cast<const RemoveWallEvent&>(event));
+         break;
+      case EventType::RemoveExtra:
+         OnRemoveExtra(dynamic_cast<const RemoveExtraEvent&>(event));
+         break;
       case EventType::RemoveBomb:
          OnRemoveBomb(dynamic_cast<const RemoveBombEvent&>(event));
          break;
@@ -60,6 +73,7 @@ void EntityManager::OnEvent(const Event& event)
       case EventType::RemovePlayer:
          OnRemovePlayer(dynamic_cast<const RemovePlayerEvent&>(event));
          break;
+
       default:
          break;
    }
@@ -122,28 +136,26 @@ void EntityManager::OnCreateScoreboard(const CreateScoreboardEvent& event)
 
 void EntityManager::OnCreateWall(const CreateWallEvent& event)
 {
-   auto wall = std::make_shared<Wall>(mArena, event.GetWall());
+   auto wall = std::make_shared<Wall>(mArena, event.GetWall(), mEventQueue);
    mArena->SetObjectPosition(*wall, event.GetCell());
    mArena->SetObjectSize(*wall);
-   mArena->SetWall(event.GetCell(), wall);
 
    mEntities.insert(wall);
 }
 
 void EntityManager::OnCreateExtra(const CreateExtraEvent& event)
 {
-   if (mArena->HasWall(event.GetCell()) &&
-       !mArena->GetWall(event.GetCell())->IsDestructible())
-   {
-      // Do not create extras on cells with indestructible walls
-      //  because a player could never reach it.
-      return;
-   }
+//   if (mArena->HasWall(event.GetCell()) &&
+//       !mArena->GetWall(event.GetCell())->IsDestructible())
+//   {
+//      // Do not create extras on cells with indestructible walls
+//      //  because a player could never reach it.
+//      return;
+//   }
 
-   auto extra = std::make_shared<Extra>(mArena, event.GetExtra());
+   auto extra = std::make_shared<Extra>(mArena, event.GetExtra(), mEventQueue);
    mArena->SetObjectPosition(*extra, event.GetCell());
    mArena->SetObjectSize(*extra);
-   mArena->SetExtra(event.GetCell(), extra);
 
    mEntities.insert(extra);
 }
@@ -151,7 +163,7 @@ void EntityManager::OnCreateExtra(const CreateExtraEvent& event)
 void EntityManager::OnCreateBomb(const CreateBombEvent& event)
 {
    auto bomb = std::make_shared<Bomb>(mArena,
-                                      event.GetBombType(),
+                                      event.GetBomb(),
                                       event.GetOwner(),
                                       mEventQueue);
    bomb->SetRange(event.GetRange());
@@ -160,12 +172,6 @@ void EntityManager::OnCreateBomb(const CreateBombEvent& event)
    mArena->SetObjectSize(*bomb);
 
    mEntities.insert(bomb);
-
-   // Spawn the explosion after we created it.
-   mEventQueue.Add(std::make_shared<SpawnBombStartEvent>(bomb->GetInstanceId(),
-                                                         event.GetCell(),
-                                                         event.GetBombType(),
-                                                         event.GetOwner()));
 }
 
 void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
@@ -179,12 +185,6 @@ void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
    mArena->SetObjectSize(*explosion);
 
    mEntities.insert(explosion);
-
-   // Spawn the explosion after we created it.
-   mEventQueue.Add(std::make_shared<SpawnExplosionStartEvent>(explosion->GetInstanceId(),
-                                                              event.GetCell(),
-                                                              event.GetExplosionType(),
-                                                              event.GetOwner()));
 }
 
 void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
@@ -216,10 +216,26 @@ void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
    mArena->SetObjectSize(*player);
 
    mEntities.insert(player);
+}
 
-   // Let the player spawn after we created it.
-   mEventQueue.Add(std::make_shared<SpawnPlayerStartEvent>(player->GetInstanceId(),
-                                                           event.GetPlayer()));
+void EntityManager::OnRemoveArena(const RemoveArenaEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemoveScoreboard(const RemoveScoreboardEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemoveWall(const RemoveWallEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemoveExtra(const RemoveExtraEvent& event)
+{
+   (void) event;
 }
 
 void EntityManager::OnRemoveBomb(const RemoveBombEvent& event)

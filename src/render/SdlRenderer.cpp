@@ -178,7 +178,7 @@ void SdlRenderer::Render(const std::shared_ptr<Bomb>& obj)
    const auto anim_time = obj->GetAnimationTime();
 
    const auto res = mResCache->GetBombResource(type);
-   const auto frame = res.GetFrame(obj->GetAnimation(), anim_time);
+   const auto frame = res.GetFrame(anim_time);
    Render(obj, frame);
 }
 
@@ -188,7 +188,7 @@ void SdlRenderer::Render(const std::shared_ptr<Explosion>& obj)
    const auto anim_time = obj->GetAnimationTime();
 
    const auto res = mResCache->GetExplosionResource(type);
-   const auto frame = res.GetFrame(obj->GetAnimation(), anim_time);
+   const auto frame = res.GetFrame(anim_time);
    Render(obj, frame);
 }
 

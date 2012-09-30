@@ -7,6 +7,7 @@
 #include <set>
 
 class EventQueue;
+
 class CreateArenaEvent;
 class CreateScoreboardEvent;
 class CreateWallEvent;
@@ -14,6 +15,11 @@ class CreateExtraEvent;
 class CreateBombEvent;
 class CreateExplosionEvent;
 class CreatePlayerEvent;
+
+class RemoveArenaEvent;
+class RemoveScoreboardEvent;
+class RemoveWallEvent;
+class RemoveExtraEvent;
 class RemoveBombEvent;
 class RemoveExplosionEvent;
 class RemovePlayerEvent;
@@ -64,6 +70,10 @@ private:
    void OnCreateExplosion(const CreateExplosionEvent& event);
    void OnCreatePlayer(const CreatePlayerEvent& event);
 
+   void OnRemoveArena(const RemoveArenaEvent& event);
+   void OnRemoveScoreboard(const RemoveScoreboardEvent& event);
+   void OnRemoveWall(const RemoveWallEvent& event);
+   void OnRemoveExtra(const RemoveExtraEvent& event);
    void OnRemoveBomb(const RemoveBombEvent& event);
    void OnRemoveExplosion(const RemoveExplosionEvent& event);
    void OnRemovePlayer(const RemovePlayerEvent& event);

@@ -41,8 +41,8 @@ public:
    EntityId GetId() const;
    ZOrder GetZOrder() const;
 
-   bool IsVisible() const;
-   void SetVisible(bool status);
+//   bool IsVisible() const;
+//   void SetVisible(bool status);
 
    Point GetPosition() const;
    void SetPosition(const Point& pos);
@@ -61,7 +61,7 @@ private:
    const EntityId mId;
    const ZOrder mZOrder;
    bool mIsValid = true;
-   bool mIsVisible = false;
+//   bool mIsVisible = false;
    Point mPos = { 0, 0 };
    Size mSize = { 0, 0 };
    int mAnimationTime = 0; // No animation by default.

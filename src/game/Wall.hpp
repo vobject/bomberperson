@@ -2,24 +2,10 @@
 #define WALL_HPP
 
 #include "ArenaObject.hpp"
+#include "EventListener.hpp"
 
-//enum class WallType
-//{
-////   Crossway,
-////   Vertical,
-////   VerticalLeftEnd,
-////   VerticalRightEnd,
-////   Horizontal,
-////   HorizontalLeftEnd,
-////   HorizontalRightEnd,
-////   NorthWestCorner,
-////   NorthEastCorner,
-////   SouthWestCorner,
-////   SouthEastCorner
-
-//   Indestructible,
-//   Destructible
-//};
+class EventQueue;
+class RemoveWallEvent;
 
 enum class WallType
 {
@@ -32,22 +18,28 @@ enum class WallType
 
 //};
 
-class Wall : public ArenaObject
+class Wall : public ArenaObject, public EventListener
 {
 public:
-   Wall(const std::shared_ptr<Arena>& arena, WallType type);
+   Wall(const std::shared_ptr<Arena>& arena,
+        WallType type,
+        EventQueue& queue);
    virtual ~Wall();
 
    Wall(const Wall&) = delete;
    Wall& operator=(const Wall&) = delete;
 
    void Update(int elapsed_time) override;
+   void OnEvent(const Event& event) override;
 
    WallType GetType() const;
-   bool IsDestructible() const;
 
 private:
+   void OnRemoveWall(const RemoveWallEvent& event);
+
    const WallType mType;
+
+   EventQueue& mEventQueue;
 };
 
 #endif // WALL_HPP
