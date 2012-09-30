@@ -1,15 +1,21 @@
 #include "Explosion.hpp"
+#include "EventQueue.hpp"
+#include "EventType.hpp"
 #include "../Options.hpp"
 
 Explosion::Explosion(
    const std::shared_ptr<Arena>& arena,
    const ExplosionType type,
-   const std::shared_ptr<Player>& owner
+   const PlayerType owner,
+   EventQueue& queue
 )
    : ArenaObject(EntityId::Explosion, ZOrder::Layer_5, arena)
    , mType(type)
    , mOwner(owner)
+   , mEventQueue(queue)
 {
+   mEventQueue.Register(this);
+
    if (ExplosionType::Center == mType) {
       mSound = ExplosionSound::Booom;
    }
@@ -17,7 +23,7 @@ Explosion::Explosion(
 
 Explosion::~Explosion()
 {
-
+   mEventQueue.UnRegister(this);
 }
 
 void Explosion::Update(const int elapsed_time)
@@ -27,7 +33,21 @@ void Explosion::Update(const int elapsed_time)
    if (GetAnimationTime() >= DefaultValue::EXPLOSION_ANIM_LEN)
    {
       // The explosion has burned out.
-      Invalidate();
+      const auto parent_cell = GetArena()->GetCellFromObject(*this);
+      mEventQueue.Add(std::make_shared<RemoveExplosionEvent>(GetInstanceId(),
+                                                             parent_cell));
+   }
+}
+
+void Explosion::OnEvent(const Event& event)
+{
+   switch (event.GetType())
+   {
+      case EventType::RemoveExplosion:
+         OnRemoveExplosion(dynamic_cast<const RemoveExplosionEvent&>(event));
+         break;
+      default:
+         break;
    }
 }
 
@@ -36,7 +56,7 @@ ExplosionType Explosion::GetType() const
    return mType;
 }
 
-std::shared_ptr<Player> Explosion::GetOwner() const
+PlayerType Explosion::GetOwner() const
 {
    return mOwner;
 }
@@ -49,4 +69,15 @@ ExplosionSound Explosion::GetSound(const bool reset)
       mSound = ExplosionSound::None;
    }
    return ret;
+}
+
+void Explosion::OnRemoveExplosion(const RemoveExplosionEvent& event)
+{
+   const auto parent_cell = GetArena()->GetCellFromObject(*this);
+
+   if (event.GetCell() != parent_cell) {
+      return;
+   }
+
+   Invalidate();
 }

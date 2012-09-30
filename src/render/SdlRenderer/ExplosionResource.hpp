@@ -10,9 +10,7 @@ struct SDL_Surface;
 class ExplosionResource
 {
 public:
-   ExplosionResource(ExplosionType type,
-                     int anim_length,
-                     const std::vector<SDL_Surface*>& textures);
+   ExplosionResource(ExplosionType type);
    ~ExplosionResource();
 
    ExplosionResource(const ExplosionResource&) = default;
@@ -21,11 +19,12 @@ public:
    ExplosionType GetType() const;
 
    SDL_Surface* GetFrame(int anim_time) const;
+   void SetFrames(int anim_length, const std::vector<SDL_Surface*>& textures);
 
 private:
    const ExplosionType mType;
-   const std::vector<SDL_Surface*> mFrames;
-   int mMsPerFrame;
+   std::vector<SDL_Surface*> mFrames;
+   int mMsPerFrame = 0;
 };
 
 #endif // EXPLOSION_RESOURCE_HPP

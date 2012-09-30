@@ -172,33 +172,38 @@ void SdlRenderer::Render(const std::shared_ptr<Extra>& extra)
    Render(extra, frame);
 }
 
-void SdlRenderer::Render(const std::shared_ptr<Bomb>& bomb)
+void SdlRenderer::Render(const std::shared_ptr<Bomb>& obj)
 {
-   const auto type = bomb->GetType();
-   const auto anim_time = bomb->GetAnimationTime();
-   const auto frame = mResCache->GetBombResource(type).GetFrame(anim_time);
-   Render(bomb, frame);
+   const auto type = obj->GetType();
+   const auto anim_time = obj->GetAnimationTime();
+
+   const auto res = mResCache->GetBombResource(type);
+   const auto frame = res.GetFrame(anim_time);
+   Render(obj, frame);
 }
 
-void SdlRenderer::Render(const std::shared_ptr<Explosion>& explosion)
+void SdlRenderer::Render(const std::shared_ptr<Explosion>& obj)
 {
-   const auto type = explosion->GetType();
-   const auto anim_time = explosion->GetAnimationTime();
-   const auto frame = mResCache->GetExplosionResource(type).GetFrame(anim_time);
-   Render(explosion, frame);
+   const auto type = obj->GetType();
+   const auto anim_time = obj->GetAnimationTime();
+
+   const auto res = mResCache->GetExplosionResource(type);
+   const auto frame = res.GetFrame(anim_time);
+   Render(obj, frame);
 }
 
-void SdlRenderer::Render(const std::shared_ptr<Player>& player)
+void SdlRenderer::Render(const std::shared_ptr<Player>& obj)
 {
-   const auto type = player->GetType();
-   const auto data = player->GetData();
-   const auto anim_time = player->GetAnimationTime();
+   const auto type = obj->GetType();
+   const auto anim_time = obj->GetAnimationTime();
 
    const auto res = mResCache->GetPlayerResource(type);
-   const auto frame = res.GetFrame(data.anim, anim_time, data.speed);
+   const auto frame = res.GetFrame(obj->GetAnimation(),
+                                   anim_time,
+                                   obj->GetSpeed() * obj->GetDistance());
 
-   auto pos = player->GetPosition();
-   const auto size = player->GetSize();
+   auto pos = obj->GetPosition();
+   const auto size = obj->GetSize();
 
    pos.X -= (DefaultValue::PLAYER_WIDTH - DefaultValue::CELL_WIDTH) / 2;
    pos.Y -= (DefaultValue::PLAYER_HEIGHT - DefaultValue::CELL_HEIGHT);

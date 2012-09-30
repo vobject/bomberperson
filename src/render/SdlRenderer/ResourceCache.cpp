@@ -159,36 +159,52 @@ void ResourceCache::LoadExtraResources()
 
 void ResourceCache::LoadBombResources()
 {
-   const auto id1 = BombType::Countdown;
-   const auto id2 = BombType::Remote;
    const Size size = { DefaultValue::BOMB_WIDTH,
                        DefaultValue::BOMB_HEIGHT };
+   const auto len = DefaultValue::BOMB_ANIM_LEN;
 
-   // TODO: Align animation speed and bomb lifetime.
-   mBombRes.insert({ id1, { id1, 2500_ms, { LoadTexture("bomb_1.png", size), LoadTexture("bomb_2.png", size), LoadTexture("bomb_3.png", size) } } });
-   mBombRes.insert({ id2, { id2, 1000_ms, { LoadTexture("bomb_remote_1.png", size), LoadTexture("bomb_remote_2.png", size) } } });
+   BombResource countdown(BombType::Countdown);
+   countdown.SetFrames(len, { LoadTexture("bomb_1.png", size), LoadTexture("bomb_2.png", size), LoadTexture("bomb_3.png", size) });
+   mBombRes.insert({ countdown.GetType(), countdown });
+
+   BombResource remote(BombType::Remote);
+   remote.SetFrames(len, { LoadTexture("bomb_remote_1.png", size), LoadTexture("bomb_remote_2.png", size) });
+   mBombRes.insert({ remote.GetType(), remote });
 }
 
 void ResourceCache::LoadExplosionResources()
 {
-   const auto id1 = ExplosionType::Center;
-   const auto id2 = ExplosionType::Horizontal;
-   const auto id3 = ExplosionType::HorizontalLeftEnd;
-   const auto id4 = ExplosionType::HorizontalRightEnd;
-   const auto id5 = ExplosionType::Vertical;
-   const auto id6 = ExplosionType::VerticalUpEnd;
-   const auto id7 = ExplosionType::VerticalDownEnd;
    const Size size = { DefaultValue::EXPLOSION_WIDTH,
                        DefaultValue::EXPLOSION_HEIGHT };
+   const auto len = DefaultValue::EXPLOSION_ANIM_LEN;
 
-   // TODO: Align animation speed and explosion lifetime.
-   mExplosionRes.insert({ id1, { id1, 750_ms, { LoadTexture("explosion_center_1.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_4.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_1.png", size) } } });
-   mExplosionRes.insert({ id2, { id2, 750_ms, { LoadTexture("explosion_horizontal_1.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_4.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_1.png", size) } } });
-   mExplosionRes.insert({ id3, { id3, 750_ms, { LoadTexture("explosion_horizontal_leftend_1.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_4.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_1.png", size) } } });
-   mExplosionRes.insert({ id4, { id4, 750_ms, { LoadTexture("explosion_horizontal_rightend_1.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_4.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_1.png", size) } } });
-   mExplosionRes.insert({ id5, { id5, 750_ms, { LoadTexture("explosion_vertical_1.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_4.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_1.png", size) } } });
-   mExplosionRes.insert({ id6, { id6, 750_ms, { LoadTexture("explosion_vertical_upend_1.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_4.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_1.png", size) } } });
-   mExplosionRes.insert({ id7, { id7, 750_ms, { LoadTexture("explosion_vertical_downend_1.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_4.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_1.png", size) } } });
+   ExplosionResource center(ExplosionType::Center);
+   center.SetFrames(len, { LoadTexture("explosion_center_1.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_4.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_1.png", size) });
+   mExplosionRes.insert({ center.GetType(), center });
+
+   ExplosionResource horizontal(ExplosionType::Horizontal);
+   horizontal.SetFrames(len, { LoadTexture("explosion_horizontal_1.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_4.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_1.png", size) });
+   mExplosionRes.insert({ horizontal.GetType(), horizontal });
+
+   ExplosionResource horizontal_leftend(ExplosionType::HorizontalLeftEnd);
+   horizontal_leftend.SetFrames(len, { LoadTexture("explosion_horizontal_leftend_1.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_4.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_1.png", size) });
+   mExplosionRes.insert({ horizontal_leftend.GetType(), horizontal_leftend });
+
+   ExplosionResource horizontal_rightend(ExplosionType::HorizontalRightEnd);
+   horizontal_rightend.SetFrames(len, { LoadTexture("explosion_horizontal_rightend_1.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_4.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_1.png", size) });
+   mExplosionRes.insert({ horizontal_rightend.GetType(), horizontal_rightend });
+
+   ExplosionResource vertical(ExplosionType::Vertical);
+   vertical.SetFrames(len, { LoadTexture("explosion_vertical_1.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_4.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_1.png", size) });
+   mExplosionRes.insert({ vertical.GetType(), vertical });
+
+   ExplosionResource vertical_upend(ExplosionType::VerticalUpEnd);
+   vertical_upend.SetFrames(len, { LoadTexture("explosion_vertical_upend_1.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_4.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_1.png", size) });
+   mExplosionRes.insert({ vertical_upend.GetType(), vertical_upend });
+
+   ExplosionResource vertical_downend(ExplosionType::VerticalDownEnd);
+   vertical_downend.SetFrames(len, { LoadTexture("explosion_vertical_downend_1.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_4.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_1.png", size) });
+   mExplosionRes.insert({ vertical_downend.GetType(), vertical_downend });
 }
 
 void ResourceCache::LoadPlayerResources()
@@ -196,9 +212,9 @@ void ResourceCache::LoadPlayerResources()
    const Size size = { DefaultValue::PLAYER_WIDTH,
                        DefaultValue::PLAYER_HEIGHT };
    const auto walk_len = DefaultValue::PLAYER_WALK_ANIM_LEN;
+   const auto spawn_len = DefaultValue::PLAYER_SPAWN_ANIM_LEN;
    const auto death_len = DefaultValue::PLAYER_DEATH_ANIM_LEN;
 
-   // TODO: align player speed and animation speed!!
    PlayerResource player_1(PlayerType::Player_1);
    player_1.SetFrames(PlayerAnimation::StandUp, walk_len, { LoadTexture("player_1_up.png", size) });
    player_1.SetFrames(PlayerAnimation::StandDown, walk_len, { LoadTexture("player_1_down.png", size) });
@@ -208,7 +224,8 @@ void ResourceCache::LoadPlayerResources()
    player_1.SetFrames(PlayerAnimation::WalkDown, walk_len, { LoadTexture("player_1_down_1.png", size), LoadTexture("player_1_down_2.png", size) });
    player_1.SetFrames(PlayerAnimation::WalkLeft, walk_len, { LoadTexture("player_1_left_1.png", size), LoadTexture("player_1_left_2.png", size) });
    player_1.SetFrames(PlayerAnimation::WalkRight, walk_len, { LoadTexture("player_1_right_1.png", size), LoadTexture("player_1_right_2.png", size) });
-   player_1.SetFrames(PlayerAnimation::Dying, death_len, { LoadTexture("player_1_death_1.png", size), LoadTexture("player_1_death_2.png", size), LoadTexture("player_1_death_3.png", size), LoadTexture("player_1_death_4.png", size) });
+   player_1.SetFrames(PlayerAnimation::Spawn, spawn_len, { LoadTexture("player_spawn_1.png", size), LoadTexture("player_spawn_2.png", size), LoadTexture("player_spawn_3.png", size), LoadTexture("player_spawn_4.png", size) });
+   player_1.SetFrames(PlayerAnimation::Destroy, death_len, { LoadTexture("player_1_death_1.png", size), LoadTexture("player_1_death_2.png", size), LoadTexture("player_1_death_3.png", size), LoadTexture("player_1_death_4.png", size) });
    mPlayerRes.insert({ player_1.GetType(), player_1 });
 
    PlayerResource player_2(PlayerType::Player_2);
@@ -220,7 +237,8 @@ void ResourceCache::LoadPlayerResources()
    player_2.SetFrames(PlayerAnimation::WalkDown, walk_len, { LoadTexture("player_2_down_1.png", size), LoadTexture("player_2_down_2.png", size) });
    player_2.SetFrames(PlayerAnimation::WalkLeft, walk_len, { LoadTexture("player_2_left_1.png", size), LoadTexture("player_2_left_2.png", size) });
    player_2.SetFrames(PlayerAnimation::WalkRight, walk_len, { LoadTexture("player_2_right_1.png", size), LoadTexture("player_2_right_2.png", size) });
-   player_2.SetFrames(PlayerAnimation::Dying, death_len, { LoadTexture("player_2_death_1.png", size), LoadTexture("player_2_death_2.png", size), LoadTexture("player_2_death_3.png", size), LoadTexture("player_2_death_4.png", size) });
+   player_2.SetFrames(PlayerAnimation::Spawn, spawn_len, { LoadTexture("player_spawn_1.png", size), LoadTexture("player_spawn_2.png", size), LoadTexture("player_spawn_3.png", size), LoadTexture("player_spawn_4.png", size) });
+   player_2.SetFrames(PlayerAnimation::Destroy, death_len, { LoadTexture("player_2_death_1.png", size), LoadTexture("player_2_death_2.png", size), LoadTexture("player_2_death_3.png", size), LoadTexture("player_2_death_4.png", size) });
    mPlayerRes.insert({ player_2.GetType(), player_2 });
 
    PlayerResource player_3(PlayerType::Player_3);
@@ -232,7 +250,8 @@ void ResourceCache::LoadPlayerResources()
    player_3.SetFrames(PlayerAnimation::WalkDown, walk_len, { LoadTexture("player_3_down_1.png", size), LoadTexture("player_3_down_2.png", size) });
    player_3.SetFrames(PlayerAnimation::WalkLeft, walk_len, { LoadTexture("player_3_left_1.png", size), LoadTexture("player_3_left_2.png", size) });
    player_3.SetFrames(PlayerAnimation::WalkRight, walk_len, { LoadTexture("player_3_right_1.png", size), LoadTexture("player_3_right_2.png", size) });
-   player_3.SetFrames(PlayerAnimation::Dying, death_len, { LoadTexture("player_3_death_1.png", size), LoadTexture("player_3_death_2.png", size), LoadTexture("player_3_death_3.png", size), LoadTexture("player_3_death_4.png", size) });
+   player_3.SetFrames(PlayerAnimation::Spawn, spawn_len, { LoadTexture("player_spawn_1.png", size), LoadTexture("player_spawn_2.png", size), LoadTexture("player_spawn_3.png", size), LoadTexture("player_spawn_4.png", size) });
+   player_3.SetFrames(PlayerAnimation::Destroy, death_len, { LoadTexture("player_3_death_1.png", size), LoadTexture("player_3_death_2.png", size), LoadTexture("player_3_death_3.png", size), LoadTexture("player_3_death_4.png", size) });
    mPlayerRes.insert({ player_3.GetType(), player_3 });
 
    PlayerResource player_4(PlayerType::Player_4);
@@ -244,7 +263,8 @@ void ResourceCache::LoadPlayerResources()
    player_4.SetFrames(PlayerAnimation::WalkDown, walk_len, { LoadTexture("player_4_down_1.png", size), LoadTexture("player_4_down_2.png", size) });
    player_4.SetFrames(PlayerAnimation::WalkLeft, walk_len, { LoadTexture("player_4_left_1.png", size), LoadTexture("player_4_left_2.png", size) });
    player_4.SetFrames(PlayerAnimation::WalkRight, walk_len, { LoadTexture("player_4_right_1.png", size), LoadTexture("player_4_right_2.png", size) });
-   player_4.SetFrames(PlayerAnimation::Dying, death_len, { LoadTexture("player_4_death_1.png", size), LoadTexture("player_4_death_2.png", size), LoadTexture("player_4_death_3.png", size), LoadTexture("player_4_death_4.png", size) });
+   player_4.SetFrames(PlayerAnimation::Spawn, spawn_len, { LoadTexture("player_spawn_1.png", size), LoadTexture("player_spawn_2.png", size), LoadTexture("player_spawn_3.png", size), LoadTexture("player_spawn_4.png", size) });
+   player_4.SetFrames(PlayerAnimation::Destroy, death_len, { LoadTexture("player_4_death_1.png", size), LoadTexture("player_4_death_2.png", size), LoadTexture("player_4_death_3.png", size), LoadTexture("player_4_death_4.png", size) });
    mPlayerRes.insert({ player_4.GetType(), player_4 });
 }
 

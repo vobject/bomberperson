@@ -20,14 +20,14 @@ PlayerType PlayerResource::GetType() const
 }
 
 void PlayerResource::SetFrames(
-   const PlayerAnimation state,
+   const PlayerAnimation anim,
    const int length,
    const std::vector<SDL_Surface*>& textures
 )
 {
    if (!length) {
       // We might divide by zero if the animation's length was 0.
-      throw "The length of a player animation cannot be 0.";
+      throw "The length of an animation cannot be 0.";
    }
 
    if (textures.empty()) {
@@ -35,7 +35,7 @@ void PlayerResource::SetFrames(
       throw "PlayerResource: Invalid sprite textures.";
    }
 
-   mFrames[state] = { textures, length };
+   mFrames.insert({ anim, { textures, length }});
 }
 
 SDL_Surface* PlayerResource::GetFrame(

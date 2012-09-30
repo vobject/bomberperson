@@ -128,7 +128,8 @@ void AudioCache::LoadPlayerResources()
    mPlayerSound.insert({ PlayerSound::Collect_Bombs, LoadSound("player_collect_bombs.wav") });
    mPlayerSound.insert({ PlayerSound::Collect_Range, LoadSound("player_collect_range.wav") });
    mPlayerSound.insert({ PlayerSound::Collect_InfiniteRange, LoadSound("player_collect_infiniterange.wav") });
-   mPlayerSound.insert({ PlayerSound::Die, LoadSound("player_die.wav") });
+   mPlayerSound.insert({ PlayerSound::Spawn, LoadSound("player_spawn.wav") });
+   mPlayerSound.insert({ PlayerSound::Destroy, LoadSound("player_die.wav") });
 //   mPlayerSound.insert({ PlayerSound::Win, LoadSound("player_.wav") });
 }
 

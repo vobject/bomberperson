@@ -1,6 +1,7 @@
 #include "SceneObject.hpp"
 
-unsigned int SceneObject::sCurrentInstanceId;
+// Do not start at 0.
+unsigned int SceneObject::sCurrentInstanceId = 1024;
 
 SceneObject::SceneObject(const EntityId id, const ZOrder zorder)
    : mInstanceId(sCurrentInstanceId++)
@@ -39,6 +40,16 @@ ZOrder SceneObject::GetZOrder() const
 {
    return mZOrder;
 }
+
+//bool SceneObject::IsVisible() const
+//{
+//   return mIsVisible;
+//}
+
+//void SceneObject::SetVisible(const bool status)
+//{
+//   mIsVisible = status;
+//}
 
 Point SceneObject::GetPosition() const
 {

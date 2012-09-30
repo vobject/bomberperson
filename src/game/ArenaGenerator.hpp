@@ -4,45 +4,40 @@
 #include "../utils/Utils.hpp"
 
 #include <memory>
-#include <string>
-#include <tuple>
-#include <vector>
 
-class Arena;
-
-class EntityManager;
+class EventQueue;
+class Cell;
 
 class ArenaGenerator
 {
 public:
-   // TODO: Init with ResCache or Options class.
-   ArenaGenerator(EntityManager& entity_factory);
+   ArenaGenerator(unsigned int id, EventQueue& queue);
    ~ArenaGenerator();
 
    ArenaGenerator(const ArenaGenerator&) = delete;
    ArenaGenerator& operator=(const ArenaGenerator&) = delete;
 
-   void SetArenaPosition(const Point& pos);
-   void SetArenaSize(const Size& size);
-   void SetArenaBorderSize(const Size& size);
+   void SetDimensions(int cells_x, int cells_y);
+   void SetPlayers(int player_count);
 
-//   std::shared_ptr<Field> FromLevel(const std::string& name) const;
-   std::shared_ptr<Arena> GetDefaultArena(int cells_x, int cells_y) const;
-   void CreateDefaultWalls(int cells_x, int cells_y, Arena& arena) const;
-   void CreateDefaultExtras(int cells_x, int cells_y, Arena& arena) const;
-   void CreateDefaultSpawnAreas(int cells_x, int cells_y, int players, Arena& arena) const;
+   void CreateDefaultWalls() const;
+   void CreateDefaultExtras() const;
 
 private:
+   void CreateDefaultWall(const Cell& cell) const;
+   void CreateDefaultExtra(const Cell& cell) const;
 
+   bool IsPatternCell(const Cell& cell) const;
+   bool IsSpawningCell(const Cell& cell) const;
    bool ShouldCreateItem() const;
 
-   EntityManager& mEntityFactory;
+   const unsigned int mArenaId;
 
-   // Absolute position on the screen.
-   Point mPos = { 0, 0 };
-   // Size of the whole arena.
-   Size mSize = { 0, 0 };
-   Size mBorders = { 0, 0 };
+   EventQueue& mEventQueue;
+
+   int mCellsX = 0;
+   int mCellsY = 0;
+   int mPlayers = 0;
 };
 
 #endif // ARENA_GENERATOR_HPP

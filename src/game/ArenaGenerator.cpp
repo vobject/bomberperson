@@ -1,5 +1,7 @@
 #include "ArenaGenerator.hpp"
-#include "EntityManager.hpp"
+#include "EventQueue.hpp"
+#include "EventType.hpp"
+
 #include "Arena.hpp"
 #include "Wall.hpp"
 #include "Extra.hpp"
@@ -8,8 +10,9 @@
 #include <cstdlib>
 #include <ctime>
 
-ArenaGenerator::ArenaGenerator(EntityManager& entity_factory)
-   : mEntityFactory(entity_factory)
+ArenaGenerator::ArenaGenerator(unsigned int id, EventQueue& queue)
+   : mArenaId(id)
+   , mEventQueue(queue)
 {
    srand(time(nullptr));
 }
@@ -19,88 +22,50 @@ ArenaGenerator::~ArenaGenerator()
 
 }
 
-void ArenaGenerator::SetArenaPosition(const Point& pos)
+void ArenaGenerator::SetDimensions(const int cells_x, const int cells_y)
 {
-   mPos = pos;
+   mCellsX = cells_x;
+   mCellsY = cells_y;
 }
 
-void ArenaGenerator::SetArenaSize(const Size& size)
+void ArenaGenerator::SetPlayers(const int player_count)
 {
-   mSize = size;
+   mPlayers = player_count;
 }
 
-void ArenaGenerator::SetArenaBorderSize(const Size& borders)
+void ArenaGenerator::CreateDefaultWalls() const
 {
-   mBorders = borders;
-}
-
-std::shared_ptr<Arena> ArenaGenerator::GetDefaultArena(
-   const int cells_x,
-   const int cells_y
-) const
-{
-   if (!mSize || !cells_x || !cells_y) {
-      throw "Arena size or dimensions not valid.";
-   }
-
-   return std::make_shared<Arena>(mPos,
-                                  mSize,
-                                  mBorders,
-                                  cells_x,
-                                  cells_y);
-}
-
-void ArenaGenerator::CreateDefaultWalls(
-   const int cells_x,
-   const int cells_y,
-   Arena& arena
-) const
-{
-   for (int x = 0; x < cells_x; x++)
+   for (int x = 0; x < mCellsX; x++)
    {
-      for (int y = 0; y < cells_y; y++)
+      for (int y = 0; y < mCellsY; y++)
       {
          const Cell cell = { x, y };
-         std::shared_ptr<Wall> wall;
 
-         if ((x % 2) && (y % 2)) // Pattern
-         {
-            // Create the field boundary and pattern.
-            wall = mEntityFactory.CreateWall(cell, WallType::Indestructible);
+         // Do not plant bombs on a plyer's spawning area.
+         if (IsSpawningCell(cell)) {
+            continue;
          }
-         else
-         {
-            wall = mEntityFactory.CreateWall(cell, WallType::Destructible);
-         }
-         arena.SetWall(cell, wall);
+
+         CreateDefaultWall(cell);
       }
    }
 }
 
-void ArenaGenerator::CreateDefaultExtras(
-   const int cells_x,
-   const int cells_y,
-   Arena& arena
-) const
+void ArenaGenerator::CreateDefaultExtras() const
 {
-   for (int x = 0; x < cells_x; x++)
+   for (int x = 0; x < mCellsX; x++)
    {
-      for (int y = 0; y < cells_y; y++)
+      for (int y = 0; y < mCellsY; y++)
       {
          const Cell cell = { x, y };
 
-         if (!arena.HasWall(cell)) {
-            // Do not put extras on a plain cell without a wall.
-            continue;
-         }
-
-         if (!arena.GetWall(cell)->IsValid()) {
-            // Do not put extras on a cell whose wall is no longer alive.
-            continue;
-         }
-
-         if (!arena.GetWall(cell)->IsDestructible()) {
+         if (IsPatternCell(cell)) {
             // Do not put extras on cells with an indestructible wall.
+            continue;
+         }
+
+         if (IsSpawningCell(cell)) {
+            // Do not put extras on a cell without a wall.
             continue;
          }
 
@@ -109,115 +74,94 @@ void ArenaGenerator::CreateDefaultExtras(
             continue;
          }
 
-         std::shared_ptr<Extra> extra;
-
-         if (!(rand() % (cells_x * cells_y / 4)))
-         {
-            // Very little chance for a golden flame (infinite explosion range).
-            extra = mEntityFactory.CreateExtra(cell, ExtraType::InfiniteRange);
-         }
-         else
-         {
-            switch (rand() % 5)
-            {
-               case 0:
-                  extra = mEntityFactory.CreateExtra(cell, ExtraType::Speed);
-                  break;
-               case 1:
-                  extra = mEntityFactory.CreateExtra(cell, ExtraType::Bombs);
-                  break;
-               case 2:
-                  extra = mEntityFactory.CreateExtra(cell, ExtraType::Range);
-                  break;
-               case 3:
-                  extra = mEntityFactory.CreateExtra(cell, ExtraType::Kick);
-                  break;
-               case 4:
-                  extra = mEntityFactory.CreateExtra(cell, ExtraType::RemoteBombs);
-                  break;
-            }
-         }
-         arena.SetExtra(cell, extra);
+         CreateDefaultExtra(cell);
       }
    }
 }
 
-void ArenaGenerator::CreateDefaultSpawnAreas(
-      const int cells_x,
-      const int cells_y,
-      const int players,
-      Arena& arena
-) const
+void ArenaGenerator::CreateDefaultWall(const Cell& cell) const
 {
-   // TODO: invalidate all extras on the spawn cells.
+   WallType type = WallType::Destructible;
 
-   if (players >= 1)
+   if (IsPatternCell(cell))
    {
-      arena.GetWall({ 0, 0 })->Invalidate();
-      arena.GetWall({ 0, 1 })->Invalidate();
-      arena.GetWall({ 1, 0 })->Invalidate();
+      // Create a pattern of indestructible walls.
+      type = WallType::Indestructible;
+   }
 
-      if (arena.HasExtra({ 0, 0 })) {
-          arena.GetExtra({ 0, 0 })->Invalidate();
-      }
-      if (arena.HasExtra({ 0, 1 })) {
-          arena.GetExtra({ 0, 1 })->Invalidate();
-      }
-      if (arena.HasExtra({ 1, 0 })) {
-          arena.GetExtra({ 1, 0 })->Invalidate();
+   mEventQueue.Add(std::make_shared<CreateWallEvent>(mArenaId, cell, type));
+}
+
+void ArenaGenerator::CreateDefaultExtra(const Cell& cell) const
+{
+   ExtraType type;
+
+   if (!(rand() % (mCellsX * mCellsY / 4)))
+   {
+      // Very little chance for a golden flame (infinite explosion range).
+      type = ExtraType::InfiniteRange;
+   }
+   else
+   {
+      switch (rand() % 5)
+      {
+         case 0:
+            type = ExtraType::Speed;
+            break;
+         case 1:
+            type = ExtraType::Bombs;
+            break;
+         case 2:
+            type = ExtraType::Range;
+            break;
+         case 3:
+            type = ExtraType::Kick;
+            break;
+         case 4:
+            type = ExtraType::RemoteBombs;
+            break;
       }
    }
 
-   if (players >= 2)
-   {
-      arena.GetWall({ cells_x - 1, cells_y - 1 })->Invalidate();
-      arena.GetWall({ cells_x - 1, cells_y - 2 })->Invalidate();
-      arena.GetWall({ cells_x - 2, cells_y - 1 })->Invalidate();
+   mEventQueue.Add(std::make_shared<CreateExtraEvent>(mArenaId, cell, type));
+}
 
-      if (arena.HasExtra({ cells_x - 1, cells_y - 1 })) {
-          arena.GetExtra({ cells_x - 1, cells_y - 1 })->Invalidate();
-      }
-      if (arena.HasExtra({ cells_x - 1, cells_y - 2 })) {
-          arena.GetExtra({ cells_x - 1, cells_y - 2 })->Invalidate();
-      }
-      if (arena.HasExtra({ cells_x - 2, cells_y - 1 })) {
-          arena.GetExtra({ cells_x - 2, cells_y - 1 })->Invalidate();
-      }
+bool ArenaGenerator::IsPatternCell(const Cell& cell) const
+{
+   return (cell.X % 2) && (cell.Y % 2);
+}
+
+bool ArenaGenerator::IsSpawningCell(const Cell& cell) const
+{
+   if ((mPlayers >= 1) && ((cell == Cell{ 0, 0 }) ||
+                           (cell == Cell{ 0, 1 }) ||
+                           (cell == Cell{ 1, 0 })))
+   {
+      return true;
    }
 
-   if (players >= 3)
+   if ((mPlayers >= 2) && ((cell == Cell{ mCellsX - 1, mCellsY - 1 }) ||
+                           (cell == Cell{ mCellsX - 1, mCellsY - 2 }) ||
+                           (cell == Cell{ mCellsX - 2, mCellsY - 1 })))
    {
-      arena.GetWall({ 0, cells_y - 2 })->Invalidate();
-      arena.GetWall({ 0, cells_y - 1 })->Invalidate();
-      arena.GetWall({ 1, cells_y - 1 })->Invalidate();
-
-      if (arena.HasExtra({ 0, cells_y - 2 })) {
-          arena.GetExtra({ 0, cells_y - 2 })->Invalidate();
-      }
-      if (arena.HasExtra({ 0, cells_y - 1 })) {
-          arena.GetExtra({ 0, cells_y - 1 })->Invalidate();
-      }
-      if (arena.HasExtra({ 1, cells_y - 1 })) {
-          arena.GetExtra({ 1, cells_y - 1 })->Invalidate();
-      }
+      return true;
    }
 
-   if (players >= 4)
+   if ((mPlayers >= 3) && ((cell == Cell{ 0, mCellsY - 2 }) ||
+                           (cell == Cell{ 0, mCellsY - 1 }) ||
+                           (cell == Cell{ 1, mCellsY - 1 })))
    {
-      arena.GetWall({ cells_x - 2, 0 })->Invalidate();
-      arena.GetWall({ cells_x - 1, 0 })->Invalidate();
-      arena.GetWall({ cells_x - 1, 1 })->Invalidate();
-
-      if (arena.HasExtra({ cells_x - 2, 0 })) {
-          arena.GetExtra({ cells_x - 2, 0 })->Invalidate();
-      }
-      if (arena.HasExtra({ cells_x - 1, 0 })) {
-          arena.GetExtra({ cells_x - 1, 0 })->Invalidate();
-      }
-      if (arena.HasExtra({ cells_x - 1, 1 })) {
-          arena.GetExtra({ cells_x - 1, 1 })->Invalidate();
-      }
+      return true;
    }
+
+   if ((mPlayers >= 4) && ((cell == Cell{ mCellsX - 2, 0 }) ||
+                           (cell == Cell{ mCellsX - 1, 0 }) ||
+                           (cell == Cell{ mCellsX - 1, 1 })))
+   {
+      return true;
+   }
+
+   return false;
 }
 
 bool ArenaGenerator::ShouldCreateItem() const

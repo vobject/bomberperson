@@ -1,18 +1,11 @@
 #include "ExplosionResource.hpp"
 
-ExplosionResource::ExplosionResource(
-   const ExplosionType type,
-   const int anim_length,
-   const std::vector<SDL_Surface*>& textures
-)
+#include <SDL.h>
+
+ExplosionResource::ExplosionResource(const ExplosionType type)
    : mType(type)
-   , mFrames(textures)
 {
-   if (mFrames.empty()) {
-      // An animation must always consist of at least one frame.
-      throw "ExplosionResource: Invalid sprite textures.";
-   }
-   mMsPerFrame = anim_length / mFrames.size();
+
 }
 
 ExplosionResource::~ExplosionResource()
@@ -26,7 +19,21 @@ ExplosionType ExplosionResource::GetType() const
    return mType;
 }
 
-SDL_Surface *ExplosionResource::GetFrame(const int anim_time) const
+void ExplosionResource::SetFrames(
+   const int anim_length,
+   const std::vector<SDL_Surface*>& textures
+)
+{
+   if (textures.empty()) {
+      // An animation must always consist of at least one frame.
+      throw "ExplosionResource: Invalid sprite textures.";
+   }
+
+   mFrames = textures;
+   mMsPerFrame = anim_length / mFrames.size();
+}
+
+SDL_Surface* ExplosionResource::GetFrame(const int anim_time) const
 {
    if (!mMsPerFrame)
    {

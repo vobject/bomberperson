@@ -1,4 +1,7 @@
 #include "EntityManager.hpp"
+#include "EventQueue.hpp"
+#include "EventType.hpp"
+
 #include "MainMenu.hpp"
 #include "MenuItem.hpp"
 #include "MenuItemSelector.hpp"
@@ -12,14 +15,68 @@
 #include "Player.hpp"
 #include "../Options.hpp"
 
-EntityManager::EntityManager()
+EntityManager::EntityManager(EventQueue& queue)
+   : mEventQueue(queue)
 {
-
+   mEventQueue.Register(this);
 }
 
 EntityManager::~EntityManager()
 {
+   mEventQueue.UnRegister(this);
+}
 
+void EntityManager::OnEvent(const Event& event)
+{
+   switch (event.GetType())
+   {
+      case EventType::CreateArena:
+         OnCreateArena(dynamic_cast<const CreateArenaEvent&>(event));
+         break;
+      case EventType::CreateScoreboard:
+         OnCreateScoreboard(dynamic_cast<const CreateScoreboardEvent&>(event));
+         break;
+      case EventType::CreateWall:
+         OnCreateWall(dynamic_cast<const CreateWallEvent&>(event));
+         break;
+      case EventType::CreateExtra:
+         OnCreateExtra(dynamic_cast<const CreateExtraEvent&>(event));
+         break;
+      case EventType::CreateBomb:
+         OnCreateBomb(dynamic_cast<const CreateBombEvent&>(event));
+         break;
+      case EventType::CreateExplosion:
+         OnCreateExplosion(dynamic_cast<const CreateExplosionEvent&>(event));
+         break;
+      case EventType::CreatePlayer:
+         OnCreatePlayer(dynamic_cast<const CreatePlayerEvent&>(event));
+         break;
+
+      case EventType::RemoveArena:
+         OnRemoveArena(dynamic_cast<const RemoveArenaEvent&>(event));
+         break;
+      case EventType::RemoveScoreboard:
+         OnRemoveScoreboard(dynamic_cast<const RemoveScoreboardEvent&>(event));
+         break;
+      case EventType::RemoveWall:
+         OnRemoveWall(dynamic_cast<const RemoveWallEvent&>(event));
+         break;
+      case EventType::RemoveExtra:
+         OnRemoveExtra(dynamic_cast<const RemoveExtraEvent&>(event));
+         break;
+      case EventType::RemoveBomb:
+         OnRemoveBomb(dynamic_cast<const RemoveBombEvent&>(event));
+         break;
+      case EventType::RemoveExplosion:
+         OnRemoveExplosion(dynamic_cast<const RemoveExplosionEvent&>(event));
+         break;
+      case EventType::RemovePlayer:
+         OnRemovePlayer(dynamic_cast<const RemovePlayerEvent&>(event));
+         break;
+
+      default:
+         break;
+   }
 }
 
 std::shared_ptr<MainMenu> EntityManager::CreateMainmenu()
@@ -47,108 +104,97 @@ std::shared_ptr<MenuItemSelector> EntityManager::CreateMenuItemSelector()
    return selector;
 }
 
-std::shared_ptr<Arena> EntityManager::CreateArena(const int player_count)
+void EntityManager::OnCreateArena(const CreateArenaEvent& event)
 {
-   ArenaGenerator arena_gen(*this);
-   arena_gen.SetArenaPosition({ DefaultValue::ARENA_POS_X, DefaultValue::ARENA_POS_Y });
-   arena_gen.SetArenaSize({ DefaultValue::ARENA_WIDTH, DefaultValue::ARENA_HEIGHT });
-   arena_gen.SetArenaBorderSize({ DefaultValue::ARENA_BORDER_WIDTH, DefaultValue::ARENA_BORDER_HEIGHT });
-
    // The arena object will be used internally to create every other
    //  ArenaObject derived class.
-   mArena = arena_gen.GetDefaultArena(DefaultValue::ARENA_CELLS_X, DefaultValue::ARENA_CELLS_Y);
-   arena_gen.CreateDefaultWalls(DefaultValue::ARENA_CELLS_X, DefaultValue::ARENA_CELLS_Y, *mArena);
-   arena_gen.CreateDefaultExtras(DefaultValue::ARENA_CELLS_X, DefaultValue::ARENA_CELLS_Y, *mArena);
-   arena_gen.CreateDefaultSpawnAreas(DefaultValue::ARENA_CELLS_X, DefaultValue::ARENA_CELLS_Y, player_count, *mArena);
+   mArena = std::make_shared<Arena>(event.GetPosition(),
+                                    event.GetSize(),
+                                    event.GetBorderSize(),
+                                    event.GetCellsX(),
+                                    event.GetCellsY(),
+                                    mEventQueue);
+
+   ArenaGenerator arena_gen(mArena->GetInstanceId(), mEventQueue);
+   arena_gen.SetDimensions(event.GetCellsX(), event.GetCellsY());
+   arena_gen.SetPlayers(event.GetPlayerCount());
+
+   arena_gen.CreateDefaultWalls();
+   arena_gen.CreateDefaultExtras();
 
    mEntities.insert(mArena);
-   return mArena;
 }
 
-std::shared_ptr<Scoreboard> EntityManager::CreateScoreboard()
+void EntityManager::OnCreateScoreboard(const CreateScoreboardEvent& event)
 {
-   auto scoreboard = std::make_shared<Scoreboard>();
-   scoreboard->SetPosition({ DefaultValue::SCOREBOARD_POS_X, DefaultValue::SCOREBOARD_POS_Y });
-   scoreboard->SetSize({ DefaultValue::SCOREBOARD_WIDTH, DefaultValue::SCOREBOARD_HEIGHT });
+   auto scoreboard = std::make_shared<Scoreboard>(mEventQueue);
+   scoreboard->SetPosition(event.GetPosition());
+   scoreboard->SetSize(event.GetSize());
 
    mEntities.insert(scoreboard);
-   return scoreboard;
 }
 
-std::shared_ptr<Wall> EntityManager::CreateWall(
-   const Cell& cell,
-   const WallType type
-)
+void EntityManager::OnCreateWall(const CreateWallEvent& event)
 {
-   auto wall = std::make_shared<Wall>(mArena, type);
-   mArena->SetObjectPosition(*wall, cell);
+   auto wall = std::make_shared<Wall>(mArena, event.GetWall(), mEventQueue);
+   mArena->SetObjectPosition(*wall, event.GetCell());
    mArena->SetObjectSize(*wall);
 
    mEntities.insert(wall);
-   return wall;
 }
 
-std::shared_ptr<Extra> EntityManager::CreateExtra(
-   const Cell& cell,
-   const ExtraType type
-)
+void EntityManager::OnCreateExtra(const CreateExtraEvent& event)
 {
-   auto extra = std::make_shared<Extra>(mArena, type);
-   mArena->SetObjectPosition(*extra, cell);
+//   if (mArena->HasWall(event.GetCell()) &&
+//       !mArena->GetWall(event.GetCell())->IsDestructible())
+//   {
+//      // Do not create extras on cells with indestructible walls
+//      //  because a player could never reach it.
+//      return;
+//   }
+
+   auto extra = std::make_shared<Extra>(mArena, event.GetExtra(), mEventQueue);
+   mArena->SetObjectPosition(*extra, event.GetCell());
    mArena->SetObjectSize(*extra);
 
    mEntities.insert(extra);
-   return extra;
 }
 
-std::shared_ptr<Bomb> EntityManager::CreateBomb(
-   const Cell& cell,
-   const BombType type,
-   const PlayerType owner
-)
+void EntityManager::OnCreateBomb(const CreateBombEvent& event)
 {
-   // Find the right player object to be passed to the new bomb as its owner.
-   for (const auto& ent : mEntities)
-   {
-      const auto ptr = std::dynamic_pointer_cast<Player>(ent);
+   auto bomb = std::make_shared<Bomb>(mArena,
+                                      event.GetBomb(),
+                                      event.GetOwner(),
+                                      mEventQueue);
+   bomb->SetRange(event.GetRange());
 
-      if (ptr && (ptr->GetType() == owner))
-      {
-         auto bomb = std::make_shared<Bomb>(mArena, type, ptr, *this);
-         mArena->SetObjectPosition(*bomb, cell);
-         mArena->SetObjectSize(*bomb);
+   mArena->SetObjectPosition(*bomb, event.GetCell());
+   mArena->SetObjectSize(*bomb);
 
-         mEntities.insert(bomb);
-         return bomb;
-      }
-   }
-
-   // Can never happen.
-   throw "The player who wants to create a bomb does not exist.";
+   mEntities.insert(bomb);
 }
 
-std::shared_ptr<Explosion> EntityManager::CreateExplosion(
-   const Cell& cell,
-   const ExplosionType type,
-   const std::shared_ptr<Player>& owner
-)
+void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
 {
-   auto explosion = std::make_shared<Explosion>(mArena, type, owner);
-   mArena->SetObjectPosition(*explosion, cell);
+   auto explosion = std::make_shared<Explosion>(mArena,
+                                                event.GetExplosionType(),
+                                                event.GetOwner(),
+                                                mEventQueue);
+
+   mArena->SetObjectPosition(*explosion, event.GetCell());
    mArena->SetObjectSize(*explosion);
 
    mEntities.insert(explosion);
-   return explosion;
 }
 
-std::shared_ptr<Player> EntityManager::CreatePlayer(const PlayerType type)
+void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
 {
    std::shared_ptr<Player> player = std::make_shared<Player>(mArena,
-                                                             type,
-                                                             *this);
+                                                             event.GetPlayer(),
+                                                             mEventQueue);
    Cell parent_cell = { -1, -1 };
 
-   switch (type)
+   switch (event.GetPlayer())
    {
       case PlayerType::Player_1:
          parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_1_CELL_X, DefaultValue::PLAYER_1_CELL_Y);
@@ -162,12 +208,49 @@ std::shared_ptr<Player> EntityManager::CreatePlayer(const PlayerType type)
       case PlayerType::Player_4:
          parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_4_CELL_X, DefaultValue::PLAYER_4_CELL_Y);
          break;
+      default:
+         throw "Trying to create an unknown player";
+         break;
    }
    mArena->SetObjectPosition(*player, parent_cell);
-   player->SetSize({ DefaultValue::CELL_WIDTH, DefaultValue::CELL_HEIGHT });
+   mArena->SetObjectSize(*player);
 
    mEntities.insert(player);
-   return player;
+}
+
+void EntityManager::OnRemoveArena(const RemoveArenaEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemoveScoreboard(const RemoveScoreboardEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemoveWall(const RemoveWallEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemoveExtra(const RemoveExtraEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemoveBomb(const RemoveBombEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemoveExplosion(const RemoveExplosionEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemovePlayer(const RemovePlayerEvent& event)
+{
+   (void) event;
 }
 
 EntitySet EntityManager::GetEntities() const

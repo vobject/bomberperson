@@ -18,6 +18,9 @@ struct Point
 {
    constexpr Point(int x, int y) : X{x}, Y{y} { }
 
+   constexpr bool operator==(const Point& other)
+   { return ((X == other.X) && (Y == other.Y)); }
+
    int X;
    int Y;
 };

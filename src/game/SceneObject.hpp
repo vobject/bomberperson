@@ -6,6 +6,8 @@
 
 #include <string>
 
+class Event;
+
 enum class ZOrder
 {
    Background, // Nothing atm
@@ -30,12 +32,14 @@ public:
    bool operator<(const SceneObject& other) const;
 
    virtual void Update(int elapsed_time) = 0;
-//   virtual void Restore() = 0;
 
    unsigned int GetInstanceId() const;
    bool IsValid() const;
    EntityId GetId() const;
    ZOrder GetZOrder() const;
+
+//   bool IsVisible() const;
+//   void SetVisible(bool status);
 
    Point GetPosition() const;
    void SetPosition(const Point& pos);
@@ -54,6 +58,7 @@ private:
    const EntityId mId;
    const ZOrder mZOrder;
    bool mIsValid = true;
+//   bool mIsVisible = false;
    Point mPos = { 0, 0 };
    Size mSize = { 0, 0 };
    int mAnimationTime = 0; // No animation by default.
