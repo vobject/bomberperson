@@ -8,6 +8,8 @@
 
 #include <memory>
 
+class Renderer;
+
 struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
@@ -21,7 +23,7 @@ enum class PlayerType;
 class Match
 {
 public:
-   Match(const MatchSettings& settings);
+   Match(const MatchSettings& settings, const std::shared_ptr<Renderer>& renderer);
    ~Match();
 
    Match(const Match&) = delete;
@@ -59,10 +61,6 @@ private:
    std::pair<PlayerType, std::shared_ptr<KeyboardInput>> mKeyboard_2;
    std::pair<PlayerType, std::shared_ptr<MouseInput>> mMouse_1;
 //   std::pair<PlayerType, std::shared_ptr<KinectInput>> mKinect_1;
-
-   // We will clean up the mEntityManager of dead entities every X seconds.
-   // This will keep track of the timing.
-   int mCleanupIdleTime = 0_ms;
 
    bool mIsGamePaused = false;
    bool mIsGameOver = false;

@@ -13,10 +13,12 @@
 #include "Bomb.hpp"
 #include "Explosion.hpp"
 #include "Player.hpp"
+#include "../render/Renderer.hpp"
 #include "../Options.hpp"
 
-EntityManager::EntityManager(EventQueue& queue)
+EntityManager::EntityManager(EventQueue& queue, const std::shared_ptr<Renderer>& renderer)
    : mEventQueue(queue)
+   , mRenderer(renderer)
 {
    mEventQueue.Register(this);
 }
@@ -24,6 +26,7 @@ EntityManager::EntityManager(EventQueue& queue)
 EntityManager::~EntityManager()
 {
    mEventQueue.UnRegister(this);
+   mRenderer->Clear();
 }
 
 void EntityManager::OnEvent(const Event& event)
@@ -123,6 +126,7 @@ void EntityManager::OnCreateArena(const CreateArenaEvent& event)
    arena_gen.CreateDefaultExtras();
 
    mEntities.insert(mArena);
+   mRenderer->AddObject(mArena);
 }
 
 void EntityManager::OnCreateScoreboard(const CreateScoreboardEvent& event)
@@ -132,6 +136,7 @@ void EntityManager::OnCreateScoreboard(const CreateScoreboardEvent& event)
    scoreboard->SetSize(event.GetSize());
 
    mEntities.insert(scoreboard);
+//   mRenderer->AddObject(scoreboard);
 }
 
 void EntityManager::OnCreateWall(const CreateWallEvent& event)
@@ -141,6 +146,7 @@ void EntityManager::OnCreateWall(const CreateWallEvent& event)
    mArena->SetObjectSize(*wall);
 
    mEntities.insert(wall);
+   mRenderer->AddObject(wall);
 }
 
 void EntityManager::OnCreateExtra(const CreateExtraEvent& event)
@@ -158,6 +164,7 @@ void EntityManager::OnCreateExtra(const CreateExtraEvent& event)
    mArena->SetObjectSize(*extra);
 
    mEntities.insert(extra);
+//   mRenderer->AddObject(extra);
 }
 
 void EntityManager::OnCreateBomb(const CreateBombEvent& event)
@@ -172,6 +179,7 @@ void EntityManager::OnCreateBomb(const CreateBombEvent& event)
    mArena->SetObjectSize(*bomb);
 
    mEntities.insert(bomb);
+//   mRenderer->AddObject(bomb);
 }
 
 void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
@@ -185,6 +193,7 @@ void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
    mArena->SetObjectSize(*explosion);
 
    mEntities.insert(explosion);
+//   mRenderer->AddObject(explosion);
 }
 
 void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
@@ -216,41 +225,42 @@ void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
    mArena->SetObjectSize(*player);
 
    mEntities.insert(player);
+//   mRenderer->AddObject(player);
 }
 
 void EntityManager::OnRemoveArena(const RemoveArenaEvent& event)
 {
-   (void) event;
+   mRenderer->RemoveObject(event.GetSender());
 }
 
 void EntityManager::OnRemoveScoreboard(const RemoveScoreboardEvent& event)
 {
-   (void) event;
+//   mRenderer->RemoveObject(event.GetSender());
 }
 
 void EntityManager::OnRemoveWall(const RemoveWallEvent& event)
 {
-   (void) event;
+   mRenderer->RemoveObject(event.GetSender());
 }
 
 void EntityManager::OnRemoveExtra(const RemoveExtraEvent& event)
 {
-   (void) event;
+//   mRenderer->RemoveObject(event.GetSender());
 }
 
 void EntityManager::OnRemoveBomb(const RemoveBombEvent& event)
 {
-   (void) event;
+//   mRenderer->RemoveObject(event.GetSender());
 }
 
 void EntityManager::OnRemoveExplosion(const RemoveExplosionEvent& event)
 {
-   (void) event;
+//   mRenderer->RemoveObject(event.GetSender());
 }
 
 void EntityManager::OnRemovePlayer(const RemovePlayerEvent& event)
 {
-   (void) event;
+//   mRenderer->RemoveObject(event.GetSender());
 }
 
 EntitySet EntityManager::GetEntities() const

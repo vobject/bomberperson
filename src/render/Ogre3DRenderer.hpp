@@ -22,45 +22,53 @@ public:
    Ogre3DRenderer(const Ogre3DRenderer&) = delete;
    Ogre3DRenderer& operator=(const Ogre3DRenderer&) = delete;
 
+   void AddObject(const std::shared_ptr<Arena>& obj) override;
+   void AddObject(const std::shared_ptr<Scoreboard>& obj) override;
+   void AddObject(const std::shared_ptr<Wall>& obj) override;
+   void AddObject(const std::shared_ptr<Extra>& obj) override;
+   void AddObject(const std::shared_ptr<Bomb>& obj) override;
+   void AddObject(const std::shared_ptr<Explosion>& obj) override;
+   void AddObject(const std::shared_ptr<Player>& obj) override;
+
+   void RemoveObject(unsigned int instance) override;
+   void Clear() override;
+
    void PreRender() override;
    void PostRender() override;
+   void Render() override;
 
-   void Render(const std::shared_ptr<MenuItem>& obj) override;
-   void Render(const std::shared_ptr<MenuItemSelector>& obj) override;
-   void Render(const std::shared_ptr<MainMenu>& obj) override;
+//   void Render(const std::shared_ptr<MenuItem>& obj) override;
+//   void Render(const std::shared_ptr<MenuItemSelector>& obj) override;
+//   void Render(const std::shared_ptr<MainMenu>& obj) override;
 
-   void Render(const std::shared_ptr<Arena>& arena) override;
-   void Render(const std::shared_ptr<Scoreboard>& scoreboard) override;
-   void Render(const std::shared_ptr<Wall>& explosion) override;
-   void Render(const std::shared_ptr<Extra>& obj) override;
-   void Render(const std::shared_ptr<Bomb>& bomb) override;
-   void Render(const std::shared_ptr<Explosion>& explosion) override;
-   void Render(const std::shared_ptr<Player>& obj) override;
+//   void Render(const std::shared_ptr<Arena>& arena) override;
+//   void Render(const std::shared_ptr<Scoreboard>& scoreboard) override;
+//   void Render(const std::shared_ptr<Wall>& explosion) override;
+//   void Render(const std::shared_ptr<Extra>& obj) override;
+//   void Render(const std::shared_ptr<Bomb>& bomb) override;
+//   void Render(const std::shared_ptr<Explosion>& explosion) override;
+//   void Render(const std::shared_ptr<Player>& obj) override;
 
 private:
-   void InitMenuScene();
+//   void InitMenuScene();
    void InitArenaScene();
 
-   void SelectMenuScene();
+//   void SelectMenuScene();
    void SelectArenaScene();
    void SelectViewport(Ogre::SceneManager* const scene_mgr);
+
+   std::string InstanceIdToNodeName(unsigned int instance) const;
 
    std::unique_ptr<Ogre3DResourceCache> mResCache;
 
    // None of these pointers are owning.
    Ogre::Root* mRoot = nullptr;
    Ogre::RenderWindow* mRenderWindow = nullptr;
-   Ogre::SceneManager* mMenuSceneMgr = nullptr;
+//   Ogre::SceneManager* mMenuSceneMgr = nullptr;
    Ogre::SceneManager* mArenaSceneMgr = nullptr;
    Ogre::Viewport* mViewPort = nullptr;
 
-//   // Resources
-//   Ogre::SceneNode* mMainMenuBgNode = nullptr;
-//   Ogre::SceneNode* mHeadNode1 = nullptr;
-//   Ogre::SceneNode* mHeadNode2 = nullptr;
-//   Ogre::SceneNode* mNinjaNode1 = nullptr;
-
-   bool mMenuSceneSelected = false;
+//   bool mMenuSceneSelected = true;
 };
 
 #endif // OGRE3D_RENDERER_HPP

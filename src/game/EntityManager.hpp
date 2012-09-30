@@ -7,6 +7,7 @@
 #include <set>
 
 class EventQueue;
+class Renderer;
 
 class CreateArenaEvent;
 class CreateScoreboardEvent;
@@ -47,7 +48,7 @@ typedef std::multiset<std::shared_ptr<SceneObject>, Sort_Dereferenced_SharedPtr<
 class EntityManager : public EventListener
 {
 public:
-   EntityManager(EventQueue& queue);
+   EntityManager(EventQueue& queue, const std::shared_ptr<Renderer>& renderer);
    ~EntityManager();
 
    void OnEvent(const Event& event);
@@ -79,10 +80,11 @@ private:
    void OnRemovePlayer(const RemovePlayerEvent& event);
 
    EventQueue& mEventQueue;
+   std::shared_ptr<Renderer> mRenderer;
    EntitySet mEntities;
 
    // A valid arena object must be created before any other ArenaObject
-   //  derivatives (wall, extra, explosion, player) are created because
+   //  derivative (wall, extra, explosion, player) are created because
    //  they will use the reference to arena object.
    std::shared_ptr<Arena> mArena;
 };

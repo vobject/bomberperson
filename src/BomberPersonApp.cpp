@@ -62,7 +62,6 @@ void BomberPersonApp::Mainloop()
          accumulator -= delta_time;
          game_time += delta_time;
       }
-
       RenderScene();
    }
 }
@@ -85,6 +84,9 @@ void BomberPersonApp::Initialize()
    mRenderer = std::make_shared<Ogre3DRenderer>(screen_size);
    mWndFrame = std::make_shared<WindowFrame>("BomberPerson");
    mLogic = std::make_shared<Logic>();
+
+   // Initialize Logic with the default renderer.
+   mLogic->SetRenderer(mRenderer);
 }
 
 void BomberPersonApp::ProcessInput()
@@ -107,18 +109,19 @@ void BomberPersonApp::ProcessInput()
       const Size screen_size = { DefaultValue::SCREEN_WIDTH,
                                  DefaultValue::SCREEN_HEIGHT };
 
-      if (SDLK_1 == event.key.keysym.sym) {
-         mRenderer = std::make_shared<SimpleSdlRenderer>(screen_size);
-      }
-      else if (SDLK_2 == event.key.keysym.sym) {
-         mRenderer = std::make_shared<SdlRenderer>(screen_size);
-      }
-      else if (SDLK_3 == event.key.keysym.sym) {
-         mRenderer = std::make_shared<SimpleGlRenderer>(screen_size);
-      }
-      else if (SDLK_4 == event.key.keysym.sym) {
-         mRenderer = std::make_shared<Ogre3DRenderer>(screen_size);
-      }
+//      if (SDLK_1 == event.key.keysym.sym) {
+//         mRenderer = std::make_shared<SimpleSdlRenderer>(screen_size);
+//      }
+//      else if (SDLK_2 == event.key.keysym.sym) {
+//         mRenderer = std::make_shared<SdlRenderer>(screen_size);
+//      }
+//      else if (SDLK_3 == event.key.keysym.sym) {
+//         mRenderer = std::make_shared<SimpleGlRenderer>(screen_size);
+//      }
+//      else if (SDLK_4 == event.key.keysym.sym) {
+//         mRenderer = std::make_shared<Ogre3DRenderer>(screen_size);
+//      }
+//      mLogic->SetRenderer(mRenderer);
 
       // TODO: KMOD_LCTRL + SDLK_K -> try connecting to kinect device.
 
@@ -155,7 +158,7 @@ void BomberPersonApp::UpdateScene(const int app_time, const int elapsed_time)
 
 void BomberPersonApp::RenderScene()
 {
-   mLogic->Render(mRenderer);
+   mLogic->Render();
    mWndFrame->FrameDone();
 }
 

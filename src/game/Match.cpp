@@ -8,9 +8,9 @@
 
 #include <SDL_events.h>
 
-Match::Match(const MatchSettings& settings)
+Match::Match(const MatchSettings& settings, const std::shared_ptr<Renderer>& renderer)
    : mSettings(settings)
-   , mEntityManager(mEventQueue)
+   , mEntityManager(mEventQueue, renderer)
 {
    // The arena is needed for the creation of the players.
    CreateArenaAndScoreboard();
@@ -78,17 +78,14 @@ void Match::Input(const SDL_MouseButtonEvent& button)
 
 void Match::Update(const int elapsed_time)
 {
-//   mCleanupIdleTime += elapsed_time;
-//   if (mCleanupIdleTime >= 1000_ms)
-//   {
-//      // Remove dead sprites every second.
-//      mEntityManager.Cleanup();
-//      mCleanupIdleTime = 0_ms;
-//   }
-
    CreateInputEvents();
    UpdateEntities(elapsed_time);
    mEventQueue.ProcessEvents();
+
+   // Remove all entities that are marked as invalid during the last
+   //  event processing cycle. This guarantees that an invalid entity
+   //  will never be requested to update itself. Updating an invalid entity
+   //  is dangerous because it may trigger new events.
    mEntityManager.Cleanup();
 
    // TODO: Query Scoreboard for game state.

@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 
+class Renderer;
+
 struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
@@ -51,7 +53,7 @@ struct MatchSettings
 class UserInterface
 {
 public:
-    UserInterface();
+    UserInterface(const std::shared_ptr<Renderer>& renderer);
     ~UserInterface();
 
     UserInterface(const UserInterface&) = delete;

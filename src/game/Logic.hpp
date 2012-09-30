@@ -24,6 +24,8 @@ public:
    Logic(const Logic&) = delete;
    Logic& operator=(const Logic&) = delete;
 
+   void SetRenderer(const std::shared_ptr<Renderer>& renderer);
+
    void ProcessInput(const SDL_KeyboardEvent& key);
    void ProcessInput(const SDL_MouseMotionEvent& motion);
    void ProcessInput(const SDL_MouseButtonEvent& button);
@@ -31,7 +33,7 @@ public:
 
    void Update(int app_time, int elapsed_time);
    void Sound(const std::shared_ptr<Audio>& audio);
-   void Render(const std::shared_ptr<Renderer>& renderer);
+   void Render();
 
    bool Done() const;
 
@@ -42,10 +44,11 @@ private:
    void SoundUserInterface(Audio& audio);
    void SoundMatch(Audio& audio);
 
-   void RenderUserInterface(Renderer& renderer);
-   void RenderMatch(Renderer& renderer);
+   void RenderUserInterface();
+   void RenderMatch();
 
    bool mDone = false;
+   std::shared_ptr<Renderer> mRenderer;
    std::shared_ptr<UserInterface> mUserInterface;
    std::shared_ptr<Match> mMatch;
 };

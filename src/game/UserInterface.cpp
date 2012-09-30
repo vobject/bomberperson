@@ -4,8 +4,8 @@
 
 #include <SDL_events.h>
 
-UserInterface::UserInterface()
-   : mEntityManager(mEventQueue)
+UserInterface::UserInterface(const std::shared_ptr<Renderer> &renderer)
+   : mEntityManager(mEventQueue, renderer)
 {
     mSettings = {
        {
