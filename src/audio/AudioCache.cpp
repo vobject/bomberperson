@@ -150,7 +150,7 @@ Mix_Chunk *AudioCache::LoadSound(const std::string& file)
 
    auto sound = Mix_LoadWAV(full_path.c_str());
    if (!sound) {
-      throw "Failed to load music file.";
+      throw "Failed to load sound file.";
    }
    return sound;
 }

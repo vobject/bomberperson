@@ -1,18 +1,23 @@
 #include "ResourceCache.hpp"
-// #include "../../game/EntityId.hpp"
-// #include "../../game/Wall.hpp"
-// #include "../../game/Extra.hpp"
-// #include "../../game/Bomb.hpp"
-// #include "../../game/Explosion.hpp"
-// #include "../../game/Player.hpp"
-// #include "../../utils/Utils.hpp"
+ #include "../../game/Wall.hpp"
+ #include "../../game/Extra.hpp"
+ #include "../../game/Bomb.hpp"
+ #include "../../game/Explosion.hpp"
+ #include "../../game/Player.hpp"
  #include "../../Options.hpp"
 
 #include <OgreRoot.h>
 #include <OgreConfigFile.h>
+#include <OgreMeshManager.h>
 
-Ogre3DResourceCache::Ogre3DResourceCache(const std::string& renderer_dir)
+#include <sstream>
+
+Ogre3DResourceCache::Ogre3DResourceCache(
+   const std::string& renderer_dir,
+   const Size res
+)
    : mResDir(RESOURCE_DIR + "/render/" + renderer_dir)
+   , mResolution(res)
 {
    InitRoot();
 
@@ -65,10 +70,96 @@ void Ogre3DResourceCache::InitRoot()
 
    render_system->setConfigOption("Full Screen","No");
    render_system->setConfigOption("VSync", "No");
-   render_system->setConfigOption("Video Mode","800 x 600 @ 32-bit");
+
+   std::ostringstream os;
+   os << mResolution.Width << " x " << mResolution.Height << " @ 32-bit";
+   render_system->setConfigOption("Video Mode", os.str());
 
    mRoot->setRenderSystem(render_system);
    mRoot->initialise(false);
+}
+
+void Ogre3DResourceCache::LoadResources()
+{
+   auto& mesh_mgr = Ogre::MeshManager::getSingleton();
+
+   mesh_mgr.createPlane("MainMenuBgPlane",
+                        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                        Ogre::Plane(Ogre::Vector3::UNIT_Y, 0),
+                        mResolution.Width,
+                        mResolution.Height,
+                        20,
+                        20,
+                        true,
+                        1,
+                        5,
+                        5,
+                        Ogre::Vector3::UNIT_Z);
+
+   mesh_mgr.createPlane("ArenaPlane",
+                        Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                        Ogre::Plane(Ogre::Vector3::UNIT_Y, 0),
+                        mResolution.Width,
+                        mResolution.Height,
+                        20,
+                        20,
+                        true,
+                        1,
+                        5,
+                        5,
+                        Ogre::Vector3::UNIT_Z);
+
+   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+}
+
+std::string Ogre3DResourceCache::GetArenaResource() const
+{
+   return "ArenaPlane";
+}
+
+std::string Ogre3DResourceCache::GetWallResource(const WallType type) const
+{
+   return "cube.mesh";
+}
+
+std::string Ogre3DResourceCache::GetExtraResource(const ExtraType type) const
+{
+   return "ogrehead.mesh";
+}
+
+std::string Ogre3DResourceCache::GetBombResource(const BombType type) const
+{
+   return "sphere.mesh";
+}
+
+std::string Ogre3DResourceCache::GetExplosionResource(const ExplosionType type) const
+{
+   return "sphere.mesh";
+}
+
+std::string Ogre3DResourceCache::GetPlayerResource(const PlayerType type) const
+{
+   std::string mesh_name;
+
+   switch (type)
+   {
+      case PlayerType::Player_1:
+         mesh_name = "ninja.mesh";
+         break;
+      case PlayerType::Player_2:
+         mesh_name = "robot.mesh";
+         break;
+      case PlayerType::Player_3:
+         mesh_name = "penguin.mesh";
+         break;
+      case PlayerType::Player_4:
+         mesh_name = "cube.mesh";
+         break;
+      default:
+         throw "Unknown player type.";
+         break;
+   }
+   return mesh_name;
 }
 
 // SpriteResource ResourceCache::GetMenuResource(const EntityId id) const

@@ -5,9 +5,10 @@
 
 namespace Ogre {
    class Root;
-   class RenderWindow;
    class SceneManager;
    class Viewport;
+   class SceneNode;
+   class Entity;
 }
 
 struct Size;
@@ -29,38 +30,25 @@ public:
    void Render(const std::shared_ptr<MenuItemSelector>& obj) override;
    void Render(const std::shared_ptr<MainMenu>& obj) override;
 
-   void Render(const std::shared_ptr<Arena>& arena) override;
-   void Render(const std::shared_ptr<Scoreboard>& scoreboard) override;
-   void Render(const std::shared_ptr<Wall>& explosion) override;
+   void Render(const std::shared_ptr<Arena>& obj) override;
+   void Render(const std::shared_ptr<Scoreboard>& obj) override;
+   void Render(const std::shared_ptr<Wall>& obj) override;
    void Render(const std::shared_ptr<Extra>& obj) override;
-   void Render(const std::shared_ptr<Bomb>& bomb) override;
-   void Render(const std::shared_ptr<Explosion>& explosion) override;
+   void Render(const std::shared_ptr<Bomb>& obj) override;
+   void Render(const std::shared_ptr<Explosion>& obj) override;
    void Render(const std::shared_ptr<Player>& obj) override;
 
 private:
-   void InitMenuScene();
-   void InitArenaScene();
-
-   void SelectMenuScene();
-   void SelectArenaScene();
-   void SelectViewport(Ogre::SceneManager* const scene_mgr);
+   Ogre::SceneNode* AddSceneNode(const SceneObject& obj, Ogre::Entity* const entity);
 
    std::unique_ptr<Ogre3DResourceCache> mResCache;
 
    // None of these pointers are owning.
    Ogre::Root* mRoot = nullptr;
-   Ogre::RenderWindow* mRenderWindow = nullptr;
-   Ogre::SceneManager* mMenuSceneMgr = nullptr;
-   Ogre::SceneManager* mArenaSceneMgr = nullptr;
+   Ogre::SceneManager* mSceneMgr = nullptr;
    Ogre::Viewport* mViewPort = nullptr;
 
-//   // Resources
-//   Ogre::SceneNode* mMainMenuBgNode = nullptr;
-//   Ogre::SceneNode* mHeadNode1 = nullptr;
-//   Ogre::SceneNode* mHeadNode2 = nullptr;
-//   Ogre::SceneNode* mNinjaNode1 = nullptr;
-
-   bool mMenuSceneSelected = false;
+   Ogre::SceneNode* mRootNode = nullptr;
 };
 
 #endif // OGRE3D_RENDERER_HPP

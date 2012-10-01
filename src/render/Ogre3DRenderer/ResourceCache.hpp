@@ -7,7 +7,8 @@
 // #include "BombResource.hpp"
 // #include "ExplosionResource.hpp"
 // #include "PlayerResource.hpp"
-// #include "../../utils/Utils.hpp"
+
+#include "../../utils/Utils.hpp"
 
 #include <memory>
 #include <map>
@@ -18,24 +19,29 @@ namespace Ogre {
    class Root;
 }
 
-// enum class EntityId;
+enum class WallType;
+enum class ExtraType;
+enum class BombType;
+enum class ExplosionType;
+enum class PlayerType;
 
 class Ogre3DResourceCache
 {
 public:
-   Ogre3DResourceCache(const std::string& renderer_dir);
+   Ogre3DResourceCache(const std::string& renderer_dir, Size res);
    ~Ogre3DResourceCache();
 
    Ogre3DResourceCache(const Ogre3DResourceCache&) = delete;
    Ogre3DResourceCache& operator=(const Ogre3DResourceCache&) = delete;
 
-//    SpriteResource GetMenuResource(EntityId id) const;
-//    SpriteResource GetArenaResource(EntityId id) const;
-//    WallResource GetWallResource(WallType type) const;
-//    ExtraResource GetExtraResource(ExtraType type) const;
-//    BombResource GetBombResource(BombType type) const;
-//    ExplosionResource GetExplosionResource(ExplosionType type) const;
-//    PlayerResource GetPlayerResource(PlayerType type) const;
+   void LoadResources();
+
+   std::string GetArenaResource() const;
+   std::string GetWallResource(WallType type) const;
+   std::string GetExtraResource(ExtraType type) const;
+   std::string GetBombResource(BombType type) const;
+   std::string GetExplosionResource(ExplosionType type) const;
+   std::string GetPlayerResource(PlayerType type) const;
 
 private:
    void InitRoot();
@@ -50,7 +56,8 @@ private:
 // 
 //    SDL_Surface* LoadTexture(const std::string& file, const Size& size);
 
-    std::string mResDir;
+    const std::string mResDir;
+    const Size mResolution;
     std::unique_ptr<Ogre::Root> mRoot;
 
 //    std::map<EntityId, SpriteResource> mMenuRes;

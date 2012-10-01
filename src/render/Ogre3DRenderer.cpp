@@ -20,11 +20,8 @@
 #include <OgreSceneManager.h>
 #include <OgreViewport.h>
 #include <OgreEntity.h>
-#include <OgreMeshManager.h>
 
 #include <SDL.h>
-
-#include <sstream>
 
 Ogre3DRenderer::Ogre3DRenderer(const Size res)
 {
@@ -41,27 +38,29 @@ Ogre3DRenderer::Ogre3DRenderer(const Size res)
       throw "SDL_SetVideoMode() failed.";
    }
 
-   mResCache = make_unique<Ogre3DResourceCache>("Ogre3DRenderer");
+   mResCache = make_unique<Ogre3DResourceCache>("Ogre3DRenderer", res);
    mRoot = Ogre::Root::getSingletonPtr();
 
    // Let OGRE blindly issue OpenGL calls because we already created
    //  a context to receive them.
    Ogre::NameValuePairList params = { { "currentGLContext", "True" } };
-   mRenderWindow = mRoot->createRenderWindow("RenderWindow",
+   auto wnd = mRoot->createRenderWindow("RenderWindow",
                                              res.Width,
                                              res.Height,
                                              false,
                                              &params);
-   mRenderWindow->setVisible(true);
+   wnd->setVisible(true);
 
-   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+   // This can only be done after the render window was created.
+   mResCache->LoadResources();
 
-   InitMenuScene();
-   InitArenaScene();
+   mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
 
-////   Ogre::MovableText* msg = new Ogre::MovableText("TXT_001", "this is \nthe caption", "BlueHighway-16", 100);
-////   msg->setTextAlignment(Ogre::MovableText::H_CENTER, Ogre::MovableText::V_ABOVE);
-////   mHeadNode1->attachObject(msg);
+   auto cam = mSceneMgr->createCamera("DefaultCamera");
+   cam->setPosition(0.0f, res.Width * 1.0f, 200.0f);
+   cam->lookAt(0.0f, 0.0f, 0.0f);
+   cam->setNearClipDistance(5.0f);
+   mViewPort = wnd->addViewport(cam);
 }
 
 Ogre3DRenderer::~Ogre3DRenderer()
@@ -71,7 +70,14 @@ Ogre3DRenderer::~Ogre3DRenderer()
 
 void Ogre3DRenderer::PreRender()
 {
+   mSceneMgr->clearScene();
+//   mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
+//   mSceneMgr->setAmbientLight(Ogre::ColourValue(1.7f, 1.7f, 1.7f));
+   mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox");
+   mSceneMgr->setAmbientLight(Ogre::ColourValue(.5f, .5f, .5f));
+   mSceneMgr->createLight()->setPosition(20, 80, 50);
 
+   mRootNode = mSceneMgr->getRootSceneNode();
 }
 
 void Ogre3DRenderer::PostRender()
@@ -82,286 +88,170 @@ void Ogre3DRenderer::PostRender()
 
 void Ogre3DRenderer::Render(const std::shared_ptr<MenuItem>& obj)
 {
-   SelectMenuScene();
+
 }
 
 void Ogre3DRenderer::Render(const std::shared_ptr<MenuItemSelector>& obj)
 {
-   SelectMenuScene();
+   const auto anim_time = obj->GetAnimationTime();
 
-   const auto node_name = "MenuItemSelector";
-   Ogre::SceneNode* node = nullptr;
+   auto entity = mSceneMgr->createEntity("ogrehead.mesh");
 
-   if (mMenuSceneMgr->hasSceneNode(node_name))
-   {
-      node = mMenuSceneMgr->getSceneNode(node_name);
-   }
-   else
-   {
-      auto root_node = mMenuSceneMgr->getRootSceneNode();
-      auto entity = mMenuSceneMgr->createEntity("ogrehead.mesh");
-
-      node = root_node->createChildSceneNode(node_name);
-      node->attachObject(entity);
-      node->pitch(Ogre::Degree(-90.0f));
-      node->scale(.7f, .7f, .7f);
-   }
+   auto node = mRootNode->createChildSceneNode();
+   node->attachObject(entity);
+   node->pitch(Ogre::Degree(-90.0f));
+   node->scale(.7f, .7f, .7f);
 
    const auto pos = obj->GetPosition();
    node->setPosition(pos.X - (mViewPort->getActualWidth() / 2),
                      40.0f,
                      pos.Y - (mViewPort->getActualHeight() / 2));
-   node->yaw(Ogre::Degree(0.1f));
+   node->yaw(Ogre::Degree(anim_time % 360));
 }
 
 void Ogre3DRenderer::Render(const std::shared_ptr<MainMenu>& obj)
 {
-   SelectMenuScene();
-
    const auto node_name = "MainMenuBackground";
 
-   if (mMenuSceneMgr->hasSceneNode(node_name)) {
-      return;
-   }
-
-   Ogre::MeshManager::getSingleton()
-         .createPlane("MainMenuBgPlane",
-                      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                      Ogre::Plane(Ogre::Vector3::UNIT_Y, 0),
-                      mViewPort->getActualWidth(),
-                      mViewPort->getActualHeight(),
-                      20,
-                      20,
-                      true,
-                      1,
-                      5,
-                      5,
-                      Ogre::Vector3::UNIT_Z);
-
-   auto entity = mMenuSceneMgr->createEntity("MainMenuBgPlane");
+   auto entity = mSceneMgr->createEntity("MainMenuBgPlane");
    entity->setMaterialName("Examples/Rockwall");
-   entity->setCastShadows(false);
 
-   auto root_node = mMenuSceneMgr->getRootSceneNode();
-   auto node = root_node->createChildSceneNode(node_name);
+   auto node = mRootNode->createChildSceneNode(node_name);
    node->attachObject(entity);
 }
 
-void Ogre3DRenderer::Render(const std::shared_ptr<Arena>& arena)
+void Ogre3DRenderer::Render(const std::shared_ptr<Arena>& obj)
 {
-   SelectArenaScene();
+   (void) obj;
 
-   const auto node_name = "Arena";
+   const auto mesh_name = mResCache->GetArenaResource();
+   auto entity = mSceneMgr->createEntity(mesh_name);
+   entity->setMaterialName("Examples/BumpyMetal");
 
-   if (mArenaSceneMgr->hasSceneNode(node_name)) {
-      return;
+   auto node = mRootNode->createChildSceneNode();
+   node->attachObject(entity);
+}
+
+void Ogre3DRenderer::Render(const std::shared_ptr<Scoreboard>& obj)
+{
+   (void) obj;
+}
+
+void Ogre3DRenderer::Render(const std::shared_ptr<Wall>& obj)
+{
+   const auto mesh_name = mResCache->GetWallResource(obj->GetType());
+   auto entity = mSceneMgr->createEntity(mesh_name);
+
+   if (WallType::Indestructible == obj->GetType()) {
+      entity->setMaterialName("2 - Default");
+   }
+   else if (WallType::Destructible == obj->GetType()) {
+      entity->setMaterialName("Examples/Rockwall");
    }
 
-   Ogre::MeshManager::getSingleton()
-         .createPlane("ArenaPlane",
-                      Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                      Ogre::Plane(Ogre::Vector3::UNIT_Y, 0),
-                      mViewPort->getActualWidth(),
-                      mViewPort->getActualHeight(),
-                      20,
-                      20,
-                      true,
-                      1,
-                      5,
-                      5,
-                      Ogre::Vector3::UNIT_Z);
-
-   auto entity = mArenaSceneMgr->createEntity("ArenaPlane");
-   entity->setMaterialName("Examples/BeachStones");
-   entity->setCastShadows(false);
-
-   auto root_node = mArenaSceneMgr->getRootSceneNode();
-   auto node = root_node->createChildSceneNode(node_name);
-   node->attachObject(entity);
-}
-
-void Ogre3DRenderer::Render(const std::shared_ptr<Scoreboard>& scoreboard)
-{
-   SelectArenaScene();
-}
-
-void Ogre3DRenderer::Render(const std::shared_ptr<Wall>& wall)
-{
-   SelectArenaScene();
+   auto node = AddSceneNode(*obj, entity);
+//   node->showBoundingBox(true);
+//   node->setVisible(false);
 }
 
 void Ogre3DRenderer::Render(const std::shared_ptr<Extra>& obj)
 {
-   SelectArenaScene();
+   const auto mesh_name = mResCache->GetExtraResource(obj->GetType());
+   auto entity = mSceneMgr->createEntity(mesh_name);
 
-   std::ostringstream os;
-   os << obj->GetInstanceId();
-   const auto node_name(os.str());
-
-   Ogre::SceneNode* node = nullptr;
-
-   if (mArenaSceneMgr->hasSceneNode(node_name))
-   {
-      node = mArenaSceneMgr->getSceneNode(node_name);
-   }
-   else
-   {
-      auto parent_node = mArenaSceneMgr->getSceneNode("Arena");
-      auto entity = mArenaSceneMgr->createEntity("ogrehead.mesh");
-
-      node = parent_node->createChildSceneNode(node_name);
-      node->attachObject(entity);
-
-      const auto obj_size = obj->GetSize();
-      const auto box_size = entity->getBoundingBox().getSize();
-
-      const auto x_scale = obj_size.Width / box_size.x;
-      const auto y_scale = obj_size.Height / box_size.y * 1.75f;
-      const auto z_scale = obj_size.Width / box_size.z;
-      node->setScale(x_scale, y_scale, z_scale);
-      node->showBoundingBox(true);
-   }
-
-   const auto pos = obj->GetPosition();
-   node->setPosition(pos.X - (mViewPort->getActualWidth() / 2),
-                     40.0f,
-                     pos.Y - (mViewPort->getActualHeight() / 2));
-   node->yaw(Ogre::Degree(0.05f));
-
+   auto node = AddSceneNode(*obj, entity);
+   node->showBoundingBox(true);
 }
 
-void Ogre3DRenderer::Render(const std::shared_ptr<Bomb>& bomb)
+void Ogre3DRenderer::Render(const std::shared_ptr<Bomb>& obj)
 {
-   SelectArenaScene();
+   const auto mesh_name = mResCache->GetBombResource(obj->GetType());
+   auto entity = mSceneMgr->createEntity(mesh_name);
+
+   auto node = AddSceneNode(*obj, entity);
+//   node->showBoundingBox(true);
 }
 
-void Ogre3DRenderer::Render(const std::shared_ptr<Explosion>& explosion)
+void Ogre3DRenderer::Render(const std::shared_ptr<Explosion>& obj)
 {
-   SelectArenaScene();
+   const auto mesh_name = mResCache->GetExplosionResource(obj->GetType());
+   auto entity = mSceneMgr->createEntity(mesh_name);
+   entity->setMaterialName("Examples/Hilite/Yellow");
+
+   auto node = AddSceneNode(*obj, entity);
+//   node->showBoundingBox(true);
 }
 
 void Ogre3DRenderer::Render(const std::shared_ptr<Player>& obj)
 {
-   SelectArenaScene();
+   const auto mesh_name = mResCache->GetPlayerResource(obj->GetType());
+   auto entity = mSceneMgr->createEntity(mesh_name);
 
-   const auto type = obj->GetType();
-   std::string node_name;
-   std::string mesh_name;
-
-   if (PlayerType::Player_1 == type) {
-      node_name = "Player_1";
-      mesh_name = "cube.mesh";
-   }
-   else if (PlayerType::Player_2 == type) {
-      node_name = "Player_2";
-      mesh_name = "robot.mesh";
-   }
-   else if (PlayerType::Player_3 == type) {
-      node_name = "Player_3";
-      mesh_name = "athene.mesh";
-   }
-   else if (PlayerType::Player_4 == type) {
-      node_name = "Player_4";
-      mesh_name = "cube.mesh";
-   }
-   else {
-      throw "Unknown player.";
-   }
-
-   Ogre::SceneNode* node = nullptr;
-
-   if (mArenaSceneMgr->hasSceneNode(node_name))
-   {
-      node = mArenaSceneMgr->getSceneNode(node_name);
-   }
-   else
-   {
-      const auto parent_node_name = "Arena";
-      auto entity = mArenaSceneMgr->createEntity(mesh_name);
-      auto parent_node = mArenaSceneMgr->getSceneNode(parent_node_name);
-
-      node = parent_node->createChildSceneNode(node_name);
-      node->attachObject(entity);
-
-      const auto obj_size = obj->GetSize();
-      const auto box_size = entity->getBoundingBox().getSize();
-
-      const auto x_scale = obj_size.Width / box_size.x;
-      const auto y_scale = obj_size.Height / box_size.y * 1.75f;
-      const auto z_scale = obj_size.Width / box_size.z;
-      node->setScale(x_scale, y_scale, z_scale);
-      node->showBoundingBox(true);
-   }
-
-   const auto pos = obj->GetPosition();
-   node->setPosition(pos.X - (mViewPort->getActualWidth() / 2),
-                     40.0f,
-                     pos.Y - (mViewPort->getActualHeight() / 2));
+   auto node = AddSceneNode(*obj, entity);
+//   node->showBoundingBox(true);
 
 //   LOG(logDEBUG) << "Viewport: (" << mViewPort->getActualWidth() << ", "
 //                 << mViewPort->getActualHeight() << ") - Player: ("
-   //                 << pos.X << ", " << pos.Y << ")";
+//                 << pos.X << ", " << pos.Y << ")";
 
 //   const auto world_v3 = node->convertLocalToWorldPosition(node->getPosition());
 //   const auto local_v3 = node->convertWorldToLocalPosition({0, 40.0f, 0});
 //   const auto sc = node->getScale();
 //   const auto sc2 = node->getInheritScale();
-//   int j = 0;
 }
 
-void Ogre3DRenderer::InitMenuScene()
+Ogre::SceneNode *Ogre3DRenderer::AddSceneNode(
+   const SceneObject& obj,
+   Ogre::Entity* const entity
+)
 {
-   mMenuSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC, "MenuSceneMgr");
-   mMenuSceneMgr->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
+   auto node = mRootNode->createChildSceneNode();
+   node->attachObject(entity);
 
-   auto cam = mMenuSceneMgr->createCamera("DefaultCamera");
-   cam->setPosition(0.0f, 900.0f, 1.0f);
-   cam->lookAt(0.0f, 0.0f, 0.0f);
-   cam->setNearClipDistance(5.0f);
+   const auto obj_size = obj.GetSize();
+   const auto box_size = entity->getBoundingBox().getSize();
 
-   auto light = mMenuSceneMgr->createLight("MenuSceneLight");
-   light->setType(Ogre::Light::LT_POINT);
-   light->setPosition(0.0f, 150.0f, 250.0f);
-   light->setDiffuseColour(1.0f, 0.0f, 0.0f);
-   light->setSpecularColour(1.0f, 0.0f, 0.0f);
+   const auto x_scale = obj_size.Width / box_size.x;
+   const auto y_scale = obj_size.Height / box_size.y;
+   const auto z_scale = obj_size.Height / box_size.z;
+   node->setScale(x_scale, y_scale, z_scale);
+
+   const auto pos = obj.GetPosition();
+   const auto x_delta = mViewPort->getActualWidth() / 2;
+   const auto z_delta = mViewPort->getActualHeight() / 2;
+   node->setPosition(pos.X - x_delta,
+                     40.0f,
+                     pos.Y - z_delta);
+   return node;
 }
 
-void Ogre3DRenderer::InitArenaScene()
-{
-   mArenaSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC, "ArenaSceneMgr");
-   mArenaSceneMgr->setAmbientLight(Ogre::ColourValue(1.7f, 1.7f, 1.7f));
-   mArenaSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
+//void Ogre3DRenderer::InitMenuScene(Ogre::SceneManager* const scene_mgr)
+//{
+//   scene_mgr = mRoot->createSceneManager(Ogre::ST_GENERIC, "MenuSceneMgr");
+//   scene_mgr->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
 
-   auto cam = mArenaSceneMgr->createCamera("DefaultCamera");
-   cam->setPosition(0.0f, 900.0f, 500.0f);
-   cam->lookAt(0.0f, 0.0f, 0.0f);
-   cam->setNearClipDistance(5.0f);
-}
+//   auto cam = scene_mgr->createCamera("DefaultCamera");
+//   cam->setPosition(0.0f, 900.0f, 1.0f);
+//   cam->lookAt(0.0f, 0.0f, 0.0f);
+//   cam->setNearClipDistance(5.0f);
+//   mViewPort = mRenderWindow->addViewport(cam);
 
-void Ogre3DRenderer::SelectMenuScene()
-{
-   if (mMenuSceneSelected) {
-      return;
-   }
+//   auto light = scene_mgr->createLight("MenuSceneLight");
+//   light->setType(Ogre::Light::LT_POINT);
+//   light->setPosition(0.0f, 150.0f, 250.0f);
+//   light->setDiffuseColour(1.0f, 0.0f, 0.0f);
+//   light->setSpecularColour(1.0f, 0.0f, 0.0f);
+//}
 
-   SelectViewport(mMenuSceneMgr);
-   mMenuSceneSelected = true;
-}
+//void Ogre3DRenderer::InitArenaScene(Ogre::SceneManager* const scene_mgr)
+//{
+//   scene_mgr = mRoot->createSceneManager(Ogre::ST_GENERIC, "ArenaSceneMgr");
+//   scene_mgr->setAmbientLight(Ogre::ColourValue(1.7f, 1.7f, 1.7f));
+//   scene_mgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
-void Ogre3DRenderer::SelectArenaScene()
-{
-   if (!mMenuSceneSelected) {
-      return;
-   }
-
-   SelectViewport(mArenaSceneMgr);
-   mMenuSceneSelected = false;
-}
-
-void Ogre3DRenderer::SelectViewport(Ogre::SceneManager* const scene_mgr)
-{
-   mRenderWindow->removeAllViewports();
-
-   auto cam = scene_mgr->getCamera("DefaultCamera");
-   mViewPort = mRenderWindow->addViewport(cam);
-}
+//   auto cam = scene_mgr->createCamera("DefaultCamera");
+//   cam->setPosition(0.0f, 900.0f, 500.0f);
+//   cam->lookAt(0.0f, 0.0f, 0.0f);
+//   cam->setNearClipDistance(5.0f);
+//   mViewPort = mRenderWindow->addViewport(cam);
+//}
