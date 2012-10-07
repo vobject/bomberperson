@@ -7,7 +7,7 @@
 
 #include <string>
 
-static const std::string RESOURCE_DIR = "res_q1_master";
+static const std::string RESOURCE_DIR = "res";
 
 struct DefaultValue
 {
