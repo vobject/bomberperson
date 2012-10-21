@@ -2,4 +2,8 @@
 Debug/
 Release/
 build/
-
+res_ab/
+res_q1/
+stuff/
+CMakeLists.txt.user*
+Ogre.log
