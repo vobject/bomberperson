@@ -1,4 +1,5 @@
 #include "SdlRenderer.hpp"
+#include "SdlRenderer/ResourceCache.hpp"
 #include "../game/UserInterface.hpp"
 #include "../game/MenuItem.hpp"
 #include "../game/MenuItemSelector.hpp"
@@ -10,7 +11,6 @@
 #include "../game/Bomb.hpp"
 #include "../game/Explosion.hpp"
 #include "../game/Player.hpp"
-#include "sdl_res/ResourceCache.hpp"
 #include "../utils/Utils.hpp"
 #include "../Options.hpp"
 
@@ -42,19 +42,19 @@ SdlRenderer::SdlRenderer(const Size res)
 
    // TODO: Load fonts from ResCache.
 
-   mFont = TTF_OpenFont("res/font/scoreboard.ttf", 16);
+   mFont = TTF_OpenFont("res/render/SdlRenderer/font/scoreboard.ttf", 16);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
 
-   mMenuFont = TTF_OpenFont("res/font/menu.ttf", 72);
+   mMenuFont = TTF_OpenFont("res/render/SdlRenderer/font/menu.ttf", 72);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
 
-   mResCache = make_unique<ResourceCache>();
+   mResCache = make_unique<ResourceCache>("SdlRenderer");
 }
 
 SdlRenderer::~SdlRenderer()

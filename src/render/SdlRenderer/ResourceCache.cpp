@@ -12,8 +12,8 @@
 #include <SDL_image.h>
 #include <SDL_rotozoom.h>
 
-ResourceCache::ResourceCache()
-   : mResDir(RESOURCE_DIR)
+ResourceCache::ResourceCache(const std::string& renderer_dir)
+   : mResDir(RESOURCE_DIR + "/render/" + renderer_dir)
 {
    if (0 == IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG)) {
        throw "Failed to initialize SDL_image";

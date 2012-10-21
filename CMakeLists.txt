@@ -9,6 +9,8 @@ IF (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE "RELEASE")
 ENDIF()
 
+OPTION(USE_OGRE "Use the Ogre3D library for rendering." ON)
+
 # TODO: Check if USE_OPENNI has been set and set it for the compilation.
 
 # TODO: Check compiler version to be at least g++4.7 or clang++3.1.
@@ -34,13 +36,26 @@ INCLUDE_DIRECTORIES(
    ${X11_INCLUDE_DIR}
 )
 
-FILE(GLOB BOMBERPERSON_HEADERS src/*.hpp
-                               src/*/*.hpp
-                               src/*/*/*.hpp)
+FILE(GLOB BOMBERPERSON_HEADERS src/BomberPersonApp.hpp
+                               src/WindowFrame.hpp
+                               src/Options.hpp
+                               src/audio/*.hpp
+                               src/game/*.hpp
+                               src/input/*.hpp
+                               src/nui/*.hpp
+                               src/render/*.hpp
+                               src/render/SdlRenderer/*.hpp
+                               src/utils/*.hpp)
 
-FILE(GLOB BOMBERPERSON_SOURCES src/*.cpp
-                               src/*/*.cpp
-                               src/*/*/*.cpp)
+FILE(GLOB BOMBERPERSON_SOURCES src/main.cpp
+                               src/BomberPersonApp.cpp
+                               src/WindowFrame.cpp
+                               src/audio/*.cpp
+                               src/game/*.cpp
+                               src/input/*.cpp
+                               src/nui/*.cpp
+                               src/render/*.cpp
+                               src/render/SdlRenderer/*.cpp)
 
 ADD_DEFINITIONS(
    -Wall
@@ -48,6 +63,31 @@ ADD_DEFINITIONS(
 )
 
 SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
+
+IF (USE_OGRE)
+    MESSAGE(STATUS "Using Ogre3D library.")
+
+    FIND_PACKAGE(OGRE REQUIRED)
+    FIND_PACKAGE(Boost REQUIRED) # boost is currently only used for Ogre3D.
+
+    INCLUDE_DIRECTORIES(${OGRE_INCLUDE_DIRS})
+    INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
+
+    # Enable Ogre3D code in the source files.
+    ADD_DEFINITIONS(-DUSE_OGRE)
+
+    FILE(GLOB OGRE_RENDERER_HEADERS src/render/Ogre3DRenderer/*.hpp)
+    FILE(GLOB OGRE_RENDERER_SOURCES src/render/Ogre3DRenderer/*.cpp)
+
+    SET(BOMBERPERSON_HEADERS ${BOMBERPERSON_HEADERS} ${OGRE_RENDERER_HEADERS})
+    SET(BOMBERPERSON_SOURCES ${BOMBERPERSON_SOURCES} ${OGRE_RENDERER_SOURCES})
+
+    SET(EXTRA_LIBS ${EXTRA_LIBS} ${OGRE_LIBRARIES})
+#    SET(EXTRA_LIBS ${EXTRA_LIBS} ${BOOST_LIBRARIES})
+    SET(EXTRA_LIBS ${EXTRA_LIBS} boost_system) # HACK
+ELSE (USE_OGRE)
+    MESSAGE(STATUS "Not using Ogre3D library.")
+ENDIF (USE_OGRE)
 
 ADD_EXECUTABLE(BomberPerson ${BOMBERPERSON_HEADERS} ${BOMBERPERSON_SOURCES})
 
@@ -60,4 +100,5 @@ TARGET_LINK_LIBRARIES(
    ${SDLMIXER_LIBRARY}
    ${OPENGL_LIBRARIES}
    ${X11_LIBRARIES}
+   ${EXTRA_LIBS}
 )

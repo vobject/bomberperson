@@ -1,5 +1,5 @@
-#ifndef RESOURCE_CACHE_HPP
-#define RESOURCE_CACHE_HPP
+#ifndef SDL_RESOURCE_CACHE_HPP
+#define SDL_RESOURCE_CACHE_HPP
 
 #include "SpriteResource.hpp"
 #include "WallResource.hpp"
@@ -19,7 +19,7 @@ enum class EntityId;
 class ResourceCache
 {
 public:
-   ResourceCache();
+   ResourceCache(const std::string& renderer_dir);
    ~ResourceCache();
 
    ResourceCache(const ResourceCache&) = delete;
@@ -50,7 +50,7 @@ private:
 
    SDL_Surface* LoadTexture(const std::string& file, const Size& size);
 
-   std::string mResDir;
+   const std::string mResDir;
    std::map<EntityId, SpriteResource> mMenuRes;
    std::map<EntityId, SpriteResource> mArenaRes;
    std::map<WallType, WallResource> mWallRes;
@@ -61,4 +61,4 @@ private:
    std::vector<SDL_Surface*> mSurfaceCache;
 };
 
-#endif // RESOURCE_CACHE_HPP
+#endif // SDL_RESOURCE_CACHE_HPP
