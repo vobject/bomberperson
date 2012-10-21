@@ -1,7 +1,7 @@
 #ifndef OGRE3D_RENDERER_HPP
 #define OGRE3D_RENDERER_HPP
 
-#include "Renderer.hpp"
+#include "../Renderer.hpp"
 
 namespace Ogre {
    class Root;
