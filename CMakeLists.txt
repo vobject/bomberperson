@@ -22,6 +22,7 @@ FIND_PACKAGE(SDL_gfx REQUIRED)
 FIND_PACKAGE(SDL_ttf REQUIRED)
 FIND_PACKAGE(SDL_mixer REQUIRED)
 FIND_PACKAGE(X11 REQUIRED) # OpenGL should already have taken care of this...
+FIND_PACKAGE(TinyXML REQUIRED)
 # TODO: Check for OpenNI
 #TODO: OpenNI Stuff: ADD_DEFINITIONS(-I/usr/include/ni)
 #TODO: OpenNI Stuff: ADD_DEFINITIONS(-Dlinux)
@@ -33,9 +34,11 @@ INCLUDE_DIRECTORIES(
    ${SDLTTF_INCLUDE_DIR}
    ${SDLMIXER_INCLUDE_DIR}
    ${X11_INCLUDE_DIR}
+   ${TINYXML_INCLUDE_DIR}
 )
 
 FILE(GLOB BOMBERPERSON_HEADERS src/BomberPersonApp.hpp
+                               src/BomberPersonConfig.hpp
                                src/WindowFrame.hpp
                                src/Options.hpp
                                src/audio/*.hpp
@@ -49,6 +52,7 @@ FILE(GLOB BOMBERPERSON_HEADERS src/BomberPersonApp.hpp
 
 FILE(GLOB BOMBERPERSON_SOURCES src/main.cpp
                                src/BomberPersonApp.cpp
+                               src/BomberPersonConfig.cpp
                                src/WindowFrame.cpp
                                src/audio/*.cpp
                                src/game/*.cpp
@@ -87,7 +91,7 @@ IF (USE_OGRE)
     MESSAGE(STATUS "Using Ogre3D library.")
 
     FIND_PACKAGE(OGRE REQUIRED)
-    FIND_PACKAGE(Boost REQUIRED) # boost is currently only used for Ogre3D.
+    FIND_PACKAGE(Boost REQUIRED COMPONENTS system)
 
     INCLUDE_DIRECTORIES(${OGRE_INCLUDE_DIRS})
     INCLUDE_DIRECTORIES(${BOOST_INCLUDE_DIRS})
@@ -102,7 +106,7 @@ IF (USE_OGRE)
     SET(BOMBERPERSON_SOURCES ${BOMBERPERSON_SOURCES} ${OGRE_RENDERER_SOURCES})
 
     SET(EXTRA_LIBS ${EXTRA_LIBS} ${OGRE_LIBRARIES})
-#    SET(EXTRA_LIBS ${EXTRA_LIBS} ${BOOST_LIBRARIES})
+#    SET(EXTRA_LIBS ${EXTRA_LIBS} ${BOOST_LIBRARIES}) # Does not work.
     SET(EXTRA_LIBS ${EXTRA_LIBS} boost_system) # HACK
 ELSE (USE_OGRE)
     MESSAGE(STATUS "Not using Ogre3D library.")
@@ -118,5 +122,6 @@ TARGET_LINK_LIBRARIES(
    ${SDLTTF_LIBRARY}
    ${SDLMIXER_LIBRARY}
    ${X11_LIBRARIES}
+   ${TINYXML_LIBRARIES}
    ${EXTRA_LIBS}
 )

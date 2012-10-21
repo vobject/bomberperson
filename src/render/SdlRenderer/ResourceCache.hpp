@@ -14,7 +14,10 @@
 #include <vector>
 
 struct SDL_Surface;
+class TiXmlHandle;
 enum class EntityId;
+
+// TODO: Put this in its own namespace.
 
 class ResourceCache
 {
@@ -42,8 +45,8 @@ public:
 private:
    void LoadMenuResources();
    void LoadArenaResources();
-   void LoadWallResources();
-   void LoadExtraResources();
+   void LoadWallResources(const TiXmlHandle& hndl);
+   void LoadExtraResources(const TiXmlHandle& hndl);
    void LoadBombResources();
    void LoadExplosionResources();
    void LoadPlayerResources();

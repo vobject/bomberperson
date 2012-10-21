@@ -12,11 +12,12 @@
 #include "../../game/Explosion.hpp"
 #include "../../game/Player.hpp"
 #include "../../utils/Utils.hpp"
+#include "../../BomberPersonConfig.hpp"
 #include "../../Options.hpp"
 
 #include <SDL.h>
 
-SdlRenderer::SdlRenderer(const Size res)
+SdlRenderer::SdlRenderer(const Size res, const BomberPersonConfig& app_cfg)
 {
    if (0 > SDL_Init(SDL_INIT_VIDEO)) {
       throw "Cannot init SDL video subsystem.";
@@ -42,21 +43,22 @@ SdlRenderer::SdlRenderer(const Size res)
 
    // TODO: Load fonts from ResCache.
 
-   const auto sb_font_path = RESOURCE_DIR + "/render/SdlRenderer/font/scoreboard.ttf";
+   const auto sb_font_path = app_cfg.ResourceDir() + "/render/SdlRenderer/font/scoreboard.ttf";
    mFont = TTF_OpenFont(sb_font_path.c_str(), 16);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
 
-   const auto menu_font_path = RESOURCE_DIR + "/render/SdlRenderer/font/menu.ttf";
+   const auto menu_font_path = app_cfg.ResourceDir() + "/render/SdlRenderer/font/menu.ttf";
    mMenuFont = TTF_OpenFont(menu_font_path.c_str(), 72);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
 
-   mResCache = make_unique<ResourceCache>("SdlRenderer");
+   const auto renderer_path = app_cfg.ResourceDir() + "/render/SdlRenderer";
+   mResCache = make_unique<ResourceCache>(renderer_path);
 }
 
 SdlRenderer::~SdlRenderer()

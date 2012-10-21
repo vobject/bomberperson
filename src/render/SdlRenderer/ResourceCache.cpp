@@ -12,18 +12,28 @@
 #include <SDL_image.h>
 #include <SDL_rotozoom.h>
 
+#include <tinyxml.h>
+
 ResourceCache::ResourceCache(const std::string& renderer_dir)
-   : mResDir(RESOURCE_DIR + "/render/" + renderer_dir)
+   : mResDir(renderer_dir)
 {
    if (0 == IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG)) {
        throw "Failed to initialize SDL_image";
    }
 
-   // TODO: Coordinate this using XML files.
+   TiXmlDocument doc(mResDir + "/config.xml");
+   if (!doc.LoadFile()) {
+      throw "Unable to load config XML file.";
+   }
+
+   TiXmlHandle doc_hndl(&doc);
+   TiXmlHandle root_hndl(doc_hndl.FirstChildElement());
+   TiXmlHandle sprite_hndl(root_hndl.FirstChild("Resource").FirstChild("Sprite"));
+
    LoadMenuResources();
    LoadArenaResources();
-   LoadWallResources();
-   LoadExtraResources();
+   LoadWallResources(sprite_hndl.FirstChild("Wall"));
+   LoadExtraResources(sprite_hndl.FirstChild("Extra"));
    LoadBombResources();
    LoadExplosionResources();
    LoadPlayerResources();
@@ -103,8 +113,7 @@ void ResourceCache::LoadMenuResources()
 {
    const auto id1 = EntityId::Menu;
    const auto id_sel = EntityId::MenuItemSelector;
-   const Size size = { DefaultValue::SCREEN_WIDTH,
-                       DefaultValue::SCREEN_HEIGHT };
+   const Size size = { DefaultValue::SCREEN_WIDTH, DefaultValue::SCREEN_HEIGHT };
    const Size size_sel = { 64, 84 };
 
    mMenuRes.insert({ id1, { id1, { LoadTexture("mainmenu.png", size) } } });
@@ -121,46 +130,44 @@ void ResourceCache::LoadMenuResources()
 void ResourceCache::LoadArenaResources()
 {
    const auto id = EntityId::Arena;
-   const Size size = { DefaultValue::ARENA_WIDTH,
-                       DefaultValue::ARENA_HEIGHT };
+   const Size size = { DefaultValue::ARENA_WIDTH, DefaultValue::ARENA_HEIGHT };
 
    mArenaRes.insert({ id, { id, { LoadTexture("arena_1.png", size) } } });
 }
 
-void ResourceCache::LoadWallResources()
+void ResourceCache::LoadWallResources(const TiXmlHandle& hndl)
 {
-   const auto id1 = WallType::Indestructible;
-   const auto id2 = WallType::Destructible;
-   const Size size = { DefaultValue::WALL_WIDTH,
-                       DefaultValue::WALL_HEIGHT };
+   const Size size = { DefaultValue::WALL_WIDTH, DefaultValue::WALL_HEIGHT };
 
-   mWallRes.insert({ id1, { id1, { LoadTexture("wall_indestructible.png", size) } } });
-   mWallRes.insert({ id2, { id2, { LoadTexture("wall_destructible.png", size) } } });
+   const auto i_file = hndl.FirstChild("Indestructible").Element()->GetText();
+   const auto d_file = hndl.FirstChild("Destructible").Element()->GetText();
+
+   mWallRes.insert({ WallType::Indestructible, { WallType::Indestructible, { LoadTexture(i_file, size) } } });
+   mWallRes.insert({ WallType::Destructible, { WallType::Destructible, { LoadTexture(d_file, size) } } });
 }
 
-void ResourceCache::LoadExtraResources()
+void ResourceCache::LoadExtraResources(const TiXmlHandle& hndl)
 {
-   const auto id1 = ExtraType::Speed;
-   const auto id2 = ExtraType::Bombs;
-   const auto id3 = ExtraType::Range;
-   const auto id4 = ExtraType::InfiniteRange;
-   const auto id5 = ExtraType::Kick;
-   const auto id6 = ExtraType::RemoteBombs;
-   const Size size = { DefaultValue::EXTRA_WIDTH,
-                       DefaultValue::EXTRA_HEIGHT };
+   const Size size = { DefaultValue::EXTRA_WIDTH, DefaultValue::EXTRA_HEIGHT };
 
-   mExtraRes.insert({ id1, { id1, { LoadTexture("extra_speed.png", size) } } });
-   mExtraRes.insert({ id2, { id2, { LoadTexture("extra_supply.png", size) } } });
-   mExtraRes.insert({ id3, { id3, { LoadTexture("extra_range.png", size) } } });
-   mExtraRes.insert({ id4, { id4, { LoadTexture("extra_range_gold.png", size) } } });
-   mExtraRes.insert({ id5, { id5, { LoadTexture("extra_kick.png", size) } } });
-   mExtraRes.insert({ id6, { id6, { LoadTexture("extra_remotebombs.png", size) } } });
+   const auto speed_file = hndl.FirstChild("Speed").Element()->GetText();
+   const auto bombs_file = hndl.FirstChild("Bombs").Element()->GetText();
+   const auto range_file = hndl.FirstChild("Range").Element()->GetText();
+   const auto rangegold_file = hndl.FirstChild("RangeGold").Element()->GetText();
+   const auto kick_file = hndl.FirstChild("Kick").Element()->GetText();
+   const auto remotebombs_file = hndl.FirstChild("RemoteBombs").Element()->GetText();
+
+   mExtraRes.insert({ ExtraType::Speed, { ExtraType::Speed, { LoadTexture(speed_file, size) } } });
+   mExtraRes.insert({ ExtraType::Bombs, { ExtraType::Bombs, { LoadTexture(bombs_file, size) } } });
+   mExtraRes.insert({ ExtraType::Range, { ExtraType::Range, { LoadTexture(range_file, size) } } });
+   mExtraRes.insert({ ExtraType::InfiniteRange, { ExtraType::InfiniteRange, { LoadTexture(rangegold_file, size) } } });
+   mExtraRes.insert({ ExtraType::Kick, { ExtraType::Kick, { LoadTexture(kick_file, size) } } });
+   mExtraRes.insert({ ExtraType::RemoteBombs, { ExtraType::RemoteBombs, { LoadTexture(remotebombs_file, size) } } });
 }
 
 void ResourceCache::LoadBombResources()
 {
-   const Size size = { DefaultValue::BOMB_WIDTH,
-                       DefaultValue::BOMB_HEIGHT };
+   const Size size = { DefaultValue::BOMB_WIDTH, DefaultValue::BOMB_HEIGHT };
    const auto len = DefaultValue::BOMB_ANIM_LEN;
 
    BombResource countdown(BombType::Countdown);
@@ -174,8 +181,7 @@ void ResourceCache::LoadBombResources()
 
 void ResourceCache::LoadExplosionResources()
 {
-   const Size size = { DefaultValue::EXPLOSION_WIDTH,
-                       DefaultValue::EXPLOSION_HEIGHT };
+   const Size size = { DefaultValue::EXPLOSION_WIDTH, DefaultValue::EXPLOSION_HEIGHT };
    const auto len = DefaultValue::EXPLOSION_ANIM_LEN;
 
    ExplosionResource center(ExplosionType::Center);

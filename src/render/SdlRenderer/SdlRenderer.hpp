@@ -10,6 +10,7 @@
 
 #include <SDL_ttf.h>
 
+class BomberPersonConfig;
 class ResourceCache;
 struct Size;
 struct SDL_Surface;
@@ -17,7 +18,7 @@ struct SDL_Surface;
 class SdlRenderer : public Renderer
 {
 public:
-   SdlRenderer(Size res);
+   SdlRenderer(Size res, const BomberPersonConfig& app_cfg);
    virtual ~SdlRenderer();
 
    SdlRenderer(const SdlRenderer&) = delete;

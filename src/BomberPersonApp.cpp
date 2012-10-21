@@ -26,6 +26,7 @@
 #include <chrono>
 
 BomberPersonApp::BomberPersonApp()
+   : mConfig("config.xml")
 {
 
 }
@@ -89,8 +90,8 @@ void BomberPersonApp::Initialize()
                               DefaultValue::SCREEN_HEIGHT };
 
    mAudio = std::make_shared<Audio>();
-   mRenderer = std::make_shared<SdlRenderer>(screen_size);
-   mWndFrame = std::make_shared<WindowFrame>("BomberPerson");
+   mRenderer = std::make_shared<SdlRenderer>(screen_size, mConfig);
+   mWndFrame = std::make_shared<WindowFrame>(mConfig.AppTitle());
    mLogic = std::make_shared<Logic>();
 }
 
@@ -118,7 +119,7 @@ void BomberPersonApp::ProcessInput()
          mRenderer = std::make_shared<SimpleSdlRenderer>(screen_size);
       }
       else if (SDLK_2 == event.key.keysym.sym) {
-         mRenderer = std::make_shared<SdlRenderer>(screen_size);
+         mRenderer = std::make_shared<SdlRenderer>(screen_size, mConfig);
       }
 
 #if defined(USE_OPENGL)

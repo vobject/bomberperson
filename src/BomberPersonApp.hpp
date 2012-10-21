@@ -1,6 +1,7 @@
 #ifndef BOMBERPERSON_APP_HPP
 #define BOMBERPERSON_APP_HPP
 
+#include "BomberPersonConfig.hpp"
 #include "utils/Utils.hpp"
 
 #include <memory>
@@ -42,6 +43,7 @@ private:
 
    bool mQuitRequested = false;
 
+   BomberPersonConfig mConfig;
 #if defined(USE_OPENNI)
    std::shared_ptr<Nui> mNui;
 #endif // USE_OPENNI
