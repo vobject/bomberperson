@@ -1,7 +1,7 @@
 #ifndef SDL_RENDERER_HPP
 #define SDL_RENDERER_HPP
 
-#include "Renderer.hpp"
+#include "../Renderer.hpp"
 
 #include <map>
 #include <memory>

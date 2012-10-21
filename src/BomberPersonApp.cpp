@@ -6,7 +6,7 @@
 #include "audio/Audio.hpp"
 #include "render/SimpleGlRenderer.hpp"
 #include "render/SimpleSdlRenderer.hpp"
-#include "render/SdlRenderer.hpp"
+#include "render/SdlRenderer/SdlRenderer.hpp"
 
 #if defined(USE_OGRE)
    #include "render/Ogre3DRenderer/Ogre3DRenderer.hpp"
