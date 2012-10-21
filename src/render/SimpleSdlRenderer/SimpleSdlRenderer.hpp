@@ -1,7 +1,7 @@
 #ifndef SIMPLE_SDL_RENDERER_HPP
 #define SIMPLE_SDL_RENDERER_HPP
 
-#include "Renderer.hpp"
+#include "../Renderer.hpp"
 
 struct Size;
 struct SDL_Surface;
@@ -20,7 +20,7 @@ public:
 
    void Render(const std::shared_ptr<MenuItem>& obj) override;
    void Render(const std::shared_ptr<MenuItemSelector>& obj) override;
-   void Render(const std::shared_ptr<MainMenu>& mainmenu) override;
+   void Render(const std::shared_ptr<MainMenu>& obj) override;
 
    void Render(const std::shared_ptr<Arena>& arena) override;
    void Render(const std::shared_ptr<Scoreboard>& scoreboard) override;
@@ -31,9 +31,6 @@ public:
    void Render(const std::shared_ptr<Player>& player) override;
 
 private:
-//   void DrawLine(const Point& src_pos, const Point& dest_pos, unsigned int color);
-//   void DrawPixel(const Point& pos, unsigned int color);
-
    // Writing to the video surface is ok since we use double buffering.
    SDL_Surface* mScreen = nullptr;
 };

@@ -102,18 +102,6 @@ void SdlRenderer::Render(const std::shared_ptr<MenuItemSelector>& obj)
    const auto anim_time = obj->GetAnimationTime();
    const auto frame = mResCache->GetMenuResource(id).GetFrame(anim_time);
    Render(obj, frame);
-
-//   const auto pos = obj->GetPosition();
-
-//   auto surface = TTF_RenderText_Blended(mMenuFont,
-//                                         "Q",
-//                                         { 0x70, 0x70, 0x70, 0 });
-//   SDL_Rect rect = { static_cast<Sint16>(pos.X),
-//                     static_cast<Sint16>(pos.Y),
-//                     0,
-//                     0 };
-//   SDL_BlitSurface(surface, NULL, mScreen, &rect);
-//   SDL_FreeSurface(surface);
 }
 
 void SdlRenderer::Render(const std::shared_ptr<MainMenu>& obj)

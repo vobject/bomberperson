@@ -82,6 +82,7 @@ void EntityManager::OnEvent(const Event& event)
 std::shared_ptr<MainMenu> EntityManager::CreateMainmenu()
 {
    auto menu = std::make_shared<MainMenu>(*this);
+   menu->SetSize({ DefaultValue::SCREEN_WIDTH, DefaultValue::SCREEN_HEIGHT });
 
    mEntities.insert(menu);
    return menu;
@@ -90,6 +91,7 @@ std::shared_ptr<MainMenu> EntityManager::CreateMainmenu()
 std::shared_ptr<MenuItem> EntityManager::CreateMenuItem(const UiItemId id)
 {
    auto item = std::make_shared<MenuItem>(id);
+   item->SetSize({ 256, 32 });
 
    mEntities.insert(item);
    return item;

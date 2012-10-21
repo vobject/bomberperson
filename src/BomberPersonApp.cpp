@@ -4,8 +4,8 @@
 #include "nui/Kinect.hpp"
 #include "nui/KinectDummy.hpp"
 #include "audio/Audio.hpp"
-#include "render/SimpleGlRenderer.hpp"
-#include "render/SimpleSdlRenderer.hpp"
+#include "render/SimpleGlRenderer/SimpleGlRenderer.hpp"
+#include "render/SimpleSdlRenderer/SimpleSdlRenderer.hpp"
 #include "render/SdlRenderer/SdlRenderer.hpp"
 
 #if defined(USE_OGRE)

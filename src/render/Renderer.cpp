@@ -69,6 +69,6 @@ void Renderer::Render(const std::shared_ptr<SceneObject>& obj)
       Render(ptr);
    }
    else {
-      LOG(logERROR) << "SdlRenderer::Render(SceneObject) Unknown object!";
+      LOG(logERROR) << "Renderer::Render(SceneObject) Unknown object!";
    }
 }

@@ -1,14 +1,16 @@
 #include "SimpleSdlRenderer.hpp"
-#include "../game/UserInterface.hpp"
-#include "../game/MainMenu.hpp"
-#include "../game/Arena.hpp"
-#include "../game/Scoreboard.hpp"
-#include "../game/Wall.hpp"
-#include "../game/Extra.hpp"
-#include "../game/Bomb.hpp"
-#include "../game/Explosion.hpp"
-#include "../game/Player.hpp"
-#include "../utils/Utils.hpp"
+#include "../../game/UserInterface.hpp"
+#include "../../game/MenuItem.hpp"
+#include "../../game/MenuItemSelector.hpp"
+#include "../../game/MainMenu.hpp"
+#include "../../game/Arena.hpp"
+#include "../../game/Scoreboard.hpp"
+#include "../../game/Wall.hpp"
+#include "../../game/Extra.hpp"
+#include "../../game/Bomb.hpp"
+#include "../../game/Explosion.hpp"
+#include "../../game/Player.hpp"
+#include "../../utils/Utils.hpp"
 
 #include <SDL.h>
 
@@ -54,45 +56,43 @@ void SimpleSdlRenderer::PostRender()
 
 void SimpleSdlRenderer::Render(const std::shared_ptr<MenuItem>& obj)
 {
+   const auto pos = obj->GetPosition();
+   const auto size = obj->GetSize();
 
+   int color = 0x909090;
+   if (obj->IsEnabled()) {
+      color = 0xC0C0C0;
+   }
+
+   SDL_Rect rect = { static_cast<Sint16>(pos.X),
+                     static_cast<Sint16>(pos.Y),
+                     static_cast<Uint16>(size.Width),
+                     static_cast<Uint16>(size.Height) };
+   SDL_FillRect(mScreen, &rect, color);
 }
 
 void SimpleSdlRenderer::Render(const std::shared_ptr<MenuItemSelector>& obj)
 {
+   const auto pos = obj->GetPosition();
+   const auto size = obj->GetSize();
 
+   SDL_Rect rect = { static_cast<Sint16>(pos.X),
+                     static_cast<Sint16>(pos.Y),
+                     static_cast<Uint16>(size.Width),
+                     static_cast<Uint16>(size.Height) };
+   SDL_FillRect(mScreen, &rect, 0xffff00);
 }
 
-void SimpleSdlRenderer::Render(const std::shared_ptr<MainMenu>& mainmenu)
+void SimpleSdlRenderer::Render(const std::shared_ptr<MainMenu>& obj)
 {
-//   const auto pos = mainmenu->GetPosition();
-//   const auto size = mainmenu->GetSize();
+   const auto pos = obj->GetPosition();
+   const auto size = obj->GetSize();
 
-//   SDL_Rect rect = { static_cast<Sint16>(pos.X),
-//                     static_cast<Sint16>(pos.Y),
-//                     static_cast<Uint16>(size.Width),
-//                     static_cast<Uint16>(size.Height) };
-//   SDL_FillRect(mScreen, &rect, 0x7f7f6f);
-
-//   const auto items = mainmenu->GetMenuItems();
-//   const auto selection = mainmenu->GetSelection();
-
-//   for (size_t i = 0; i < items.size(); i++)
-//   {
-//      SDL_Rect item_rect = { static_cast<Sint16>(pos.X + 128),
-//                             static_cast<Sint16>(pos.Y + 96 + (96 * i)),
-//                             static_cast<Uint16>(384),
-//                             static_cast<Uint16>(64) };
-//      SDL_FillRect(mScreen, &item_rect, 0xffffff);
-
-//      if (selection.id == items[i].id)
-//      {
-//         SDL_Rect sel_rect = { static_cast<Sint16>(pos.X + 64),
-//                               static_cast<Sint16>(pos.Y + 110 + (96 * i)),
-//                               static_cast<Uint16>(48),
-//                               static_cast<Uint16>(48) };
-//         SDL_FillRect(mScreen, &sel_rect, 0xffff00);
-//      }
-//   }
+   SDL_Rect rect = { static_cast<Sint16>(pos.X),
+                     static_cast<Sint16>(pos.Y),
+                     static_cast<Uint16>(size.Width),
+                     static_cast<Uint16>(size.Height) };
+   SDL_FillRect(mScreen, &rect, 0x0000af);
 }
 
 void SimpleSdlRenderer::Render(const std::shared_ptr<Arena>& arena)
@@ -204,72 +204,3 @@ void SimpleSdlRenderer::Render(const std::shared_ptr<Player>& player)
                      static_cast<Uint16>(size.Height) };
    SDL_FillRect(mScreen, &rect, 0x00afaf);
 }
-
-//void SimpleSdlRenderer::DrawLine(const Point& src_pos, const Point& dest_pos, const unsigned int color)
-//{
-//   // based on http://alawibaba.com/projects/whiteboard/drawing-SDL.c
-//
-//#define SGN(x) ((x)>0 ? 1 : ((x)==0 ? 0:(-1)))
-//#define ABS(x) ((x)>0 ? (x) : (-x))
-//
-//   int x1 = src_pos.X;
-//   int y1 = src_pos.Y;
-//   int x2 = dest_pos.X;
-//   int y2 = dest_pos.Y;
-//
-//   int lg_delta;
-//   int sh_delta;
-//   int cycle;
-//   int lg_step;
-//   int sh_step;
-//
-//   lg_delta = x2 - x1;
-//   sh_delta = y2 - y1;
-//   lg_step = SGN(lg_delta);
-//   lg_delta = ABS(lg_delta);
-//   sh_step = SGN(sh_delta);
-//   sh_delta = ABS(sh_delta);
-//
-//   if (sh_delta < lg_delta)
-//   {
-//      cycle = lg_delta >> 1;
-//      while (x1 != x2)
-//      {
-//         DrawPixel({x1, y1}, color);
-//
-//         cycle += sh_delta;
-//         if (cycle > lg_delta)
-//         {
-//            cycle -= lg_delta;
-//            y1 += sh_step;
-//         }
-//         x1 += lg_step;
-//      }
-//      DrawPixel({x1, y1}, color);
-//   }
-//
-//   cycle = sh_delta >> 1;
-//   while (y1 != y2)
-//   {
-//      DrawPixel({x1, y1}, color);
-//
-//      cycle += lg_delta;
-//      if (cycle > sh_delta)
-//      {
-//         cycle -= sh_delta;
-//         x1 += lg_step;
-//      }
-//      y1 += sh_step;
-//   }
-//   DrawPixel({x1, y1}, color);
-//}
-//
-//void SimpleSdlRenderer::DrawPixel(const Point& pos, const unsigned int color)
-//{
-//   const auto bpp = mScreen->format->BytesPerPixel;
-//   const auto offset = (mScreen->pitch * pos.Y) + (pos.X * bpp);
-//
-//   SDL_LockSurface(mScreen);
-//   memcpy(static_cast<char*>(mScreen->pixels) + offset, &color, bpp);
-//   SDL_UnlockSurface(mScreen);
-//}

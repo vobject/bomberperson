@@ -1,7 +1,7 @@
 #ifndef SIMPLE_GL_RENDERER_HPP
 #define SIMPLE_GL_RENDERER_HPP
 
-#include "Renderer.hpp"
+#include "../Renderer.hpp"
 
 struct Size;
 struct SDL_Surface;
