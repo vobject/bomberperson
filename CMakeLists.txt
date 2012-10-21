@@ -9,6 +9,7 @@ IF (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE "RELEASE")
 ENDIF()
 
+OPTION(USE_OPENGL "Use OpenGL for rendering." ON)
 OPTION(USE_OGRE "Use the Ogre3D library for rendering." ON)
 
 # TODO: Check if USE_OPENNI has been set and set it for the compilation.
@@ -20,7 +21,6 @@ FIND_PACKAGE(SDL_image REQUIRED)
 FIND_PACKAGE(SDL_gfx REQUIRED)
 FIND_PACKAGE(SDL_ttf REQUIRED)
 FIND_PACKAGE(SDL_mixer REQUIRED)
-FIND_PACKAGE(OpenGL REQUIRED) # TODO: Make this optional
 FIND_PACKAGE(X11 REQUIRED) # OpenGL should already have taken care of this...
 # TODO: Check for OpenNI
 #TODO: OpenNI Stuff: ADD_DEFINITIONS(-I/usr/include/ni)
@@ -32,7 +32,6 @@ INCLUDE_DIRECTORIES(
    ${SDLGFX_INCLUDE_DIR}
    ${SDLTTF_INCLUDE_DIR}
    ${SDLMIXER_INCLUDE_DIR}
-   ${OPENGL_INCLUDE_DIR}
    ${X11_INCLUDE_DIR}
 )
 
@@ -45,7 +44,6 @@ FILE(GLOB BOMBERPERSON_HEADERS src/BomberPersonApp.hpp
                                src/nui/*.hpp
                                src/render/*.hpp
                                src/render/SimpleSdlRenderer/*.hpp
-                               src/render/SimpleGlRenderer/*.hpp
                                src/render/SdlRenderer/*.hpp
                                src/utils/*.hpp)
 
@@ -58,7 +56,6 @@ FILE(GLOB BOMBERPERSON_SOURCES src/main.cpp
                                src/nui/*.cpp
                                src/render/*.cpp
                                src/render/SimpleSdlRenderer/*.cpp
-                               src/render/SimpleGlRenderer/*.cpp
                                src/render/SdlRenderer/*.cpp)
 
 ADD_DEFINITIONS(
@@ -67,6 +64,24 @@ ADD_DEFINITIONS(
 )
 
 SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
+
+IF (USE_OPENGL)
+    MESSAGE(STATUS "Using OpenGL.")
+
+    FIND_PACKAGE(OpenGL REQUIRED)
+    INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
+    ADD_DEFINITIONS(-DUSE_OPENGL)
+
+    FILE(GLOB GL_RENDERER_HEADERS src/render/SimpleGlRenderer/*.hpp)
+    FILE(GLOB GL_RENDERER_SOURCES src/render/SimpleGlRenderer/*.cpp)
+
+    SET(BOMBERPERSON_HEADERS ${BOMBERPERSON_HEADERS} ${GL_RENDERER_HEADERS})
+    SET(BOMBERPERSON_SOURCES ${BOMBERPERSON_SOURCES} ${GL_RENDERER_SOURCES})
+
+    SET(EXTRA_LIBS ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
+ELSE (USE_OPENGL)
+    MESSAGE(STATUS "Not using OpenGL.")
+ENDIF (USE_OPENGL)
 
 IF (USE_OGRE)
     MESSAGE(STATUS "Using Ogre3D library.")
@@ -102,7 +117,6 @@ TARGET_LINK_LIBRARIES(
    ${SDLGFX_LIBRARY}
    ${SDLTTF_LIBRARY}
    ${SDLMIXER_LIBRARY}
-   ${OPENGL_LIBRARIES}
    ${X11_LIBRARIES}
    ${EXTRA_LIBS}
 )

@@ -4,9 +4,12 @@
 #include "nui/Kinect.hpp"
 #include "nui/KinectDummy.hpp"
 #include "audio/Audio.hpp"
-#include "render/SimpleGlRenderer/SimpleGlRenderer.hpp"
 #include "render/SimpleSdlRenderer/SimpleSdlRenderer.hpp"
 #include "render/SdlRenderer/SdlRenderer.hpp"
+
+#if defined(USE_OPENGL)
+   #include "render/SimpleGlRenderer/SimpleGlRenderer.hpp"
+#endif // USE_OPENGL
 
 #if defined(USE_OGRE)
    #include "render/Ogre3DRenderer/Ogre3DRenderer.hpp"
@@ -117,9 +120,13 @@ void BomberPersonApp::ProcessInput()
       else if (SDLK_2 == event.key.keysym.sym) {
          mRenderer = std::make_shared<SdlRenderer>(screen_size);
       }
+
+#if defined(USE_OPENGL)
       else if (SDLK_3 == event.key.keysym.sym) {
          mRenderer = std::make_shared<SimpleGlRenderer>(screen_size);
       }
+#endif // USE_OPENGL
+
 #if defined(USE_OGRE)
       else if (SDLK_4 == event.key.keysym.sym) {
          mRenderer = std::make_shared<Ogre3DRenderer>(screen_size);
