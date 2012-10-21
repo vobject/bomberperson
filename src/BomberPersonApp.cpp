@@ -86,7 +86,7 @@ void BomberPersonApp::Initialize()
                               DefaultValue::SCREEN_HEIGHT };
 
    mAudio = std::make_shared<Audio>();
-   mRenderer = std::make_shared<SimpleSdlRenderer>(screen_size);
+   mRenderer = std::make_shared<SdlRenderer>(screen_size);
    mWndFrame = std::make_shared<WindowFrame>("BomberPerson");
    mLogic = std::make_shared<Logic>();
 }
