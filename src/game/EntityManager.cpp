@@ -110,7 +110,8 @@ void EntityManager::OnCreateArena(const CreateArenaEvent& event)
 {
    // The arena object will be used internally to create every other
    //  ArenaObject derived class.
-   mArena = std::make_shared<Arena>(event.GetPosition(),
+   mArena = std::make_shared<Arena>(event.GetArena(),
+                                    event.GetPosition(),
                                     event.GetSize(),
                                     event.GetBorderSize(),
                                     event.GetCellsX(),

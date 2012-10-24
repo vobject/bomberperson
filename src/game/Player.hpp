@@ -99,7 +99,7 @@ private:
    void IncreaseSpeed();
    PlayerAnimation GetStopWalkingState(PlayerAnimation anim) const;
 
-   PlayerType mType;
+   const PlayerType mType;
 
    EventQueue& mEventQueue;
 

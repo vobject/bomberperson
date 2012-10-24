@@ -8,6 +8,7 @@ UserInterface::UserInterface()
    : mEntityManager(mEventQueue)
 {
     mSettings = {
+       ArenaId::Arena_1,
        {
           { PlayerId::Player_1, InputId::Keyboard_1 },
           { PlayerId::Player_2, InputId::Keyboard_2 },

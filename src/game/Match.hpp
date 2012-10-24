@@ -16,6 +16,7 @@ class KeyboardInput;
 class MouseInput;
 //class KinectInput;
 
+enum class ArenaType;
 enum class PlayerType;
 
 class Match
@@ -48,6 +49,7 @@ private:
    void CreateInputEvents();
    void UpdateEntities(int elapsed_time);
 
+   ArenaType ArenaTypeFromArenaId(ArenaId id);
    PlayerType PlayerTypeFromPlayerId(PlayerId id);
 
    const MatchSettings mSettings;

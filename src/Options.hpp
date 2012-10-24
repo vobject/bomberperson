@@ -20,7 +20,7 @@ struct DefaultValue
    static const int ARENA_HEIGHT            = SCREEN_HEIGHT;
    static const int ARENA_BORDER_WIDTH      = .03125 * SCREEN_WIDTH;
    static const int ARENA_BORDER_HEIGHT     = .03704 * SCREEN_HEIGHT;
-   static const int ARENA_CELLS_X           = 15;
+   static const int ARENA_CELLS_X           = 13;
    static const int ARENA_CELLS_Y           = 11;
 
    static const int SCOREBOARD_POS_X        = ARENA_POS_X + ARENA_WIDTH;
@@ -39,24 +39,24 @@ struct DefaultValue
 
    static const int BOMB_WIDTH              = CELL_WIDTH;
    static const int BOMB_HEIGHT             = CELL_HEIGHT;
-   static const int BOMB_ANIM_LEN           =  2500_ms;
+   static const int BOMB_ANIM_LEN           = 2500_ms;
 
    static const int EXPLOSION_WIDTH         = CELL_WIDTH;
    static const int EXPLOSION_HEIGHT        = CELL_HEIGHT;
    static const int EXPLOSION_ANIM_LEN      = 750_ms;
 
-   static const int PLAYER_WIDTH            = CELL_WIDTH * 1.75f;
+   static const int PLAYER_WIDTH            = CELL_WIDTH * 1.55f;
    static const int PLAYER_HEIGHT           = CELL_HEIGHT * 1.75f;
    static const int PLAYER_WALK_ANIM_LEN    = 1000_ms;
    static const int PLAYER_SPAWN_ANIM_LEN   = 1000_ms;
    static const int PLAYER_DEATH_ANIM_LEN   = 1000_ms;
    static const int PLAYER_1_CELL_X         = 0;
    static const int PLAYER_1_CELL_Y         = 0;
-   static const int PLAYER_2_CELL_X         = 14;
+   static const int PLAYER_2_CELL_X         = 12;
    static const int PLAYER_2_CELL_Y         = 10;
    static const int PLAYER_3_CELL_X         = 0;
    static const int PLAYER_3_CELL_Y         = 10;
-   static const int PLAYER_4_CELL_X         = 14;
+   static const int PLAYER_4_CELL_X         = 12;
    static const int PLAYER_4_CELL_Y         = 0;
 };
 

@@ -25,6 +25,13 @@ enum class UiItemId
    MainMenu_Exit
 };
 
+enum class ArenaId
+{
+   Arena_1,
+   Arena_2,
+   Arena_3
+};
+
 enum class InputId
 {
    Keyboard_1,
@@ -43,6 +50,7 @@ enum class PlayerId
 
 struct MatchSettings
 {
+   ArenaId arena;
    std::vector<std::pair<PlayerId, InputId>> players;
    // Level
    // Key config

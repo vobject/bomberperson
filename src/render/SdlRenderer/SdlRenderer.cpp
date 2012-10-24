@@ -115,8 +115,8 @@ void SdlRenderer::Render(const std::shared_ptr<MainMenu>& obj)
 
 void SdlRenderer::Render(const std::shared_ptr<Arena>& arena)
 {
-   const auto id = arena->GetId();
-   const auto frame = mResCache->GetArenaResource(id).GetFrame();
+   const auto type = arena->GetType();
+   const auto frame = mResCache->GetArenaResource(type).GetFrame();
    Render(arena, frame);
 }
 

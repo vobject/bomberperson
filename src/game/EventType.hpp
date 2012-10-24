@@ -4,6 +4,7 @@
 #include "Arena.hpp"
 #include "../utils/Utils.hpp"
 
+enum class ArenaType;
 enum class WallType;
 enum class ExtraType;
 enum class BombType;
@@ -53,9 +54,10 @@ private:
 class CreateArenaEvent : public Event
 {
 public:
-   CreateArenaEvent(Point pos, Size size, Size boder_size,
+   CreateArenaEvent(ArenaType type, Point pos, Size size, Size boder_size,
                     int cells_x, int cells_y, int player_count)
       : Event(EventType::CreateArena, 0)
+      , mArena(type)
       , mPosition(pos)
       , mSize(size)
       , mBoderSize(boder_size)
@@ -65,6 +67,7 @@ public:
    { }
    virtual ~CreateArenaEvent() { }
 
+   ArenaType GetArena() const { return mArena; }
    Point GetPosition() const { return mPosition; }
    Size GetSize() const { return mSize; }
    Size GetBorderSize() const { return mBoderSize; }
@@ -73,6 +76,7 @@ public:
    int GetPlayerCount() const { return mPlayerCount; }
 
 private:
+   const ArenaType mArena;
    const Point mPosition;
    const Size mSize;
    const Size mBoderSize;

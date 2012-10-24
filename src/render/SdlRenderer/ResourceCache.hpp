@@ -2,6 +2,7 @@
 #define SDL_RESOURCE_CACHE_HPP
 
 #include "SpriteResource.hpp"
+#include "ArenaResource.hpp"
 #include "WallResource.hpp"
 #include "ExtraResource.hpp"
 #include "BombResource.hpp"
@@ -32,30 +33,29 @@ public:
    // SetTheme();
 
    SpriteResource GetMenuResource(EntityId id) const;
-   SpriteResource GetArenaResource(EntityId id) const;
+   ArenaResource GetArenaResource(ArenaType type) const;
    WallResource GetWallResource(WallType type) const;
    ExtraResource GetExtraResource(ExtraType type) const;
    BombResource GetBombResource(BombType type) const;
    ExplosionResource GetExplosionResource(ExplosionType type) const;
    PlayerResource GetPlayerResource(PlayerType type) const;
 
-//   Texture GetPlayer(const Kinect& kinect);
-   // std::shared_ptr<...> GetAudioSample(const std::string& id);
-
 private:
    void LoadMenuResources();
-   void LoadArenaResources();
+   void LoadArenaResources(const TiXmlHandle& hndl);
    void LoadWallResources(const TiXmlHandle& hndl);
    void LoadExtraResources(const TiXmlHandle& hndl);
-   void LoadBombResources();
-   void LoadExplosionResources();
-   void LoadPlayerResources();
+   void LoadBombResources(const TiXmlHandle& hndl);
+   void LoadExplosionResources(const TiXmlHandle& hndl);
+   void LoadPlayerResources(const TiXmlHandle& hndl);
 
+   PlayerResource LoadPlayer(PlayerType type, const std::string& name, const TiXmlHandle& hndl);
+   std::vector<SDL_Surface*> LoadTextures(const TiXmlHandle& hndl, const std::string& name, Size size);
    SDL_Surface* LoadTexture(const std::string& file, const Size& size);
 
    const std::string mResDir;
    std::map<EntityId, SpriteResource> mMenuRes;
-   std::map<EntityId, SpriteResource> mArenaRes;
+   std::map<ArenaType, ArenaResource> mArenaRes;
    std::map<WallType, WallResource> mWallRes;
    std::map<ExtraType, ExtraResource> mExtraRes;
    std::map<BombType, BombResource> mBombRes;

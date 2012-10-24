@@ -36,7 +36,7 @@ void BomberPersonConfig::Load()
    }
 
    TiXmlHandle doc_hndl(&doc);
-   TiXmlHandle root_hndl(doc_hndl.FirstChild());
+   TiXmlHandle root_hndl(doc_hndl.FirstChildElement());
 
    TiXmlHandle app_hndl(root_hndl.FirstChild("Application"));
    mAppTitle = app_hndl.FirstChild("Title").Element()->GetText();

@@ -122,11 +122,12 @@ void Match::CreateArenaAndScoreboard()
    const Size borders = { DefaultValue::ARENA_BORDER_WIDTH, DefaultValue::ARENA_BORDER_HEIGHT };
    const auto cells_x = DefaultValue::ARENA_CELLS_X;
    const auto cells_y = DefaultValue::ARENA_CELLS_Y;
+   const auto arena = ArenaTypeFromArenaId(mSettings.arena);
    const auto players = mSettings.players.size();
 
    // This is the very first event that must be created. The arena object is
    //  used internally to help create other ArenaObject-derived classes.
-   mEventQueue.Add(std::make_shared<CreateArenaEvent>(pos, size, borders,
+   mEventQueue.Add(std::make_shared<CreateArenaEvent>(arena, pos, size, borders,
                                                       cells_x, cells_y, players));
 
    const Point sb_pos = { DefaultValue::SCOREBOARD_POS_X, DefaultValue::SCOREBOARD_POS_Y };
@@ -217,9 +218,27 @@ void Match::UpdateEntities(int elapsed_time)
    // TODO: Update all entities againg after collisions were detected.
 }
 
+ArenaType Match::ArenaTypeFromArenaId(const ArenaId id)
+{
+   // Translate ArenaIds (which are option values) to ArenaType (used to
+   //  identify Entities which may need resources and appear on the screen).
+
+   switch (id)
+   {
+      case ArenaId::Arena_1:
+         return ArenaType::Arena_1;
+      case ArenaId::Arena_2:
+         return ArenaType::Arena_2;
+      case ArenaId::Arena_3:
+         return ArenaType::Arena_3;
+      default:
+         throw "Unknown arena id.";
+   }
+}
+
 PlayerType Match::PlayerTypeFromPlayerId(const PlayerId id)
 {
-   // Translate PlayerIds (which are option values) to EntityIds (used to
+   // Translate PlayerIds (which are option values) to PlayerType (used to
    //  identify Entities which may need resources and appear on the screen).
 
    switch (id)

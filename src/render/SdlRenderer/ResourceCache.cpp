@@ -1,5 +1,6 @@
 #include "ResourceCache.hpp"
 #include "../../game/EntityId.hpp"
+#include "../../game/Arena.hpp"
 #include "../../game/Wall.hpp"
 #include "../../game/Extra.hpp"
 #include "../../game/Bomb.hpp"
@@ -31,12 +32,12 @@ ResourceCache::ResourceCache(const std::string& renderer_dir)
    TiXmlHandle sprite_hndl(root_hndl.FirstChild("Resource").FirstChild("Sprite"));
 
    LoadMenuResources();
-   LoadArenaResources();
+   LoadArenaResources(sprite_hndl.FirstChild("Arena"));
    LoadWallResources(sprite_hndl.FirstChild("Wall"));
    LoadExtraResources(sprite_hndl.FirstChild("Extra"));
-   LoadBombResources();
-   LoadExplosionResources();
-   LoadPlayerResources();
+   LoadBombResources(sprite_hndl.FirstChild("Bomb"));
+   LoadExplosionResources(sprite_hndl.FirstChild("Explosion"));
+   LoadPlayerResources(sprite_hndl.FirstChild("Player"));
 }
 
 ResourceCache::~ResourceCache()
@@ -55,9 +56,9 @@ SpriteResource ResourceCache::GetMenuResource(const EntityId id) const
    return iter->second;
 }
 
-SpriteResource ResourceCache::GetArenaResource(const EntityId id) const
+ArenaResource ResourceCache::GetArenaResource(const ArenaType type) const
 {
-   const auto iter = mArenaRes.find(id);
+   const auto iter = mArenaRes.find(type);
    if (iter == mArenaRes.end()) {
       throw "Trying to access non-existing resource";
    }
@@ -127,151 +128,154 @@ void ResourceCache::LoadMenuResources()
                                1000_ms } });
 }
 
-void ResourceCache::LoadArenaResources()
+void ResourceCache::LoadArenaResources(const TiXmlHandle& hndl)
 {
-   const auto id = EntityId::Arena;
    const Size size = { DefaultValue::ARENA_WIDTH, DefaultValue::ARENA_HEIGHT };
 
-   mArenaRes.insert({ id, { id, { LoadTexture("arena_1.png", size) } } });
+   ArenaResource arena_1(ArenaType::Arena_1, LoadTextures(hndl, "Arena_1", size));
+   ArenaResource arena_2(ArenaType::Arena_2, LoadTextures(hndl, "Arena_2", size));
+   ArenaResource arena_3(ArenaType::Arena_3, LoadTextures(hndl, "Arena_3", size));
+
+   mArenaRes.insert({ arena_1.GetType(), arena_1 });
+   mArenaRes.insert({ arena_2.GetType(), arena_2 });
+   mArenaRes.insert({ arena_3.GetType(), arena_3 });
 }
 
 void ResourceCache::LoadWallResources(const TiXmlHandle& hndl)
 {
    const Size size = { DefaultValue::WALL_WIDTH, DefaultValue::WALL_HEIGHT };
 
-   const auto i_file = hndl.FirstChild("Indestructible").Element()->GetText();
-   const auto d_file = hndl.FirstChild("Destructible").Element()->GetText();
+   WallResource indestructible(WallType::Indestructible, LoadTextures(hndl, "Indestructible", size));
+   WallResource destructible(WallType::Destructible, LoadTextures(hndl, "Destructible", size));
 
-   mWallRes.insert({ WallType::Indestructible, { WallType::Indestructible, { LoadTexture(i_file, size) } } });
-   mWallRes.insert({ WallType::Destructible, { WallType::Destructible, { LoadTexture(d_file, size) } } });
+   mWallRes.insert({ indestructible.GetType(), indestructible });
+   mWallRes.insert({ destructible.GetType(), destructible });
 }
 
 void ResourceCache::LoadExtraResources(const TiXmlHandle& hndl)
 {
    const Size size = { DefaultValue::EXTRA_WIDTH, DefaultValue::EXTRA_HEIGHT };
 
-   const auto speed_file = hndl.FirstChild("Speed").Element()->GetText();
-   const auto bombs_file = hndl.FirstChild("Bombs").Element()->GetText();
-   const auto range_file = hndl.FirstChild("Range").Element()->GetText();
-   const auto rangegold_file = hndl.FirstChild("RangeGold").Element()->GetText();
-   const auto kick_file = hndl.FirstChild("Kick").Element()->GetText();
-   const auto remotebombs_file = hndl.FirstChild("RemoteBombs").Element()->GetText();
+   ExtraResource speed(ExtraType::Speed, LoadTextures(hndl, "Speed", size));
+   ExtraResource bomb(ExtraType::Bombs, LoadTextures(hndl, "Bombs", size));
+   ExtraResource range(ExtraType::Range, LoadTextures(hndl, "Range", size));
+   ExtraResource range_gold(ExtraType::InfiniteRange, LoadTextures(hndl, "RangeGold", size));
+   ExtraResource kick(ExtraType::Kick, LoadTextures(hndl, "Kick", size));
+   ExtraResource remotebombs(ExtraType::RemoteBombs, LoadTextures(hndl, "RemoteBombs", size));
 
-   mExtraRes.insert({ ExtraType::Speed, { ExtraType::Speed, { LoadTexture(speed_file, size) } } });
-   mExtraRes.insert({ ExtraType::Bombs, { ExtraType::Bombs, { LoadTexture(bombs_file, size) } } });
-   mExtraRes.insert({ ExtraType::Range, { ExtraType::Range, { LoadTexture(range_file, size) } } });
-   mExtraRes.insert({ ExtraType::InfiniteRange, { ExtraType::InfiniteRange, { LoadTexture(rangegold_file, size) } } });
-   mExtraRes.insert({ ExtraType::Kick, { ExtraType::Kick, { LoadTexture(kick_file, size) } } });
-   mExtraRes.insert({ ExtraType::RemoteBombs, { ExtraType::RemoteBombs, { LoadTexture(remotebombs_file, size) } } });
+   mExtraRes.insert({ speed.GetType(), speed });
+   mExtraRes.insert({ bomb.GetType(), bomb });
+   mExtraRes.insert({ range.GetType(), range });
+   mExtraRes.insert({ range_gold.GetType(), range_gold });
+   mExtraRes.insert({ kick.GetType(), kick });
+   mExtraRes.insert({ remotebombs.GetType(), remotebombs });
 }
 
-void ResourceCache::LoadBombResources()
+void ResourceCache::LoadBombResources(const TiXmlHandle& hndl)
 {
    const Size size = { DefaultValue::BOMB_WIDTH, DefaultValue::BOMB_HEIGHT };
    const auto len = DefaultValue::BOMB_ANIM_LEN;
 
    BombResource countdown(BombType::Countdown);
-   countdown.SetFrames(len, { LoadTexture("bomb_1.png", size), LoadTexture("bomb_2.png", size), LoadTexture("bomb_3.png", size) });
-   mBombRes.insert({ countdown.GetType(), countdown });
+   countdown.SetFrames(len, LoadTextures(hndl, "Countdown", size));
 
    BombResource remote(BombType::Remote);
-   remote.SetFrames(len, { LoadTexture("bomb_remote_1.png", size), LoadTexture("bomb_remote_2.png", size) });
+   remote.SetFrames(len, LoadTextures(hndl, "Remote", size));
+
+   mBombRes.insert({ countdown.GetType(), countdown });
    mBombRes.insert({ remote.GetType(), remote });
 }
 
-void ResourceCache::LoadExplosionResources()
+void ResourceCache::LoadExplosionResources(const TiXmlHandle& hndl)
 {
    const Size size = { DefaultValue::EXPLOSION_WIDTH, DefaultValue::EXPLOSION_HEIGHT };
    const auto len = DefaultValue::EXPLOSION_ANIM_LEN;
 
    ExplosionResource center(ExplosionType::Center);
-   center.SetFrames(len, { LoadTexture("explosion_center_1.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_4.png", size), LoadTexture("explosion_center_3.png", size), LoadTexture("explosion_center_2.png", size), LoadTexture("explosion_center_1.png", size) });
-   mExplosionRes.insert({ center.GetType(), center });
+   center.SetFrames(len, LoadTextures(hndl, "Center", size));
 
    ExplosionResource horizontal(ExplosionType::Horizontal);
-   horizontal.SetFrames(len, { LoadTexture("explosion_horizontal_1.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_4.png", size), LoadTexture("explosion_horizontal_3.png", size), LoadTexture("explosion_horizontal_2.png", size), LoadTexture("explosion_horizontal_1.png", size) });
-   mExplosionRes.insert({ horizontal.GetType(), horizontal });
+   horizontal.SetFrames(len, LoadTextures(hndl, "Horizontal", size));
 
    ExplosionResource horizontal_leftend(ExplosionType::HorizontalLeftEnd);
-   horizontal_leftend.SetFrames(len, { LoadTexture("explosion_horizontal_leftend_1.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_4.png", size), LoadTexture("explosion_horizontal_leftend_3.png", size), LoadTexture("explosion_horizontal_leftend_2.png", size), LoadTexture("explosion_horizontal_leftend_1.png", size) });
-   mExplosionRes.insert({ horizontal_leftend.GetType(), horizontal_leftend });
+   horizontal_leftend.SetFrames(len, LoadTextures(hndl, "HorizontalLeftEnd", size));
 
    ExplosionResource horizontal_rightend(ExplosionType::HorizontalRightEnd);
-   horizontal_rightend.SetFrames(len, { LoadTexture("explosion_horizontal_rightend_1.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_4.png", size), LoadTexture("explosion_horizontal_rightend_3.png", size), LoadTexture("explosion_horizontal_rightend_2.png", size), LoadTexture("explosion_horizontal_rightend_1.png", size) });
-   mExplosionRes.insert({ horizontal_rightend.GetType(), horizontal_rightend });
+   horizontal_rightend.SetFrames(len, LoadTextures(hndl, "HorizontalRightEnd", size));
 
    ExplosionResource vertical(ExplosionType::Vertical);
-   vertical.SetFrames(len, { LoadTexture("explosion_vertical_1.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_4.png", size), LoadTexture("explosion_vertical_3.png", size), LoadTexture("explosion_vertical_2.png", size), LoadTexture("explosion_vertical_1.png", size) });
-   mExplosionRes.insert({ vertical.GetType(), vertical });
+   vertical.SetFrames(len, LoadTextures(hndl, "Vertical", size));
 
    ExplosionResource vertical_upend(ExplosionType::VerticalUpEnd);
-   vertical_upend.SetFrames(len, { LoadTexture("explosion_vertical_upend_1.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_4.png", size), LoadTexture("explosion_vertical_upend_3.png", size), LoadTexture("explosion_vertical_upend_2.png", size), LoadTexture("explosion_vertical_upend_1.png", size) });
-   mExplosionRes.insert({ vertical_upend.GetType(), vertical_upend });
+   vertical_upend.SetFrames(len, LoadTextures(hndl, "VerticalUpEnd", size));
 
    ExplosionResource vertical_downend(ExplosionType::VerticalDownEnd);
-   vertical_downend.SetFrames(len, { LoadTexture("explosion_vertical_downend_1.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_4.png", size), LoadTexture("explosion_vertical_downend_3.png", size), LoadTexture("explosion_vertical_downend_2.png", size), LoadTexture("explosion_vertical_downend_1.png", size) });
+   vertical_downend.SetFrames(len, LoadTextures(hndl, "VerticalDownEnd", size));
+
+   mExplosionRes.insert({ center.GetType(), center });
+   mExplosionRes.insert({ horizontal.GetType(), horizontal });
+   mExplosionRes.insert({ horizontal_leftend.GetType(), horizontal_leftend });
+   mExplosionRes.insert({ horizontal_rightend.GetType(), horizontal_rightend });
+   mExplosionRes.insert({ vertical.GetType(), vertical });
+   mExplosionRes.insert({ vertical_upend.GetType(), vertical_upend });
    mExplosionRes.insert({ vertical_downend.GetType(), vertical_downend });
 }
 
-void ResourceCache::LoadPlayerResources()
+void ResourceCache::LoadPlayerResources(const TiXmlHandle& hndl)
+{
+   PlayerResource player_1(LoadPlayer(PlayerType::Player_1, "Player_1", hndl));
+   PlayerResource player_2(LoadPlayer(PlayerType::Player_2, "Player_2", hndl));
+   PlayerResource player_3(LoadPlayer(PlayerType::Player_3, "Player_3", hndl));
+   PlayerResource player_4(LoadPlayer(PlayerType::Player_4, "Player_4", hndl));
+
+   mPlayerRes.insert({ player_1.GetType(), player_1 });
+   mPlayerRes.insert({ player_2.GetType(), player_2 });
+   mPlayerRes.insert({ player_3.GetType(), player_3 });
+   mPlayerRes.insert({ player_4.GetType(), player_4 });
+}
+
+PlayerResource ResourceCache::LoadPlayer(
+   const PlayerType type,
+   const std::string& name,
+   const TiXmlHandle& hndl
+)
 {
    const Size size = { DefaultValue::PLAYER_WIDTH,
                        DefaultValue::PLAYER_HEIGHT };
    const auto walk_len = DefaultValue::PLAYER_WALK_ANIM_LEN;
    const auto spawn_len = DefaultValue::PLAYER_SPAWN_ANIM_LEN;
    const auto death_len = DefaultValue::PLAYER_DEATH_ANIM_LEN;
+   const auto player_hndl = hndl.FirstChild(name);
 
-   PlayerResource player_1(PlayerType::Player_1);
-   player_1.SetFrames(PlayerAnimation::StandUp, walk_len, { LoadTexture("player_1_up.png", size) });
-   player_1.SetFrames(PlayerAnimation::StandDown, walk_len, { LoadTexture("player_1_down.png", size) });
-   player_1.SetFrames(PlayerAnimation::StandLeft, walk_len, { LoadTexture("player_1_left.png", size) });
-   player_1.SetFrames(PlayerAnimation::StandRight, walk_len, { LoadTexture("player_1_right.png", size) });
-   player_1.SetFrames(PlayerAnimation::WalkUp, walk_len, { LoadTexture("player_1_up_1.png", size), LoadTexture("player_1_up_2.png", size) });
-   player_1.SetFrames(PlayerAnimation::WalkDown, walk_len, { LoadTexture("player_1_down_1.png", size), LoadTexture("player_1_down_2.png", size) });
-   player_1.SetFrames(PlayerAnimation::WalkLeft, walk_len, { LoadTexture("player_1_left_1.png", size), LoadTexture("player_1_left_2.png", size) });
-   player_1.SetFrames(PlayerAnimation::WalkRight, walk_len, { LoadTexture("player_1_right_1.png", size), LoadTexture("player_1_right_2.png", size) });
-   player_1.SetFrames(PlayerAnimation::Spawn, spawn_len, { LoadTexture("player_spawn_1.png", size), LoadTexture("player_spawn_2.png", size), LoadTexture("player_spawn_3.png", size), LoadTexture("player_spawn_4.png", size) });
-   player_1.SetFrames(PlayerAnimation::Destroy, death_len, { LoadTexture("player_1_death_1.png", size), LoadTexture("player_1_death_2.png", size), LoadTexture("player_1_death_3.png", size), LoadTexture("player_1_death_4.png", size) });
-   mPlayerRes.insert({ player_1.GetType(), player_1 });
+   PlayerResource player(type);
+   player.SetFrames(PlayerAnimation::StandUp, walk_len, LoadTextures(player_hndl, "StandUp", size));
+   player.SetFrames(PlayerAnimation::StandDown, walk_len, LoadTextures(player_hndl, "StandDown", size));
+   player.SetFrames(PlayerAnimation::StandLeft, walk_len, LoadTextures(player_hndl, "StandLeft", size));
+   player.SetFrames(PlayerAnimation::StandRight, walk_len, LoadTextures(player_hndl, "StandRight", size));
+   player.SetFrames(PlayerAnimation::WalkUp, walk_len, LoadTextures(player_hndl, "WalkUp", size));
+   player.SetFrames(PlayerAnimation::WalkDown, walk_len, LoadTextures(player_hndl, "WalkDown", size));
+   player.SetFrames(PlayerAnimation::WalkLeft, walk_len, LoadTextures(player_hndl, "WalkLeft", size));
+   player.SetFrames(PlayerAnimation::WalkRight, walk_len, LoadTextures(player_hndl, "WalkRight", size));
+   player.SetFrames(PlayerAnimation::Spawn, spawn_len, LoadTextures(player_hndl, "Spawn", size));
+   player.SetFrames(PlayerAnimation::Destroy, death_len, LoadTextures(player_hndl, "Death", size));
+   return player;
+}
 
-   PlayerResource player_2(PlayerType::Player_2);
-   player_2.SetFrames(PlayerAnimation::StandUp, walk_len, { LoadTexture("player_2_up.png", size) });
-   player_2.SetFrames(PlayerAnimation::StandDown, walk_len, { LoadTexture("player_2_down.png", size) });
-   player_2.SetFrames(PlayerAnimation::StandLeft, walk_len, { LoadTexture("player_2_left.png", size) });
-   player_2.SetFrames(PlayerAnimation::StandRight, walk_len, { LoadTexture("player_2_right.png", size) });
-   player_2.SetFrames(PlayerAnimation::WalkUp, walk_len, { LoadTexture("player_2_up_1.png", size), LoadTexture("player_2_up_2.png", size) });
-   player_2.SetFrames(PlayerAnimation::WalkDown, walk_len, { LoadTexture("player_2_down_1.png", size), LoadTexture("player_2_down_2.png", size) });
-   player_2.SetFrames(PlayerAnimation::WalkLeft, walk_len, { LoadTexture("player_2_left_1.png", size), LoadTexture("player_2_left_2.png", size) });
-   player_2.SetFrames(PlayerAnimation::WalkRight, walk_len, { LoadTexture("player_2_right_1.png", size), LoadTexture("player_2_right_2.png", size) });
-   player_2.SetFrames(PlayerAnimation::Spawn, spawn_len, { LoadTexture("player_spawn_1.png", size), LoadTexture("player_spawn_2.png", size), LoadTexture("player_spawn_3.png", size), LoadTexture("player_spawn_4.png", size) });
-   player_2.SetFrames(PlayerAnimation::Destroy, death_len, { LoadTexture("player_2_death_1.png", size), LoadTexture("player_2_death_2.png", size), LoadTexture("player_2_death_3.png", size), LoadTexture("player_2_death_4.png", size) });
-   mPlayerRes.insert({ player_2.GetType(), player_2 });
+std::vector<SDL_Surface*> ResourceCache::LoadTextures(
+   const TiXmlHandle& hndl,
+   const std::string& name,
+   const Size size
+)
+{
+   std::vector<SDL_Surface*> textures;
 
-   PlayerResource player_3(PlayerType::Player_3);
-   player_3.SetFrames(PlayerAnimation::StandUp, walk_len, { LoadTexture("player_3_up.png", size) });
-   player_3.SetFrames(PlayerAnimation::StandDown, walk_len, { LoadTexture("player_3_down.png", size) });
-   player_3.SetFrames(PlayerAnimation::StandLeft, walk_len, { LoadTexture("player_3_left.png", size) });
-   player_3.SetFrames(PlayerAnimation::StandRight, walk_len, { LoadTexture("player_3_right.png", size) });
-   player_3.SetFrames(PlayerAnimation::WalkUp, walk_len, { LoadTexture("player_3_up_1.png", size), LoadTexture("player_3_up_2.png", size) });
-   player_3.SetFrames(PlayerAnimation::WalkDown, walk_len, { LoadTexture("player_3_down_1.png", size), LoadTexture("player_3_down_2.png", size) });
-   player_3.SetFrames(PlayerAnimation::WalkLeft, walk_len, { LoadTexture("player_3_left_1.png", size), LoadTexture("player_3_left_2.png", size) });
-   player_3.SetFrames(PlayerAnimation::WalkRight, walk_len, { LoadTexture("player_3_right_1.png", size), LoadTexture("player_3_right_2.png", size) });
-   player_3.SetFrames(PlayerAnimation::Spawn, spawn_len, { LoadTexture("player_spawn_1.png", size), LoadTexture("player_spawn_2.png", size), LoadTexture("player_spawn_3.png", size), LoadTexture("player_spawn_4.png", size) });
-   player_3.SetFrames(PlayerAnimation::Destroy, death_len, { LoadTexture("player_3_death_1.png", size), LoadTexture("player_3_death_2.png", size), LoadTexture("player_3_death_3.png", size), LoadTexture("player_3_death_4.png", size) });
-   mPlayerRes.insert({ player_3.GetType(), player_3 });
-
-   PlayerResource player_4(PlayerType::Player_4);
-   player_4.SetFrames(PlayerAnimation::StandUp, walk_len, { LoadTexture("player_4_up.png", size) });
-   player_4.SetFrames(PlayerAnimation::StandDown, walk_len, { LoadTexture("player_4_down.png", size) });
-   player_4.SetFrames(PlayerAnimation::StandLeft, walk_len, { LoadTexture("player_4_left.png", size) });
-   player_4.SetFrames(PlayerAnimation::StandRight, walk_len, { LoadTexture("player_4_right.png", size) });
-   player_4.SetFrames(PlayerAnimation::WalkUp, walk_len, { LoadTexture("player_4_up_1.png", size), LoadTexture("player_4_up_2.png", size) });
-   player_4.SetFrames(PlayerAnimation::WalkDown, walk_len, { LoadTexture("player_4_down_1.png", size), LoadTexture("player_4_down_2.png", size) });
-   player_4.SetFrames(PlayerAnimation::WalkLeft, walk_len, { LoadTexture("player_4_left_1.png", size), LoadTexture("player_4_left_2.png", size) });
-   player_4.SetFrames(PlayerAnimation::WalkRight, walk_len, { LoadTexture("player_4_right_1.png", size), LoadTexture("player_4_right_2.png", size) });
-   player_4.SetFrames(PlayerAnimation::Spawn, spawn_len, { LoadTexture("player_spawn_1.png", size), LoadTexture("player_spawn_2.png", size), LoadTexture("player_spawn_3.png", size), LoadTexture("player_spawn_4.png", size) });
-   player_4.SetFrames(PlayerAnimation::Destroy, death_len, { LoadTexture("player_4_death_1.png", size), LoadTexture("player_4_death_2.png", size), LoadTexture("player_4_death_3.png", size), LoadTexture("player_4_death_4.png", size) });
-   mPlayerRes.insert({ player_4.GetType(), player_4 });
+   for (auto elem = hndl.FirstChild(name).Element();
+        elem;
+        elem = elem->NextSiblingElement(name))
+   {
+      textures.push_back(LoadTexture(elem->GetText(), size));
+   }
+   return textures;
 }
 
 SDL_Surface* ResourceCache::LoadTexture(const std::string& file, const Size& size)

@@ -9,6 +9,7 @@
 #include "../utils/Utils.hpp"
 
 Arena::Arena(
+   const ArenaType type,
    const Point pos,
    const Size size,
    const Size borders,
@@ -17,6 +18,7 @@ Arena::Arena(
    EventQueue& queue
 )
    : SceneObject(EntityId::Arena, ZOrder::Layer_1)
+   , mType(type)
    , mXCells(cells_x)
    , mYCells(cells_y)
    , mBorders(borders)
@@ -104,6 +106,11 @@ void Arena::SetObjectPosition(ArenaObject& obj, const Cell& cell) const
 void Arena::SetObjectSize(ArenaObject& obj) const
 {
    obj.SetSize({ mCellSize.Width, mCellSize.Height });
+}
+
+ArenaType Arena::GetType() const
+{
+   return mType;
 }
 
 Size Arena::GetCellSize() const

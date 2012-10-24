@@ -35,10 +35,12 @@ enum class ExtraType;
 enum class BombType;
 enum class PlayerType;
 
-//enum class ArenaType
-//{
-
-//};
+enum class ArenaType
+{
+   Arena_1,
+   Arena_2,
+   Arena_3
+};
 
 enum class ArenaMusic
 {
@@ -63,7 +65,7 @@ struct Cell
 class Arena : public SceneObject, public EventListener
 {
 public:
-   Arena(const Point pos, const Size size, const Size borders,
+   Arena(ArenaType type, Point pos, Size size, Size borders,
          int cells_x, int cells_y, EventQueue& queue);
    virtual ~Arena();
 
@@ -76,6 +78,7 @@ public:
    void SetObjectPosition(ArenaObject& obj, const Cell& cell) const;
    void SetObjectSize(ArenaObject& obj) const;
 
+   ArenaType GetType() const;
    Size GetCellSize() const;
    Point GetCellPosition(const Cell& cell) const;
 
@@ -140,6 +143,7 @@ private:
       PlayerType explosion_owner;
    };
 
+   ArenaType mType;
    const int mXCells; // Number of horizontal cells.
    const int mYCells; // Number of vertical cells.
    const Size mBorders; // Size of the arenas borders in pixel.
