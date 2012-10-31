@@ -178,29 +178,38 @@ void Match::CreateInputDevicesAndPlayers()
 
 void Match::CreateInputEvents()
 {
-   mEventQueue.Add(std::make_shared<InputEvent>(mKeyboard_1.first,
-                                                mKeyboard_1.second->TestUp(),
-                                                mKeyboard_1.second->TestDown(),
-                                                mKeyboard_1.second->TestLeft(),
-                                                mKeyboard_1.second->TestRight(),
-                                                mKeyboard_1.second->TestAction1(),
-                                                mKeyboard_1.second->TestAction2()));
+   if (mKeyboard_1.second)
+   {
+      mEventQueue.Add(std::make_shared<InputEvent>(mKeyboard_1.first,
+                                                   mKeyboard_1.second->TestUp(),
+                                                   mKeyboard_1.second->TestDown(),
+                                                   mKeyboard_1.second->TestLeft(),
+                                                   mKeyboard_1.second->TestRight(),
+                                                   mKeyboard_1.second->TestAction1(),
+                                                   mKeyboard_1.second->TestAction2()));
+   }
 
-   mEventQueue.Add(std::make_shared<InputEvent>(mKeyboard_2.first,
-                                                mKeyboard_2.second->TestUp(),
-                                                mKeyboard_2.second->TestDown(),
-                                                mKeyboard_2.second->TestLeft(),
-                                                mKeyboard_2.second->TestRight(),
-                                                mKeyboard_2.second->TestAction1(),
-                                                mKeyboard_2.second->TestAction2()));
+   if (mKeyboard_2.second)
+   {
+      mEventQueue.Add(std::make_shared<InputEvent>(mKeyboard_2.first,
+                                                   mKeyboard_2.second->TestUp(),
+                                                   mKeyboard_2.second->TestDown(),
+                                                   mKeyboard_2.second->TestLeft(),
+                                                   mKeyboard_2.second->TestRight(),
+                                                   mKeyboard_2.second->TestAction1(),
+                                                   mKeyboard_2.second->TestAction2()));
+   }
 
-   mEventQueue.Add(std::make_shared<InputEvent>(mMouse_1.first,
-                                                mMouse_1.second->TestUp(),
-                                                mMouse_1.second->TestDown(),
-                                                mMouse_1.second->TestLeft(),
-                                                mMouse_1.second->TestRight(),
-                                                mMouse_1.second->TestAction1(),
-                                                mMouse_1.second->TestAction2()));
+   if (mMouse_1.second)
+   {
+      mEventQueue.Add(std::make_shared<InputEvent>(mMouse_1.first,
+                                                   mMouse_1.second->TestUp(),
+                                                   mMouse_1.second->TestDown(),
+                                                   mMouse_1.second->TestLeft(),
+                                                   mMouse_1.second->TestRight(),
+                                                   mMouse_1.second->TestAction1(),
+                                                   mMouse_1.second->TestAction2()));
+   }
 }
 
 void Match::UpdateEntities(int elapsed_time)

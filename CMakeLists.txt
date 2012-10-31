@@ -45,6 +45,7 @@ FILE(GLOB BOMBERPERSON_HEADERS src/BomberPersonApp.hpp
                                src/render/*.hpp
                                src/render/SimpleSdlRenderer/*.hpp
                                src/render/SdlRenderer/*.hpp
+                               src/render/RaycastRenderer/*.hpp
                                src/utils/*.hpp)
 
 FILE(GLOB BOMBERPERSON_SOURCES src/main.cpp
@@ -56,7 +57,8 @@ FILE(GLOB BOMBERPERSON_SOURCES src/main.cpp
                                src/nui/*.cpp
                                src/render/*.cpp
                                src/render/SimpleSdlRenderer/*.cpp
-                               src/render/SdlRenderer/*.cpp)
+                               src/render/SdlRenderer/*.cpp
+                               src/render/RaycastRenderer/*.cpp)
 
 ADD_DEFINITIONS(
    -Wall

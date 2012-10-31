@@ -6,6 +6,7 @@
 #include "audio/Audio.hpp"
 #include "render/SimpleSdlRenderer/SimpleSdlRenderer.hpp"
 #include "render/SdlRenderer/SdlRenderer.hpp"
+#include "render/RaycastRenderer/RaycastRenderer.hpp"
 
 #if defined(USE_OPENGL)
    #include "render/SimpleGlRenderer/SimpleGlRenderer.hpp"
@@ -89,7 +90,7 @@ void BomberPersonApp::Initialize()
                               DefaultValue::SCREEN_HEIGHT };
 
    mAudio = std::make_shared<Audio>();
-   mRenderer = std::make_shared<SdlRenderer>(screen_size);
+   mRenderer = std::make_shared<RaycastRenderer>(screen_size);
    mWndFrame = std::make_shared<WindowFrame>("BomberPerson");
    mLogic = std::make_shared<Logic>();
 }
@@ -132,6 +133,10 @@ void BomberPersonApp::ProcessInput()
          mRenderer = std::make_shared<Ogre3DRenderer>(screen_size);
       }
 #endif // USE_OGRE
+
+      else if (SDLK_5 == event.key.keysym.sym) {
+         mRenderer = std::make_shared<RaycastRenderer>(screen_size);
+      }
 
       // TODO: KMOD_LCTRL + SDLK_K -> try connecting to kinect device.
 
