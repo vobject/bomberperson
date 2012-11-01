@@ -18,7 +18,7 @@ struct SDL_Surface;
 class SdlRenderer : public Renderer
 {
 public:
-   SdlRenderer(Size res, const BomberPersonConfig& app_cfg);
+   SdlRenderer(const BomberPersonConfig& app_cfg);
    virtual ~SdlRenderer();
 
    SdlRenderer(const SdlRenderer&) = delete;
@@ -41,6 +41,8 @@ public:
 
 private:
    void Render(const std::shared_ptr<SceneObject>& obj, SDL_Surface* frame);
+
+   const BomberPersonConfig& mAppConfig;
 
    // Writing to the video surface is ok since we use double buffering.
    SDL_Surface* mScreen = nullptr;

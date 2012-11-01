@@ -1,16 +1,17 @@
 #include "Match.hpp"
+#include "../BomberPersonConfig.hpp"
 #include "EventType.hpp"
 #include "Player.hpp"
 #include "../input/KeyboardInput.hpp"
 #include "../input/MouseInput.hpp"
 #include "../utils/Utils.hpp"
-#include "../Options.hpp"
 
 #include <SDL_events.h>
 
-Match::Match(const MatchSettings& settings)
-   : mSettings(settings)
-   , mEntityManager(mEventQueue)
+Match::Match(BomberPersonConfig& cfg, const MatchSettings& settings)
+   : mConfig(cfg)
+   , mSettings(settings)
+   , mEntityManager(mConfig, mEventQueue)
 {
    // The arena is needed for the creation of the players.
    CreateArenaAndScoreboard();
@@ -117,23 +118,21 @@ EntitySet Match::GetEntities() const
 
 void Match::CreateArenaAndScoreboard()
 {
-   const Point pos = { DefaultValue::ARENA_POS_X, DefaultValue::ARENA_POS_Y };
-   const Size size = { DefaultValue::ARENA_WIDTH, DefaultValue::ARENA_HEIGHT };
-   const Size borders = { DefaultValue::ARENA_BORDER_WIDTH, DefaultValue::ARENA_BORDER_HEIGHT };
-   const auto cells_x = DefaultValue::ARENA_CELLS_X;
-   const auto cells_y = DefaultValue::ARENA_CELLS_Y;
    const auto arena = ArenaTypeFromArenaId(mSettings.arena);
    const auto players = mSettings.players.size();
 
    // This is the very first event that must be created. The arena object is
    //  used internally to help create other ArenaObject-derived classes.
-   mEventQueue.Add(std::make_shared<CreateArenaEvent>(arena, pos, size, borders,
-                                                      cells_x, cells_y, players));
+   mEventQueue.Add(std::make_shared<CreateArenaEvent>(arena,
+                                                      mConfig.GetArenaPosition(),
+                                                      mConfig.GetArenaSize(),
+                                                      mConfig.GetArenaBorderSize(),
+                                                      mConfig.GetArenaCellsX(),
+                                                      mConfig.GetArenaCellsY(),
+                                                      players));
 
-   const Point sb_pos = { DefaultValue::SCOREBOARD_POS_X, DefaultValue::SCOREBOARD_POS_Y };
-   const Size sb_size = { DefaultValue::SCOREBOARD_WIDTH, DefaultValue::SCOREBOARD_HEIGHT };
-
-   mEventQueue.Add(std::make_shared<CreateScoreboardEvent>(sb_pos, sb_size));
+   mEventQueue.Add(std::make_shared<CreateScoreboardEvent>(mConfig.GetScoreboardPosition(),
+                                                           mConfig.GetScoreboardSize()));
 }
 
 void Match::CreateInputDevicesAndPlayers()
@@ -159,8 +158,9 @@ void Match::CreateInputDevicesAndPlayers()
 
       if (InputId::Mouse_1 == p2i.second)
       {
-         const Point mouse_center(DefaultValue::SCREEN_WIDTH / 2,
-                                  DefaultValue::SCREEN_HEIGHT / 2);
+         const auto res = mConfig.GetResolution();
+         const Point mouse_center(res.Width / 2,
+                                  res.Height / 2);
 
          mMouse_1 = { player_type,
                       std::make_shared<MouseInput>(mouse_center,

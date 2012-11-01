@@ -1,11 +1,9 @@
 #include "ArenaGenerator.hpp"
 #include "EventQueue.hpp"
 #include "EventType.hpp"
-
 #include "Arena.hpp"
 #include "Wall.hpp"
 #include "Extra.hpp"
-#include "../Options.hpp"
 
 #include <cstdlib>
 #include <ctime>

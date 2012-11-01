@@ -1,4 +1,5 @@
 #include "EntityManager.hpp"
+#include "../BomberPersonConfig.hpp"
 #include "EventQueue.hpp"
 #include "EventType.hpp"
 
@@ -13,10 +14,10 @@
 #include "Bomb.hpp"
 #include "Explosion.hpp"
 #include "Player.hpp"
-#include "../Options.hpp"
 
-EntityManager::EntityManager(EventQueue& queue)
-   : mEventQueue(queue)
+EntityManager::EntityManager(BomberPersonConfig &cfg, EventQueue& queue)
+   : mConfig(cfg)
+   , mEventQueue(queue)
 {
    mEventQueue.Register(this);
 }
@@ -82,7 +83,7 @@ void EntityManager::OnEvent(const Event& event)
 std::shared_ptr<MainMenu> EntityManager::CreateMainmenu()
 {
    auto menu = std::make_shared<MainMenu>(*this);
-   menu->SetSize({ DefaultValue::SCREEN_WIDTH, DefaultValue::SCREEN_HEIGHT });
+   menu->SetSize(mConfig.GetResolution());
 
    mEntities.insert(menu);
    return menu;
@@ -148,14 +149,6 @@ void EntityManager::OnCreateWall(const CreateWallEvent& event)
 
 void EntityManager::OnCreateExtra(const CreateExtraEvent& event)
 {
-//   if (mArena->HasWall(event.GetCell()) &&
-//       !mArena->GetWall(event.GetCell())->IsDestructible())
-//   {
-//      // Do not create extras on cells with indestructible walls
-//      //  because a player could never reach it.
-//      return;
-//   }
-
    auto extra = std::make_shared<Extra>(mArena, event.GetExtra(), mEventQueue);
    mArena->SetObjectPosition(*extra, event.GetCell());
    mArena->SetObjectSize(*extra);
@@ -167,6 +160,7 @@ void EntityManager::OnCreateBomb(const CreateBombEvent& event)
 {
    auto bomb = std::make_shared<Bomb>(mArena,
                                       event.GetBomb(),
+                                      mConfig.GetBombLifetime(),
                                       event.GetOwner(),
                                       mEventQueue);
    bomb->SetRange(event.GetRange());
@@ -181,6 +175,7 @@ void EntityManager::OnCreateExplosion(const CreateExplosionEvent& event)
 {
    auto explosion = std::make_shared<Explosion>(mArena,
                                                 event.GetExplosionType(),
+                                                mConfig.GetExplosionLifetime(),
                                                 event.GetOwner(),
                                                 mEventQueue);
 
@@ -194,27 +189,31 @@ void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
 {
    std::shared_ptr<Player> player = std::make_shared<Player>(mArena,
                                                              event.GetPlayer(),
+                                                             mConfig.GetPlayerSpawnLength(),
+                                                             mConfig.GetPlayerDeathLength(),
                                                              mEventQueue);
-   Cell parent_cell = { -1, -1 };
+   Point spawn_cell = { -1, -1 };
 
    switch (event.GetPlayer())
    {
       case PlayerType::Player_1:
-         parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_1_CELL_X, DefaultValue::PLAYER_1_CELL_Y);
+         spawn_cell = mConfig.GetSpawningCells()[0];
          break;
       case PlayerType::Player_2:
-         parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_2_CELL_X, DefaultValue::PLAYER_2_CELL_Y);
+         spawn_cell = mConfig.GetSpawningCells()[1];
          break;
       case PlayerType::Player_3:
-         parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_3_CELL_X, DefaultValue::PLAYER_3_CELL_Y);
+         spawn_cell = mConfig.GetSpawningCells()[2];
          break;
       case PlayerType::Player_4:
-         parent_cell = mArena->GetCellFromCoordinates(DefaultValue::PLAYER_4_CELL_X, DefaultValue::PLAYER_4_CELL_Y);
+         spawn_cell = mConfig.GetSpawningCells()[3];
          break;
       default:
          throw "Trying to create an unknown player";
          break;
    }
+
+   const auto parent_cell = mArena->GetCellFromCoordinates(spawn_cell.X, spawn_cell.Y);
    mArena->SetObjectPosition(*player, parent_cell);
    mArena->SetObjectSize(*player);
 

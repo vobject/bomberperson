@@ -1,5 +1,6 @@
 #include "SdlRenderer.hpp"
 #include "ResourceCache.hpp"
+#include "../../BomberPersonConfig.hpp"
 #include "../../game/UserInterface.hpp"
 #include "../../game/MenuItem.hpp"
 #include "../../game/MenuItemSelector.hpp"
@@ -12,20 +13,19 @@
 #include "../../game/Explosion.hpp"
 #include "../../game/Player.hpp"
 #include "../../utils/Utils.hpp"
-#include "../../BomberPersonConfig.hpp"
-#include "../../Options.hpp"
 
 #include <SDL.h>
 
-SdlRenderer::SdlRenderer(const Size res, const BomberPersonConfig& app_cfg)
+SdlRenderer::SdlRenderer(const BomberPersonConfig& app_cfg)
+   : mAppConfig(app_cfg)
 {
    if (0 > SDL_Init(SDL_INIT_VIDEO)) {
       throw "Cannot init SDL video subsystem.";
    }
    atexit(SDL_Quit);
 
-   mScreen = SDL_SetVideoMode(res.Width,
-                              res.Height,
+   mScreen = SDL_SetVideoMode(mAppConfig.GetResolution().Width,
+                              mAppConfig.GetResolution().Height,
                               32,
                               SDL_ANYFORMAT |
                                  SDL_SWSURFACE |
@@ -43,22 +43,20 @@ SdlRenderer::SdlRenderer(const Size res, const BomberPersonConfig& app_cfg)
 
    // TODO: Load fonts from ResCache.
 
-   const auto sb_font_path = app_cfg.ResourceDir() + "/render/SdlRenderer/font/scoreboard.ttf";
+   const auto sb_font_path = mAppConfig.GetResourceDir() + "/render/SdlRenderer/font/scoreboard.ttf";
    mFont = TTF_OpenFont(sb_font_path.c_str(), 16);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
 
-   const auto menu_font_path = app_cfg.ResourceDir() + "/render/SdlRenderer/font/menu.ttf";
+   const auto menu_font_path = mAppConfig.GetResourceDir() + "/render/SdlRenderer/font/menu.ttf";
    mMenuFont = TTF_OpenFont(menu_font_path.c_str(), 72);
    if (!mFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
-
-   const auto renderer_path = app_cfg.ResourceDir() + "/render/SdlRenderer";
-   mResCache = make_unique<ResourceCache>(renderer_path);
+   mResCache = make_unique<ResourceCache>(mAppConfig);
 }
 
 SdlRenderer::~SdlRenderer()
@@ -197,8 +195,8 @@ void SdlRenderer::Render(const std::shared_ptr<Player>& obj)
    auto pos = obj->GetPosition();
    const auto size = obj->GetSize();
 
-   pos.X -= (DefaultValue::PLAYER_WIDTH - DefaultValue::CELL_WIDTH) / 2;
-   pos.Y -= (DefaultValue::PLAYER_HEIGHT - DefaultValue::CELL_HEIGHT);
+   pos.X -= (frame->w - mAppConfig.GetCellSize().Width) / 2;
+   pos.Y -= (frame->h - mAppConfig.GetCellSize().Height);
 
    SDL_Rect rect = { static_cast<Sint16>(pos.X),
                      static_cast<Sint16>(pos.Y),

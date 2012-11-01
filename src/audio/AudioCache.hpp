@@ -17,7 +17,7 @@ enum class PlayerSound;
 class AudioCache
 {
 public:
-   AudioCache();
+   AudioCache(const std::string& res_dir);
    ~AudioCache();
 
    AudioCache(const AudioCache&) = delete;
@@ -41,7 +41,7 @@ private:
    Mix_Music* LoadMusic(const std::string& file);
    Mix_Chunk* LoadSound(const std::string& file);
 
-   std::string mResDir;
+   const std::string mResourceDir;
    std::map<MenuMusic, Mix_Music*> mMenuMusic;
    std::map<MenuSound, Mix_Chunk*> mMenuSound;
    std::map<ArenaMusic, Mix_Music*> mArenaMusic;

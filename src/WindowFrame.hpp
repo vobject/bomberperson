@@ -2,7 +2,6 @@
 #define WINDOW_FRAME_HPP
 
 #include "utils/Utils.hpp"
-#include "Options.hpp"
 
 #include <SDL.h>
 

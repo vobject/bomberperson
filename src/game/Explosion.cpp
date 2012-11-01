@@ -1,16 +1,17 @@
 #include "Explosion.hpp"
 #include "EventQueue.hpp"
 #include "EventType.hpp"
-#include "../Options.hpp"
 
 Explosion::Explosion(
    const std::shared_ptr<Arena>& arena,
    const ExplosionType type,
+   const int lifespan,
    const PlayerType owner,
    EventQueue& queue
 )
    : ArenaObject(EntityId::Explosion, ZOrder::Layer_5, arena)
    , mType(type)
+   , mLifeSpan(lifespan)
    , mOwner(owner)
    , mEventQueue(queue)
 {
@@ -30,7 +31,7 @@ void Explosion::Update(const int elapsed_time)
 {
    SetAnimationTime(GetAnimationTime() + elapsed_time);
 
-   if (GetAnimationTime() >= DefaultValue::EXPLOSION_ANIM_LEN)
+   if (GetAnimationTime() >= mLifeSpan)
    {
       // The explosion has burned out.
       const auto parent_cell = GetArena()->GetCellFromObject(*this);

@@ -3,6 +3,7 @@
 
 #include <memory>
 
+class BomberPersonConfig;
 class SceneObject;
 class MainMenu;
 class Arena;
@@ -39,7 +40,7 @@ class AudioCache;
 class Audio
 {
 public:
-   Audio();
+   Audio(const BomberPersonConfig& app_cfg);
    ~Audio();
 
    Audio(const Audio&) = delete;

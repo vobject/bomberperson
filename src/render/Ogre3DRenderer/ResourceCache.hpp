@@ -56,7 +56,7 @@ private:
 // 
 //    SDL_Surface* LoadTexture(const std::string& file, const Size& size);
 
-    const std::string mResDir;
+    const std::string mResourceDir;
     const Size mResolution;
     std::unique_ptr<Ogre::Root> mRoot;
 

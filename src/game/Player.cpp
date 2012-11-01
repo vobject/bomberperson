@@ -6,15 +6,18 @@
 #include "Bomb.hpp"
 #include "Explosion.hpp"
 #include "../utils/Utils.hpp"
-#include "../Options.hpp"
 
 Player::Player(
    const std::shared_ptr<Arena>& arena,
    const PlayerType type,
+   const int spawn_len,
+   const int death_len,
    EventQueue& queue
 )
    : ArenaObject(EntityId::Player, ZOrder::Layer_6, arena)
    , mType(type)
+   , mSpawnAnimLength(spawn_len)
+   , mDeathAnimLength(death_len)
    , mEventQueue(queue)
 {
    mEventQueue.Register(this);
@@ -35,7 +38,7 @@ void Player::Update(const int elapsed_time)
 
    if (PlayerAnimation::Spawn == mAnimation)
    {
-      if (GetAnimationTime() >= DefaultValue::PLAYER_SPAWN_ANIM_LEN)
+      if (GetAnimationTime() >= mSpawnAnimLength)
       {
          // Set the players default values, now that he spawned.
          mAnimation = PlayerAnimation::StandDown;
@@ -48,7 +51,7 @@ void Player::Update(const int elapsed_time)
 
    if (PlayerAnimation::Destroy == mAnimation)
    {
-      if (GetAnimationTime() >= DefaultValue::PLAYER_DEATH_ANIM_LEN)
+      if (GetAnimationTime() >= mDeathAnimLength)
       {
          // The death animation is over. Remove the player from the game.
          mEventQueue.Add(std::make_shared<RemovePlayerEvent>(GetInstanceId(),

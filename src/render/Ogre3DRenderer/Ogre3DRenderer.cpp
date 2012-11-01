@@ -1,6 +1,6 @@
 #include "Ogre3DRenderer.hpp"
 #include "ResourceCache.hpp"
-#include "MovableText.hpp"
+#include "../../BomberPersonConfig.hpp"
 #include "../../game/UserInterface.hpp"
 #include "../../game/MenuItem.hpp"
 #include "../../game/MenuItemSelector.hpp"
@@ -13,7 +13,6 @@
 #include "../../game/Explosion.hpp"
 #include "../../game/Player.hpp"
 #include "../../utils/Utils.hpp"
-#include "../../Options.hpp"
 
 #include <OgreRoot.h>
 #include <OgreRenderWindow.h>
@@ -23,13 +22,14 @@
 
 #include <SDL.h>
 
-Ogre3DRenderer::Ogre3DRenderer(const Size res)
+Ogre3DRenderer::Ogre3DRenderer(const BomberPersonConfig& app_cfg)
 {
    if (0 > SDL_Init(SDL_INIT_VIDEO)) {
       throw "Cannot init SDL video subsystem.";
    }
    atexit(SDL_Quit);
 
+   const auto res = app_cfg.GetResolution();
    const auto screen = SDL_SetVideoMode(res.Width,
                                         res.Height,
                                         0,
@@ -38,17 +38,18 @@ Ogre3DRenderer::Ogre3DRenderer(const Size res)
       throw "SDL_SetVideoMode() failed.";
    }
 
-   mResCache = make_unique<Ogre3DResourceCache>("Ogre3DRenderer", res);
+   const auto renderer_path = app_cfg.GetResourceDir() + "/render/Ogre3DRenderer";
+   mResCache = make_unique<Ogre3DResourceCache>(renderer_path, res);
    mRoot = Ogre::Root::getSingletonPtr();
 
    // Let OGRE blindly issue OpenGL calls because we already created
    //  a context to receive them.
    Ogre::NameValuePairList params = { { "currentGLContext", "True" } };
    auto wnd = mRoot->createRenderWindow("RenderWindow",
-                                             res.Width,
-                                             res.Height,
-                                             false,
-                                             &params);
+                                        res.Width,
+                                        res.Height,
+                                        false,
+                                        &params);
    wnd->setVisible(true);
 
    // This can only be done after the render window was created.

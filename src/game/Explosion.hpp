@@ -38,6 +38,7 @@ class Explosion : public ArenaObject, public EventListener
 public:
    Explosion(const std::shared_ptr<Arena>& arena,
              ExplosionType type,
+             int lifespan,
              PlayerType owner,
              EventQueue& queue);
    virtual ~Explosion();
@@ -56,6 +57,7 @@ private:
    void OnRemoveExplosion(const RemoveExplosionEvent& event);
 
    const ExplosionType mType;
+   const int mLifeSpan;
    const PlayerType mOwner;
 
    EventQueue& mEventQueue;

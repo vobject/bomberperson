@@ -12,6 +12,7 @@ struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
 
+class BomberPersonConfig;
 class KeyboardInput;
 class MouseInput;
 //class KinectInput;
@@ -22,7 +23,7 @@ enum class PlayerType;
 class Match
 {
 public:
-   Match(const MatchSettings& settings);
+   Match(BomberPersonConfig& cfg, const MatchSettings& settings);
    ~Match();
 
    Match(const Match&) = delete;
@@ -52,6 +53,7 @@ private:
    ArenaType ArenaTypeFromArenaId(ArenaId id);
    PlayerType PlayerTypeFromPlayerId(PlayerId id);
 
+   BomberPersonConfig& mConfig;
    const MatchSettings mSettings;
    EventQueue mEventQueue;
    EntityManager mEntityManager;

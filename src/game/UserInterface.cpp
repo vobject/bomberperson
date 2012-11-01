@@ -4,8 +4,9 @@
 
 #include <SDL_events.h>
 
-UserInterface::UserInterface()
-   : mEntityManager(mEventQueue)
+UserInterface::UserInterface(BomberPersonConfig& cfg)
+   : mConfig(cfg)
+   , mEntityManager(mConfig, mEventQueue)
 {
     mSettings = {
        ArenaId::Arena_1,

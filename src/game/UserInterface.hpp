@@ -12,6 +12,7 @@ struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
 
+class BomberPersonConfig;
 class MainMenu;
 class MenuItem;
 
@@ -59,7 +60,7 @@ struct MatchSettings
 class UserInterface
 {
 public:
-    UserInterface();
+    UserInterface(BomberPersonConfig& cfg);
     ~UserInterface();
 
     UserInterface(const UserInterface&) = delete;
@@ -83,6 +84,7 @@ public:
     EntitySet GetEntities() const;
 
 private:
+   BomberPersonConfig& mConfig;
    EventQueue mEventQueue;
    EntityManager mEntityManager;
    MatchSettings mSettings;

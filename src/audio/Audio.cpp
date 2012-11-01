@@ -1,4 +1,6 @@
 #include "Audio.hpp"
+#include "AudioCache.hpp"
+#include "../BomberPersonConfig.hpp"
 #include "../game/Match.hpp"
 #include "../game/MainMenu.hpp"
 #include "../game/Arena.hpp"
@@ -8,12 +10,11 @@
 #include "../game/Bomb.hpp"
 #include "../game/Explosion.hpp"
 #include "../game/Player.hpp"
-#include "AudioCache.hpp"
 
 #include <SDL.h>
 #include <SDL_mixer.h>
 
-Audio::Audio()
+Audio::Audio(const BomberPersonConfig& app_cfg)
 {
    if(0 > SDL_Init(SDL_INIT_AUDIO)) {
       throw "Cannot init SDL audio subsystem.";
@@ -31,7 +32,7 @@ Audio::Audio()
    Mix_Volume(-1, MIX_MAX_VOLUME / 4);
    Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
 
-   mCache = make_unique<AudioCache>();
+   mCache = make_unique<AudioCache>(app_cfg.GetResourceDir());
 }
 
 Audio::~Audio()

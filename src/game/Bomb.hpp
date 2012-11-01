@@ -40,6 +40,7 @@ class Bomb : public ArenaObject, public EventListener
 public:
    Bomb(const std::shared_ptr<Arena>& arena,
         BombType type,
+        int lifespan,
         PlayerType owner,
         EventQueue& queue);
    virtual ~Bomb();
@@ -72,6 +73,7 @@ private:
    ExplosionType GetExplosionType(Direction dir, bool end) const;
 
    const BombType mType;
+   const int mLifeSpan;
    const PlayerType mOwner;
 
    EventQueue& mEventQueue;

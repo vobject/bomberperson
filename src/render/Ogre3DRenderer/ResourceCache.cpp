@@ -4,7 +4,6 @@
  #include "../../game/Bomb.hpp"
  #include "../../game/Explosion.hpp"
  #include "../../game/Player.hpp"
- #include "../../Options.hpp"
 
 #include <OgreRoot.h>
 #include <OgreConfigFile.h>
@@ -16,7 +15,7 @@ Ogre3DResourceCache::Ogre3DResourceCache(
    const std::string& renderer_dir,
    const Size res
 )
-   : mResDir(RESOURCE_DIR + "/render/" + renderer_dir)
+   : mResourceDir(renderer_dir)
    , mResolution(res)
 {
    InitRoot();
@@ -40,10 +39,10 @@ Ogre3DResourceCache::~Ogre3DResourceCache()
 
 void Ogre3DResourceCache::InitRoot()
 {
-   mRoot = make_unique<Ogre::Root>(mResDir + "/plugins.cfg");
+   mRoot = make_unique<Ogre::Root>(mResourceDir + "/plugins.cfg");
 
    Ogre::ConfigFile cfg_file;
-   cfg_file.load(mResDir + "/resources.cfg");
+   cfg_file.load(mResourceDir + "/resources.cfg");
 
    for (auto section_iter = cfg_file.getSectionIterator();
         section_iter.hasMoreElements();)

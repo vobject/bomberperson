@@ -8,10 +8,11 @@
 
 #include <SDL_events.h>
 
-Logic::Logic()
+Logic::Logic(BomberPersonConfig& cfg)
+   : mConfig(cfg)
 {
    // Show the main menu when the game starts.
-   mUserInterface = std::make_shared<UserInterface>();
+   mUserInterface = std::make_shared<UserInterface>(mConfig);
    mUserInterface->ShowMainMenu(false);
 }
 
@@ -122,7 +123,7 @@ void Logic::UpdateUserInterface(int elapsed_time)
       case UiItemId::MainMenu_NewGame:
          {
             mUserInterface->HideMainMenu();
-            mMatch = std::make_shared<Match>(mUserInterface->GetMatchSettings());
+            mMatch = std::make_shared<Match>(mConfig, mUserInterface->GetMatchSettings());
          }
          break;
       case UiItemId::MainMenu_ResumeGame:

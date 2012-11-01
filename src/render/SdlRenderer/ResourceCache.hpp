@@ -14,16 +14,17 @@
 #include <string>
 #include <vector>
 
+class BomberPersonConfig;
+enum class EntityId;
 struct SDL_Surface;
 class TiXmlHandle;
-enum class EntityId;
 
 // TODO: Put this in its own namespace.
 
 class ResourceCache
 {
 public:
-   ResourceCache(const std::string& renderer_dir);
+   ResourceCache(const BomberPersonConfig& app_cfg);
    ~ResourceCache();
 
    ResourceCache(const ResourceCache&) = delete;
@@ -53,7 +54,9 @@ private:
    std::vector<SDL_Surface*> LoadTextures(const TiXmlHandle& hndl, const std::string& name, Size size);
    SDL_Surface* LoadTexture(const std::string& file, const Size& size);
 
-   const std::string mResDir;
+   const BomberPersonConfig& mAppConfig;
+   const std::string mResourceDir;
+   const Size mResolution;
    std::map<EntityId, SpriteResource> mMenuRes;
    std::map<ArenaType, ArenaResource> mArenaRes;
    std::map<WallType, WallResource> mWallRes;

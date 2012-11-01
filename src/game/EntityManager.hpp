@@ -6,6 +6,7 @@
 #include <memory>
 #include <set>
 
+class BomberPersonConfig;
 class EventQueue;
 
 class CreateArenaEvent;
@@ -47,7 +48,7 @@ typedef std::multiset<std::shared_ptr<SceneObject>, Sort_Dereferenced_SharedPtr<
 class EntityManager : public EventListener
 {
 public:
-   EntityManager(EventQueue& queue);
+   EntityManager(BomberPersonConfig& cfg, EventQueue& queue);
    ~EntityManager();
 
    void OnEvent(const Event& event);
@@ -78,6 +79,7 @@ private:
    void OnRemoveExplosion(const RemoveExplosionEvent& event);
    void OnRemovePlayer(const RemovePlayerEvent& event);
 
+   BomberPersonConfig& mConfig;
    EventQueue& mEventQueue;
    EntitySet mEntities;
 

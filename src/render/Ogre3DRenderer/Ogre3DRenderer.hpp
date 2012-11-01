@@ -11,13 +11,14 @@ namespace Ogre {
    class Entity;
 }
 
-struct Size;
+class BomberPersonConfig;
 class Ogre3DResourceCache;
+struct Size;
 
 class Ogre3DRenderer : public Renderer
 {
 public:
-   Ogre3DRenderer(Size res);
+   Ogre3DRenderer(const BomberPersonConfig& app_cfg);
    virtual ~Ogre3DRenderer();
 
    Ogre3DRenderer(const Ogre3DRenderer&) = delete;

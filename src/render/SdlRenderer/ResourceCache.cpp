@@ -1,4 +1,5 @@
 #include "ResourceCache.hpp"
+#include "../../BomberPersonConfig.hpp"
 #include "../../game/EntityId.hpp"
 #include "../../game/Arena.hpp"
 #include "../../game/Wall.hpp"
@@ -7,7 +8,6 @@
 #include "../../game/Explosion.hpp"
 #include "../../game/Player.hpp"
 #include "../../utils/Utils.hpp"
-#include "../../Options.hpp"
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -15,14 +15,16 @@
 
 #include <tinyxml.h>
 
-ResourceCache::ResourceCache(const std::string& renderer_dir)
-   : mResDir(renderer_dir)
+ResourceCache::ResourceCache(const BomberPersonConfig& app_cfg)
+   : mAppConfig(app_cfg)
+   , mResourceDir(mAppConfig.GetResourceDir() + "/render/SdlRenderer")
+   , mResolution(mAppConfig.GetResolution())
 {
    if (0 == IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG)) {
        throw "Failed to initialize SDL_image";
    }
 
-   TiXmlDocument doc(mResDir + "/config.xml");
+   TiXmlDocument doc(mResourceDir + "/config.xml");
    if (!doc.LoadFile()) {
       throw "Unable to load config XML file.";
    }
@@ -114,10 +116,9 @@ void ResourceCache::LoadMenuResources()
 {
    const auto id1 = EntityId::Menu;
    const auto id_sel = EntityId::MenuItemSelector;
-   const Size size = { DefaultValue::SCREEN_WIDTH, DefaultValue::SCREEN_HEIGHT };
    const Size size_sel = { 64, 84 };
 
-   mMenuRes.insert({ id1, { id1, { LoadTexture("mainmenu.png", size) } } });
+   mMenuRes.insert({ id1, { id1, { LoadTexture("mainmenu.png", mResolution) } } });
    mMenuRes.insert({ id_sel, { id_sel,
                                { LoadTexture("menu_selector_1.png", size_sel),
                                  LoadTexture("menu_selector_2.png", size_sel),
@@ -130,7 +131,7 @@ void ResourceCache::LoadMenuResources()
 
 void ResourceCache::LoadArenaResources(const TiXmlHandle& hndl)
 {
-   const Size size = { DefaultValue::ARENA_WIDTH, DefaultValue::ARENA_HEIGHT };
+   const Size size = mAppConfig.GetArenaSize();
 
    ArenaResource arena_1(ArenaType::Arena_1, LoadTextures(hndl, "Arena_1", size));
    ArenaResource arena_2(ArenaType::Arena_2, LoadTextures(hndl, "Arena_2", size));
@@ -143,7 +144,7 @@ void ResourceCache::LoadArenaResources(const TiXmlHandle& hndl)
 
 void ResourceCache::LoadWallResources(const TiXmlHandle& hndl)
 {
-   const Size size = { DefaultValue::WALL_WIDTH, DefaultValue::WALL_HEIGHT };
+   const Size size = mAppConfig.GetCellSize();
 
    WallResource indestructible(WallType::Indestructible, LoadTextures(hndl, "Indestructible", size));
    WallResource destructible(WallType::Destructible, LoadTextures(hndl, "Destructible", size));
@@ -154,7 +155,7 @@ void ResourceCache::LoadWallResources(const TiXmlHandle& hndl)
 
 void ResourceCache::LoadExtraResources(const TiXmlHandle& hndl)
 {
-   const Size size = { DefaultValue::EXTRA_WIDTH, DefaultValue::EXTRA_HEIGHT };
+   const Size size = mAppConfig.GetCellSize();
 
    ExtraResource speed(ExtraType::Speed, LoadTextures(hndl, "Speed", size));
    ExtraResource bomb(ExtraType::Bombs, LoadTextures(hndl, "Bombs", size));
@@ -173,8 +174,8 @@ void ResourceCache::LoadExtraResources(const TiXmlHandle& hndl)
 
 void ResourceCache::LoadBombResources(const TiXmlHandle& hndl)
 {
-   const Size size = { DefaultValue::BOMB_WIDTH, DefaultValue::BOMB_HEIGHT };
-   const auto len = DefaultValue::BOMB_ANIM_LEN;
+   const Size size = mAppConfig.GetCellSize();
+   const auto len = mAppConfig.GetBombLifetime();
 
    BombResource countdown(BombType::Countdown);
    countdown.SetFrames(len, LoadTextures(hndl, "Countdown", size));
@@ -188,8 +189,8 @@ void ResourceCache::LoadBombResources(const TiXmlHandle& hndl)
 
 void ResourceCache::LoadExplosionResources(const TiXmlHandle& hndl)
 {
-   const Size size = { DefaultValue::EXPLOSION_WIDTH, DefaultValue::EXPLOSION_HEIGHT };
-   const auto len = DefaultValue::EXPLOSION_ANIM_LEN;
+   const Size size = mAppConfig.GetCellSize();
+   const auto len = mAppConfig.GetExplosionLifetime();
 
    ExplosionResource center(ExplosionType::Center);
    center.SetFrames(len, LoadTextures(hndl, "Center", size));
@@ -240,11 +241,11 @@ PlayerResource ResourceCache::LoadPlayer(
    const TiXmlHandle& hndl
 )
 {
-   const Size size = { DefaultValue::PLAYER_WIDTH,
-                       DefaultValue::PLAYER_HEIGHT };
-   const auto walk_len = DefaultValue::PLAYER_WALK_ANIM_LEN;
-   const auto spawn_len = DefaultValue::PLAYER_SPAWN_ANIM_LEN;
-   const auto death_len = DefaultValue::PLAYER_DEATH_ANIM_LEN;
+   const Size size = { static_cast<int>(mAppConfig.GetCellSize().Width * 1.55f),
+                       static_cast<int>(mAppConfig.GetCellSize().Height * 1.75f) };
+   const auto walk_len = 1000_ms;
+   const auto spawn_len = 1000_ms;
+   const auto death_len = 1000_ms;
    const auto player_hndl = hndl.FirstChild(name);
 
    PlayerResource player(type);
@@ -280,7 +281,7 @@ std::vector<SDL_Surface*> ResourceCache::LoadTextures(
 
 SDL_Surface* ResourceCache::LoadTexture(const std::string& file, const Size& size)
 {
-   const auto full_path = mResDir + "/sprite/" + file;
+   const auto full_path = mResourceDir + "/sprite/" + file;
 
    SDL_Surface* img_loaded = IMG_Load(full_path.c_str());
    if (!img_loaded) {

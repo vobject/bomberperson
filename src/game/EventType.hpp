@@ -142,10 +142,11 @@ private:
 class CreateBombEvent : public Event
 {
 public:
-   CreateBombEvent(unsigned int sender, Cell cell, BombType type, PlayerType owner, int range)
+   CreateBombEvent(unsigned int sender, Cell cell, BombType type/*, int lifespan*/, PlayerType owner, int range)
       : Event(EventType::CreateBomb, sender)
       , mCell(cell)
       , mBomb(type)
+//      , mLifeSpan(lifespan)
       , mOwner(owner)
       , mRange(range)
    { }
@@ -153,12 +154,14 @@ public:
 
    Cell GetCell() const { return mCell; }
    BombType GetBomb() const { return mBomb; }
-   int GetRange() const { return mRange; }
+//   int GetLifeSpan() const { return mLifeSpan; }
    PlayerType GetOwner() const { return mOwner; }
+   int GetRange() const { return mRange; }
 
 private:
    const Cell mCell;
    const BombType mBomb;
+//   const int mLifeSpan;
    const PlayerType mOwner;
    const int mRange;
 };
@@ -166,21 +169,24 @@ private:
 class CreateExplosionEvent : public Event
 {
 public:
-   CreateExplosionEvent(unsigned int sender, Cell cell, ExplosionType type, PlayerType owner)
+   CreateExplosionEvent(unsigned int sender, Cell cell, ExplosionType type/*, int lifespan*/, PlayerType owner)
       : Event(EventType::CreateExplosion, sender)
       , mCell(cell)
       , mExplosionType(type)
+//      , mLifeSpan(lifespan)
       , mOwner(owner)
    { }
    virtual ~CreateExplosionEvent() { }
 
    Cell GetCell() const { return mCell; }
    ExplosionType GetExplosionType() const { return mExplosionType; }
+//   int GetLifeSpan() const { return mLifeSpan; }
    PlayerType GetOwner() const { return mOwner; }
 
 private:
    const Cell mCell;
    const ExplosionType mExplosionType;
+//   const int mLifeSpan;
    const PlayerType mOwner;
 };
 

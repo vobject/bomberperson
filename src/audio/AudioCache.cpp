@@ -4,10 +4,9 @@
 #include "../game/Bomb.hpp"
 #include "../game/Explosion.hpp"
 #include "../game/Player.hpp"
-#include "../Options.hpp"
 
-AudioCache::AudioCache()
-   : mResDir(RESOURCE_DIR)
+AudioCache::AudioCache(const std::string& res_dir)
+   : mResourceDir(res_dir)
 {
    // TODO: Coordinate this using XML files.
    LoadMenuResources();
@@ -135,7 +134,7 @@ void AudioCache::LoadPlayerResources()
 
 Mix_Music *AudioCache::LoadMusic(const std::string& file)
 {
-   const auto full_path = mResDir + "/music/" + file;
+   const auto full_path = mResourceDir + "/music/" + file;
 
    auto music = Mix_LoadMUS(full_path.c_str());
    if (!music) {
@@ -146,7 +145,7 @@ Mix_Music *AudioCache::LoadMusic(const std::string& file)
 
 Mix_Chunk *AudioCache::LoadSound(const std::string& file)
 {
-   const auto full_path = mResDir + "/sound/" + file;
+   const auto full_path = mResourceDir + "/sound/" + file;
 
    auto sound = Mix_LoadWAV(full_path.c_str());
    if (!sound) {

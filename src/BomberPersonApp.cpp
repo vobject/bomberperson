@@ -1,6 +1,5 @@
 #include "BomberPersonApp.hpp"
 #include "WindowFrame.hpp"
-#include "Options.hpp"
 #include "nui/Kinect.hpp"
 #include "nui/KinectDummy.hpp"
 #include "audio/Audio.hpp"
@@ -48,7 +47,7 @@ void BomberPersonApp::Mainloop()
    //  http://gafferongames.com/game-physics/fix-your-timestep/
 
    // A game update call will update the game status by this amount of time.
-   const std::chrono::milliseconds delta_time(2_ms);
+   const std::chrono::milliseconds delta_time(1000_ms / mConfig.GetUpdatesPerSecond());
 
    auto old_time = std::chrono::milliseconds(SDL_GetTicks());
    auto game_time = std::chrono::milliseconds::zero();
@@ -70,7 +69,6 @@ void BomberPersonApp::Mainloop()
          accumulator -= delta_time;
          game_time += delta_time;
       }
-
       RenderScene();
    }
 }
@@ -86,13 +84,10 @@ void BomberPersonApp::Initialize()
 
    InitNui();
 
-   const Size screen_size = { DefaultValue::SCREEN_WIDTH,
-                              DefaultValue::SCREEN_HEIGHT };
-
-   mAudio = std::make_shared<Audio>();
-   mRenderer = std::make_shared<SdlRenderer>(screen_size, mConfig);
-   mWndFrame = std::make_shared<WindowFrame>(mConfig.AppTitle());
-   mLogic = std::make_shared<Logic>();
+   mAudio = std::make_shared<Audio>(mConfig);
+   mRenderer = std::make_shared<SdlRenderer>(mConfig);
+   mWndFrame = std::make_shared<WindowFrame>(mConfig.GetAppTitle());
+   mLogic = std::make_shared<Logic>(mConfig);
 }
 
 void BomberPersonApp::ProcessInput()
@@ -109,28 +104,25 @@ void BomberPersonApp::ProcessInput()
       return;
    }
 
-   // Handle application-level requests, e.g. change of the renderer.
+   // Handle application-level requests, e.g. switching of renderer.
    if (SDL_KEYDOWN == event.type && (event.key.keysym.mod & KMOD_LCTRL))
    {
-      const Size screen_size = { DefaultValue::SCREEN_WIDTH,
-                                 DefaultValue::SCREEN_HEIGHT };
-
       if (SDLK_1 == event.key.keysym.sym) {
-         mRenderer = std::make_shared<SimpleSdlRenderer>(screen_size);
+         mRenderer = std::make_shared<SimpleSdlRenderer>(mConfig.GetResolution());
       }
       else if (SDLK_2 == event.key.keysym.sym) {
-         mRenderer = std::make_shared<SdlRenderer>(screen_size, mConfig);
+         mRenderer = std::make_shared<SdlRenderer>(mConfig);
       }
 
 #if defined(USE_OPENGL)
       else if (SDLK_3 == event.key.keysym.sym) {
-         mRenderer = std::make_shared<SimpleGlRenderer>(screen_size);
+         mRenderer = std::make_shared<SimpleGlRenderer>(mConfig.GetResolution());
       }
 #endif // USE_OPENGL
 
 #if defined(USE_OGRE)
       else if (SDLK_4 == event.key.keysym.sym) {
-         mRenderer = std::make_shared<Ogre3DRenderer>(screen_size);
+         mRenderer = std::make_shared<Ogre3DRenderer>(mConfig);
       }
 #endif // USE_OGRE
 

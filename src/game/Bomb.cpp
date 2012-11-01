@@ -5,16 +5,17 @@
 #include "Wall.hpp"
 #include "Extra.hpp"
 #include "Explosion.hpp"
-#include "../Options.hpp"
 
 Bomb::Bomb(
    const std::shared_ptr<Arena>& arena,
    const BombType type,
+   const int lifespan,
    PlayerType owner,
    EventQueue& queue
 )
    : ArenaObject(EntityId::Bomb, ZOrder::Layer_4, arena)
    , mType(type)
+   , mLifeSpan(lifespan)
    , mOwner(owner)
    , mEventQueue(queue)
 {
@@ -38,7 +39,7 @@ void Bomb::Update(const int elapsed_time)
       mLifeTime += elapsed_time;
    }
 
-   if (mLifeTime >= DefaultValue::BOMB_ANIM_LEN)
+   if (mLifeTime >= mLifeSpan)
    {
       Detonate();
    }

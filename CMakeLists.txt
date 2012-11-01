@@ -40,7 +40,6 @@ INCLUDE_DIRECTORIES(
 FILE(GLOB BOMBERPERSON_HEADERS src/BomberPersonApp.hpp
                                src/BomberPersonConfig.hpp
                                src/WindowFrame.hpp
-                               src/Options.hpp
                                src/audio/*.hpp
                                src/game/*.hpp
                                src/input/*.hpp

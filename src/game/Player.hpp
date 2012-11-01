@@ -60,6 +60,8 @@ class Player : public ArenaObject, public EventListener
 public:
    Player(const std::shared_ptr<Arena>& arena,
           PlayerType type,
+          int spawn_len,
+          int death_len,
           EventQueue& queue);
    virtual ~Player();
 
@@ -100,6 +102,8 @@ private:
    PlayerAnimation GetStopWalkingState(PlayerAnimation anim) const;
 
    const PlayerType mType;
+   const int mSpawnAnimLength;
+   const int mDeathAnimLength;
 
    EventQueue& mEventQueue;
 

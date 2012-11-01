@@ -7,6 +7,7 @@ struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
 
+class BomberPersonConfig;
 class Audio;
 class UserInterface;
 class Renderer;
@@ -18,7 +19,7 @@ class Match;
 class Logic
 {
 public:
-   Logic();
+   Logic(BomberPersonConfig& cfg);
    ~Logic();
 
    Logic(const Logic&) = delete;
@@ -45,6 +46,7 @@ private:
    void RenderUserInterface(Renderer& renderer);
    void RenderMatch(Renderer& renderer);
 
+   BomberPersonConfig& mConfig;
    bool mDone = false;
    std::shared_ptr<UserInterface> mUserInterface;
    std::shared_ptr<Match> mMatch;
