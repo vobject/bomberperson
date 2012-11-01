@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<BomberPerson>
+    <Application>
+        <Title>BomberPerson</Title>
+        <ResourceDir>res_q1</ResourceDir>
+        <Resolution>
+            <Width>800</Width>
+            <Height>600</Height>
+        </Resolution>
+        <UpdatesPerSecond>500</UpdatesPerSecond>
+
+        <BombLifetime>2500</BombLifetime>
+        <ExplosionLifetime>750</ExplosionLifetime>
+        <PlayerSpawnLength>1000</PlayerSpawnLength>
+        <PlayerDeathLength>1000</PlayerDeathLength>
+
+        <Arena>
+            <Width>640</Width>
+            <Height>600</Height>
+            <Position>
+                <X>0</X>
+                <Y>0</Y>
+            </Position>
+            <Borders>
+                <Width>20</Width>
+                <Height>20</Height>
+            </Borders>
+            <Cells>
+                <X>13</X>
+                <Y>11</Y>
+            </Cells>
+            <SpawningCell>
+                    <X>0</X>
+                    <Y>0</Y>
+            </SpawningCell>
+            <SpawningCell>
+                    <X>12</X>
+                    <Y>10</Y>
+            </SpawningCell>
+            <SpawningCell>
+                    <X>0</X>
+                    <Y>10</Y>
+            </SpawningCell>
+            <SpawningCell>
+                    <X>12</X>
+                    <Y>0</Y>
+            </SpawningCell>
+        </Arena>
+
+        <Scoreboard>
+            <Width>160</Width>
+            <Height>600</Height>
+            <Position>
+                <X>640</X>
+                <Y>0</Y>
+            </Position>
+        </Scoreboard>
+    </Application>
+</BomberPerson>
