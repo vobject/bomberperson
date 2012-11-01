@@ -62,6 +62,7 @@ FILE(GLOB BOMBERPERSON_SOURCES src/main.cpp
                                src/render/SdlRenderer/*.cpp)
 
 ADD_DEFINITIONS(
+   -DTIXML_USE_STL
    -Wall
    -std=c++11
 )
