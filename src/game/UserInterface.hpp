@@ -4,37 +4,48 @@
 #include "EventListener.hpp"
 #include "EventQueue.hpp"
 #include "EntityManager.hpp"
-#include "MainMenu.hpp"
+//#include "MainMenu.hpp"
+#include "../input/KeyboardInput.hpp"
 #include "../utils/Utils.hpp"
-
-#include <memory>
-#include <vector>
 
 struct SDL_KeyboardEvent;
 struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
 
 class BomberPersonConfig;
-class MainMenuActionEvent;
-class KeyboardInput;
-class MainMenu;
-class MenuItem;
-enum class MainMenuItem;
+class MenuItemActionEvent;
+//class MainMenu;
+//class MenuItem;
+//enum class MainMenuItem;
 
 enum class MenuType
 {
-   MainMenu
+   MainMenu,
+   Options
 };
 
-//enum class UiItemId
-//{
-//   MainMenu_NewGame,
-//   MainMenu_ResumeGame,
+enum class MenuItemId
+{
+   MainMenu_ResumeGame,
+   MainMenu_NewGame,
 //   MainMenu_SetupMatch,
 ////   MainMenu_Options,
 ////   MainMenu_Credits,
-//   MainMenu_Exit
-//};
+   MainMenu_Exit
+};
+
+enum class MenuMusic
+{
+   MainmenuTrack
+};
+
+enum class MenuSound
+{
+   None,
+   Switch,
+   Choose,
+   Invalid
+};
 
 enum class ArenaId
 {
@@ -85,7 +96,7 @@ public:
 
     bool IsActive() const;
     bool IsDone() const;
-    MainMenuItem GetSelection() const;
+    MenuItemId GetSelection() const;
 
     void ShowMainMenu(bool game_paused);
     void HideMainMenu();
@@ -94,7 +105,7 @@ public:
     EntitySet GetEntities() const;
 
 private:
-   void OnMainMenuAction(const MainMenuActionEvent& event);
+   void OnMenuItemAction(const MenuItemActionEvent& event);
 
    void CreateInputEvents();
    void UpdateEntities(int elapsed_time);
@@ -102,12 +113,11 @@ private:
    BomberPersonConfig& mConfig;
    EventQueue mEventQueue;
    EntityManager mEntityManager;
-
-   std::shared_ptr<KeyboardInput> mKeyboard;
+   KeyboardInput mKeyboard;
 
    bool mActive = false;
    bool mDone = false;
-   MainMenuItem mSelection = MainMenuItem::NewGame;
+   MenuItemId mSelection = MenuItemId::MainMenu_NewGame;
 
    MatchSettings mSettings;
 };

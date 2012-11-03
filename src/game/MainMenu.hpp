@@ -3,37 +3,14 @@
 
 #include "SceneObject.hpp"
 #include "EventListener.hpp"
-#include "../utils/Utils.hpp"
 
-#include <memory>
-#include <string>
 #include <vector>
 
 class EventQueue;
-class CreateMainMenuItemEvent;
+class CreateMenuItemEvent;
 class MenuInputEvent;
-class MenuItem;
-class MenuItemSelector;
-
-enum class MenuMusic
-{
-   MainmenuTrack
-};
-
-enum class MenuSound
-{
-   None,
-   Switch,
-   Choose,
-   Invalid
-};
-
-enum class MainMenuItem
-{
-   ResumeGame,
-   NewGame,
-   Exit
-};
+enum class MenuItemId;
+enum class MenuSound;
 
 class MainMenu : public SceneObject, public EventListener
 {
@@ -47,19 +24,15 @@ public:
     void Update(int elapsed_time) override;
     void OnEvent(const Event& event) override;
 
-//    std::shared_ptr<MenuItem> GetSelection();
-//    std::vector<std::shared_ptr<MenuItem>> GetMenuItems() const;
     MenuSound GetSound(bool reset);
 
-//    void SetResumeStatus(bool enabled);
-
 private:
-    void OnCreateMainMenuItem(const CreateMainMenuItemEvent& event);
+    void OnCreateMenuItem(const CreateMenuItemEvent& event);
     void OnMenuInput(const MenuInputEvent& event);
 
     void SelectionUp();
     void SelectionDown();
-    void Choose(MainMenuItem item);
+    void Choose(MenuItemId item);
     void ResetInputState();
 
     EventQueue& mEventQueue;
@@ -73,8 +46,8 @@ private:
     bool mInputEscape = false;
 
     unsigned int mCurrentSelection = 0;
-    std::vector<MainMenuItem> mItems;
-    MenuSound mSound = MenuSound::None;
+    std::vector<MenuItemId> mItems;
+    MenuSound mSound;
 };
 
 #endif // MAIN_MENU_HPP

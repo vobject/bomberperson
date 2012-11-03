@@ -121,13 +121,13 @@ void Logic::UpdateUserInterface(int elapsed_time)
    // The main menu was exited. Execute the requested action.
    switch (mUserInterface->GetSelection())
    {
-      case MainMenuItem::NewGame:
+      case MenuItemId::MainMenu_NewGame:
          {
             mUserInterface->HideMainMenu();
             mMatch = std::make_shared<Match>(mConfig, mUserInterface->GetMatchSettings());
          }
          break;
-      case MainMenuItem::ResumeGame:
+      case MenuItemId::MainMenu_ResumeGame:
          {
             if (mMatch)
             {
@@ -140,7 +140,7 @@ void Logic::UpdateUserInterface(int elapsed_time)
             }
          }
          break;
-      case MainMenuItem::Exit:
+      case MenuItemId::MainMenu_Exit:
          mDone = true;
          break;
       default:

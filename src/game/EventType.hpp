@@ -5,7 +5,8 @@
 #include "../utils/Utils.hpp"
 
 enum class MenuType;
-enum class MainMenuItem;
+enum class MenuItemId;
+
 enum class ArenaType;
 enum class WallType;
 enum class ExtraType;
@@ -16,7 +17,7 @@ enum class PlayerType;
 enum class EventType
 {
    CreateMainMenu,
-   CreateMainMenuItem,
+   CreateMenuItem,
    CreateArena,
    CreateScoreboard,
    CreateWall,
@@ -26,7 +27,7 @@ enum class EventType
    CreatePlayer,
 
    RemoveMainMenu,
-   RemoveMainMenuItem,
+   RemoveMenuItem,
    RemoveArena,
    RemoveScoreboard,
    RemoveWall,
@@ -36,9 +37,9 @@ enum class EventType
    RemovePlayer,
 
    MenuInput,           // From UserInterface to a menu.
-   MainMenuSelection,   // From MainMenu to MenuItems.
-   MainMenuEnable,      // From MainMenu to MenuItems.
-   MainMenuAction,      // From MainMenu to UserInterface.
+   MenuItemSelection,   // From MainMenu to MenuItems.
+   MenuItemEnable,      // From MainMenu to MenuItems.
+   MenuItemAction,      // From MainMenu to UserInterface.
    Input,               // From Match to the players.
    KillPlayer,          // From Player to other players and itself.
    DetonateBomb,        // From Bomb to other bombs to get a chain reaction.
@@ -79,12 +80,13 @@ private:
    const Size mSize;
 };
 
-class CreateMainMenuItemEvent : public Event
+class CreateMenuItemEvent : public Event
 {
 public:
-   CreateMainMenuItemEvent(MainMenuItem item, Point pos, Size size,
-                           const std::string& text, bool enabled, bool selected)
-      : Event(EventType::CreateMainMenuItem, 0)
+   CreateMenuItemEvent(MenuType owner, MenuItemId item, Point pos, Size size,
+                       const std::string& text, bool enabled, bool selected)
+      : Event(EventType::CreateMenuItem, 0)
+      , mOwner(owner)
       , mItem(item)
       , mPosition(pos)
       , mSize(size)
@@ -92,9 +94,10 @@ public:
       , mIsEnabled(enabled)
       , mIsSelected(selected)
    { }
-   virtual ~CreateMainMenuItemEvent() { }
+   virtual ~CreateMenuItemEvent() { }
 
-   MainMenuItem GetItem() const { return mItem; }
+   MenuType GetOwner() const { return mOwner; }
+   MenuItemId GetItem() const { return mItem; }
    Point GetPosition() const { return mPosition; }
    Size GetSize() const { return mSize; }
    std::string GetText() const { return mText; }
@@ -102,7 +105,8 @@ public:
    bool IsSelected() const { return mIsSelected; }
 
 private:
-   const MainMenuItem mItem;
+   const MenuType mOwner;
+   const MenuItemId mItem;
    const Point mPosition;
    const Size mSize;
    const std::string mText;
@@ -273,13 +277,13 @@ public:
    virtual ~RemoveMainMenuEvent() { }
 };
 
-class RemoveMainMenuItemEvent : public Event
+class RemoveMenuItemEvent : public Event
 {
 public:
-   RemoveMainMenuItemEvent()
-      : Event(EventType::RemoveMainMenuItem, 0)
+   RemoveMenuItemEvent()
+      : Event(EventType::RemoveMenuItem, 0)
    { }
-   virtual ~RemoveMainMenuItemEvent() { }
+   virtual ~RemoveMenuItemEvent() { }
 };
 
 class RemoveArenaEvent : public Event
@@ -381,11 +385,11 @@ private:
 class MenuInputEvent : public Event
 {
 public:
-   MenuInputEvent(MenuType menu, bool up, bool down,
-                                 bool left, bool right,
-                                 bool enter, bool escape)
+   MenuInputEvent(MenuType target, bool up, bool down,
+                                   bool left, bool right,
+                                   bool enter, bool escape)
       : Event(EventType::MenuInput, 0)
-      , mMenu(menu)
+      , mTarget(target)
       , mUp(up)
       , mDown(down)
       , mLeft(left)
@@ -395,7 +399,7 @@ public:
    { }
    virtual ~MenuInputEvent() { }
 
-   MenuType GetMenu() const { return mMenu; }
+   MenuType GetTarget() const { return mTarget; }
    bool GetUp() const { return mUp; }
    bool GetDown() const { return mDown; }
    bool GetLeft() const { return mLeft; }
@@ -404,7 +408,7 @@ public:
    bool GetEscape() const { return mEscape; }
 
 private:
-   const MenuType mMenu;
+   const MenuType mTarget;
    const bool mUp;
    const bool mDown;
    const bool mLeft;
@@ -413,55 +417,55 @@ private:
    const bool mEscape;
 };
 
-class MainMenuSelectionEvent : public Event
+class MenuItemSelectionEvent : public Event
 {
 public:
-   MainMenuSelectionEvent(MainMenuItem unselected, MainMenuItem selected)
-      : Event(EventType::MainMenuSelection, 0)
+   MenuItemSelectionEvent(MenuItemId unselected, MenuItemId selected)
+      : Event(EventType::MenuItemSelection, 0)
       , mUnselected(unselected)
       , mSelected(selected)
    { }
-   virtual ~MainMenuSelectionEvent() { }
+   virtual ~MenuItemSelectionEvent() { }
 
-   MainMenuItem GetUnselected() const { return mUnselected; }
-   MainMenuItem GetSelected() const { return mSelected; }
+   MenuItemId GetUnselected() const { return mUnselected; }
+   MenuItemId GetSelected() const { return mSelected; }
 
 private:
-   const MainMenuItem mUnselected;
-   const MainMenuItem mSelected;
+   const MenuItemId mUnselected;
+   const MenuItemId mSelected;
 };
 
-class MainMenuEnableEvent : public Event
+class MenuItemEnableEvent : public Event
 {
 public:
-   MainMenuEnableEvent(MainMenuItem item, bool status)
-      : Event(EventType::MainMenuEnable, 0)
+   MenuItemEnableEvent(MenuItemId item, bool status)
+      : Event(EventType::MenuItemEnable, 0)
       , mItem(item)
       , mStatus(status)
    { }
-   virtual ~MainMenuEnableEvent() { }
+   virtual ~MenuItemEnableEvent() { }
 
-   MainMenuItem GetItem() const { return mItem; }
+   MenuItemId GetItem() const { return mItem; }
    bool GetStatus() const { return mStatus; }
 
 private:
-   const MainMenuItem mItem;
+   const MenuItemId mItem;
    const bool mStatus;
 };
 
-class MainMenuActionEvent : public Event
+class MenuItemActionEvent : public Event
 {
 public:
-   MainMenuActionEvent(MainMenuItem item)
-      : Event(EventType::MainMenuAction, 0)
+   MenuItemActionEvent(MenuItemId item)
+      : Event(EventType::MenuItemAction, 0)
       , mItem(item)
    { }
-   virtual ~MainMenuActionEvent() { }
+   virtual ~MenuItemActionEvent() { }
 
-   MainMenuItem GetItem() const { return mItem; }
+   MenuItemId GetItem() const { return mItem; }
 
 private:
-   const MainMenuItem mItem;
+   const MenuItemId mItem;
 };
 
 class InputEvent : public Event

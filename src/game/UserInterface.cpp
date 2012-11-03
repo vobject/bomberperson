@@ -2,19 +2,15 @@
 #include "../BomberPersonConfig.hpp"
 #include "EventQueue.hpp"
 #include "EventType.hpp"
-#include "../input/KeyboardInput.hpp"
 
 #include <SDL_events.h>
 
 UserInterface::UserInterface(BomberPersonConfig& cfg)
    : mConfig(cfg)
    , mEntityManager(mConfig, mEventQueue)
+   , mKeyboard(SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT, SDLK_RETURN, SDLK_ESCAPE)
 {
    mEventQueue.Register(this);
-
-   mKeyboard = std::make_shared<KeyboardInput>(SDLK_UP, SDLK_DOWN,
-                                               SDLK_LEFT, SDLK_RIGHT,
-                                               SDLK_RETURN, SDLK_ESCAPE);
 
    // Create all menu types available and keep them alive
    // as long as the UserInterface class exists.
@@ -42,7 +38,7 @@ UserInterface::~UserInterface()
 void UserInterface::Input(const SDL_KeyboardEvent& key)
 {
    if (SDL_KEYDOWN == key.type) {
-      mKeyboard->Press(key.keysym.sym);
+      mKeyboard.Press(key.keysym.sym);
    }
 }
 
@@ -67,8 +63,8 @@ void UserInterface::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
-      case EventType::MainMenuAction:
-         OnMainMenuAction(dynamic_cast<const MainMenuActionEvent&>(event));
+      case EventType::MenuItemAction:
+         OnMenuItemAction(dynamic_cast<const MenuItemActionEvent&>(event));
          break;
       default:
          break;
@@ -85,7 +81,7 @@ bool UserInterface::IsDone() const
    return mDone;
 }
 
-MainMenuItem UserInterface::GetSelection() const
+MenuItemId UserInterface::GetSelection() const
 {
   return  mSelection;
 }
@@ -94,7 +90,8 @@ void UserInterface::ShowMainMenu(const bool game_paused)
 {
    if (game_paused)
    {
-      mEventQueue.Add(std::make_shared<MainMenuEnableEvent>(MainMenuItem::ResumeGame, true));
+      mEventQueue.Add(std::make_shared<MenuItemEnableEvent>
+         (MenuItemId::MainMenu_ResumeGame, true));
 
 //      // HACK: Select "Resume Game" item by default if the game was paused.
 //      mEventQueue.Add(std::make_shared<MenuInputEvent>(MenuType::MainMenu,
@@ -109,7 +106,6 @@ void UserInterface::ShowMainMenu(const bool game_paused)
 
 void UserInterface::HideMainMenu()
 {
-//   mEntityManager.Reset();
    mActive = false;
 }
 
@@ -123,7 +119,7 @@ EntitySet UserInterface::GetEntities() const
    return mEntityManager.GetEntities();
 }
 
-void UserInterface::OnMainMenuAction(const MainMenuActionEvent& event)
+void UserInterface::OnMenuItemAction(const MenuItemActionEvent& event)
 {
    mSelection = event.GetItem();
    mDone = true;
@@ -132,13 +128,13 @@ void UserInterface::OnMainMenuAction(const MainMenuActionEvent& event)
 void UserInterface::CreateInputEvents()
 {
    mEventQueue.Add(std::make_shared<MenuInputEvent>(MenuType::MainMenu,
-                                                    mKeyboard->TestUp(),
-                                                    mKeyboard->TestDown(),
-                                                    mKeyboard->TestLeft(),
-                                                    mKeyboard->TestRight(),
-                                                    mKeyboard->TestAction1(),
-                                                    mKeyboard->TestAction2()));
-   mKeyboard->Reset();
+                                                    mKeyboard.TestUp(),
+                                                    mKeyboard.TestDown(),
+                                                    mKeyboard.TestLeft(),
+                                                    mKeyboard.TestRight(),
+                                                    mKeyboard.TestAction1(),
+                                                    mKeyboard.TestAction2()));
+   mKeyboard.Reset();
 }
 
 void UserInterface::UpdateEntities(const int elapsed_time)

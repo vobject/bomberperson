@@ -3,11 +3,11 @@
 #include "EventType.hpp"
 #include "UserInterface.hpp"
 #include "MenuItem.hpp"
-//#include "MenuItemSelector.hpp"
 
 MainMenu::MainMenu(EventQueue& queue)
    : SceneObject(EntityId::Menu, ZOrder::Menu)
    , mEventQueue(queue)
+   , mSound(MenuSound::None)
 {
    mEventQueue.Register(this);
 
@@ -15,8 +15,9 @@ MainMenu::MainMenu(EventQueue& queue)
    //  This call to GetPosition() may be dangerous.
    const auto mainmenu_pos = GetPosition();
 
-   mEventQueue.Add(std::make_shared<CreateMainMenuItemEvent>(
-      MainMenuItem::ResumeGame,
+   mEventQueue.Add(std::make_shared<CreateMenuItemEvent>(
+      MenuType::MainMenu,
+      MenuItemId::MainMenu_ResumeGame,
       Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 0)),
       Size(256, 32),
       "Resume Game",
@@ -24,8 +25,9 @@ MainMenu::MainMenu(EventQueue& queue)
       false)
    );
 
-   mEventQueue.Add(std::make_shared<CreateMainMenuItemEvent>(
-      MainMenuItem::NewGame,
+   mEventQueue.Add(std::make_shared<CreateMenuItemEvent>(
+      MenuType::MainMenu,
+      MenuItemId::MainMenu_NewGame,
       Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 1)),
       Size(256, 32),
       "New Game",
@@ -33,8 +35,9 @@ MainMenu::MainMenu(EventQueue& queue)
       true)
    );
 
-   mEventQueue.Add(std::make_shared<CreateMainMenuItemEvent>(
-      MainMenuItem::Exit,
+   mEventQueue.Add(std::make_shared<CreateMenuItemEvent>(
+      MenuType::MainMenu,
+      MenuItemId::MainMenu_Exit,
       Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 2)),
       Size(256, 32),
       "Exit",
@@ -55,7 +58,7 @@ void MainMenu::Update(const int elapsed_time)
    (void) elapsed_time;
 
    if (mInputEscape) {
-      Choose(MainMenuItem::Exit);
+      Choose(MenuItemId::MainMenu_Exit);
    }
    else if (mInputEnter) {
       Choose(mItems.at(mCurrentSelection));
@@ -72,8 +75,8 @@ void MainMenu::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
-      case EventType::CreateMainMenuItem:
-         OnCreateMainMenuItem(dynamic_cast<const CreateMainMenuItemEvent&>(event));
+      case EventType::CreateMenuItem:
+         OnCreateMenuItem(dynamic_cast<const CreateMenuItemEvent&>(event));
          break;
       case EventType::MenuInput:
          OnMenuInput(dynamic_cast<const MenuInputEvent&>(event));
@@ -83,14 +86,18 @@ void MainMenu::OnEvent(const Event& event)
    }
 }
 
-void MainMenu::OnCreateMainMenuItem(const CreateMainMenuItemEvent& event)
+void MainMenu::OnCreateMenuItem(const CreateMenuItemEvent& event)
 {
+   if (MenuType::MainMenu != event.GetOwner()) {
+      return;
+   }
+
    mItems.push_back(event.GetItem());
 }
 
 void MainMenu::OnMenuInput(const MenuInputEvent& event)
 {
-   if (MenuType::MainMenu != event.GetMenu()) {
+   if (MenuType::MainMenu != event.GetTarget()) {
       return;
    }
 
@@ -124,7 +131,7 @@ void MainMenu::SelectionUp()
       mCurrentSelection--;
    }
 
-   mEventQueue.Add(std::make_shared<MainMenuSelectionEvent>
+   mEventQueue.Add(std::make_shared<MenuItemSelectionEvent>
       (old_selection, mItems[mCurrentSelection]));
 }
 
@@ -140,12 +147,12 @@ void MainMenu::SelectionDown()
       mCurrentSelection++;
    }
 
-   mEventQueue.Add(std::make_shared<MainMenuSelectionEvent>
+   mEventQueue.Add(std::make_shared<MenuItemSelectionEvent>
       (old_selection, mItems[mCurrentSelection]));
 }
 
-void MainMenu::Choose(const MainMenuItem item)
+void MainMenu::Choose(const MenuItemId item)
 {
    mSound = MenuSound::Choose;
-   mEventQueue.Add(std::make_shared<MainMenuActionEvent>(item));
+   mEventQueue.Add(std::make_shared<MenuItemActionEvent>(item));
 }

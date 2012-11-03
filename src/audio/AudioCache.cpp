@@ -1,5 +1,5 @@
 #include "AudioCache.hpp"
-#include "../game/MainMenu.hpp"
+#include "../game/UserInterface.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Bomb.hpp"
 #include "../game/Explosion.hpp"

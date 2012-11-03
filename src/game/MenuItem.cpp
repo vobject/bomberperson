@@ -2,7 +2,7 @@
 #include "EventQueue.hpp"
 #include "EventType.hpp"
 
-MenuItem::MenuItem(MainMenuItem type, EventQueue& queue)
+MenuItem::MenuItem(MenuItemId type, EventQueue& queue)
    : SceneObject(EntityId::MenuItem, ZOrder::MenuItem)
    , mType(type)
    , mEventQueue(queue)
@@ -24,11 +24,11 @@ void MenuItem::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
-      case EventType::MainMenuSelection:
-         OnMainMenuSelection(dynamic_cast<const MainMenuSelectionEvent&>(event));
+      case EventType::MenuItemSelection:
+         OnMenuItemSelection(dynamic_cast<const MenuItemSelectionEvent&>(event));
          break;
-      case EventType::MainMenuEnable:
-         OnMainMenuEnabled(dynamic_cast<const MainMenuEnableEvent&>(event));
+      case EventType::MenuItemEnable:
+         OnMenuItemEnabled(dynamic_cast<const MenuItemEnableEvent&>(event));
          break;
       default:
          break;
@@ -65,7 +65,7 @@ void MenuItem::SetSelected(bool status)
    mSelected = status;
 }
 
-void MenuItem::OnMainMenuSelection(const MainMenuSelectionEvent& event)
+void MenuItem::OnMenuItemSelection(const MenuItemSelectionEvent& event)
 {
    if (mType == event.GetUnselected())
    {
@@ -78,7 +78,7 @@ void MenuItem::OnMainMenuSelection(const MainMenuSelectionEvent& event)
    }
 }
 
-void MenuItem::OnMainMenuEnabled(const MainMenuEnableEvent& event)
+void MenuItem::OnMenuItemEnabled(const MenuItemEnableEvent& event)
 {
    if (mType == event.GetItem())
    {

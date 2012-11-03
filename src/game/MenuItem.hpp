@@ -7,15 +7,14 @@
 #include <string>
 
 class EventQueue;
-class MainMenuSelectionEvent;
-class MainMenuEnableEvent;
-enum class MainMenuItem;
+class MenuItemSelectionEvent;
+class MenuItemEnableEvent;
+enum class MenuItemId;
 
-// FIXME: This class depends on MainMenuItem.
 class MenuItem : public SceneObject, public EventListener
 {
 public:
-   MenuItem(MainMenuItem type, EventQueue& queue);
+   MenuItem(MenuItemId type, EventQueue& queue);
    virtual ~MenuItem();
 
    MenuItem(const MenuItem&) = delete;
@@ -36,10 +35,10 @@ public:
    void SetSelected(bool status);
 
 private:
-   void OnMainMenuSelection(const MainMenuSelectionEvent& event);
-   void OnMainMenuEnabled(const MainMenuEnableEvent& event);
+   void OnMenuItemSelection(const MenuItemSelectionEvent& event);
+   void OnMenuItemEnabled(const MenuItemEnableEvent& event);
 
-   const MainMenuItem mType;
+   const MenuItemId mType;
 
    EventQueue& mEventQueue;
 

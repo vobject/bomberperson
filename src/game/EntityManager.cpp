@@ -34,8 +34,8 @@ void EntityManager::OnEvent(const Event& event)
       case EventType::CreateMainMenu:
          OnCreateMainMenu(dynamic_cast<const CreateMainMenuEvent&>(event));
          break;
-      case EventType::CreateMainMenuItem:
-         OnCreateMainMenuItem(dynamic_cast<const CreateMainMenuItemEvent&>(event));
+      case EventType::CreateMenuItem:
+         OnCreateMenuItem(dynamic_cast<const CreateMenuItemEvent&>(event));
          break;
 //      case EventType::CreateMenuItemSelector:
 //         OnCreateMenuItemSelector(dynamic_cast<const CreateMenuItemSelectorEvent&>(event));
@@ -65,8 +65,8 @@ void EntityManager::OnEvent(const Event& event)
       case EventType::RemoveMainMenu:
          OnRemoveMainMenu(dynamic_cast<const RemoveMainMenuEvent&>(event));
          break;
-      case EventType::RemoveMainMenuItem:
-         OnRemoveMainMenuItem(dynamic_cast<const RemoveMainMenuItemEvent&>(event));
+      case EventType::RemoveMenuItem:
+         OnRemoveMenuItem(dynamic_cast<const RemoveMenuItemEvent&>(event));
          break;
 //      case EventType::RemoveMenuItemSelector:
 //         OnRemoveMenuItemSelector(dynamic_cast<const RemoveMenuItemSelectorEvent&>(event));
@@ -134,7 +134,7 @@ void EntityManager::OnCreateMainMenu(const CreateMainMenuEvent& event)
    mEntities.insert(menu);
 }
 
-void EntityManager::OnCreateMainMenuItem(const CreateMainMenuItemEvent& event)
+void EntityManager::OnCreateMenuItem(const CreateMenuItemEvent& event)
 {
    auto item = std::make_shared<MenuItem>(event.GetItem(), mEventQueue);
    item->SetPosition(event.GetPosition());
@@ -268,15 +268,10 @@ void EntityManager::OnRemoveMainMenu(const RemoveMainMenuEvent& event)
    (void) event;
 }
 
-void EntityManager::OnRemoveMainMenuItem(const RemoveMainMenuItemEvent& event)
+void EntityManager::OnRemoveMenuItem(const RemoveMenuItemEvent& event)
 {
    (void) event;
 }
-
-//void EntityManager::OnRemoveMenuItemSelector(const RemoveMenuItemSelectorEvent& event)
-//{
-//   (void) event;
-//}
 
 void EntityManager::OnRemoveArena(const RemoveArenaEvent& event)
 {
