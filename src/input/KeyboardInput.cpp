@@ -80,6 +80,16 @@ void KeyboardInput::Release(const SDLKey key)
    }
 }
 
+void KeyboardInput::Reset()
+{
+   mUpKeyPressed = false;
+   mDownKeyPressed = false;
+   mLeftKeyPressed = false;
+   mRightKeyPressed = false;
+   mAction1KeyPressed = false;
+   mAction2KeyPressed = false;
+}
+
 bool KeyboardInput::TestUp() const
 {
    return mUpKeyPressed;

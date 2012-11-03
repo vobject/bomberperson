@@ -2,19 +2,18 @@
 #define MAIN_MENU_HPP
 
 #include "SceneObject.hpp"
+#include "EventListener.hpp"
 #include "../utils/Utils.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
 
-class EntityManager;
+class EventQueue;
+class CreateMainMenuItemEvent;
+class MenuInputEvent;
 class MenuItem;
 class MenuItemSelector;
-
-enum class MenuType
-{
-   Mainmenu
-};
 
 enum class MenuMusic
 {
@@ -29,33 +28,52 @@ enum class MenuSound
    Invalid
 };
 
-class MainMenu : public SceneObject
+enum class MainMenuItem
+{
+   ResumeGame,
+   NewGame,
+   Exit
+};
+
+class MainMenu : public SceneObject, public EventListener
 {
 public:
-    MainMenu(EntityManager& entity_factory);
+    MainMenu(EventQueue& queue);
     virtual ~MainMenu();
 
     MainMenu(const MainMenu&) = delete;
     MainMenu& operator=(const MainMenu&) = delete;
 
     void Update(int elapsed_time) override;
+    void OnEvent(const Event& event) override;
+
+//    std::shared_ptr<MenuItem> GetSelection();
+//    std::vector<std::shared_ptr<MenuItem>> GetMenuItems() const;
+    MenuSound GetSound(bool reset);
+
+//    void SetResumeStatus(bool enabled);
+
+private:
+    void OnCreateMainMenuItem(const CreateMainMenuItemEvent& event);
+    void OnMenuInput(const MenuInputEvent& event);
 
     void SelectionUp();
     void SelectionDown();
-    void Choose();
+    void Choose(MainMenuItem item);
+    void ResetInputState();
 
-    std::shared_ptr<MenuItem> GetSelection();
-    std::vector<std::shared_ptr<MenuItem>> GetMenuItems() const;
-    MenuSound GetSound(bool reset);
+    EventQueue& mEventQueue;
 
-    void SetResumeStatus(bool enabled);
+    // Input handling:
+    bool mInputUp = false;
+    bool mInputDown = false;
+    bool mInputLeft = false;
+    bool mInputRight = false;
+    bool mInputEnter = false;
+    bool mInputEscape = false;
 
-private:
-    EntityManager& mEntityFactory;
-
-    unsigned int mSelectionMarker = 0;
-    std::shared_ptr<MenuItemSelector> mSelector;
-    std::vector<std::shared_ptr<MenuItem>> mItems;
+    unsigned int mCurrentSelection = 0;
+    std::vector<MainMenuItem> mItems;
     MenuSound mSound = MenuSound::None;
 };
 

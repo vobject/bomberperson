@@ -1,8 +1,10 @@
 #ifndef USER_INTERFACE_HPP
 #define USER_INTERFACE_HPP
 
+#include "EventListener.hpp"
 #include "EventQueue.hpp"
 #include "EntityManager.hpp"
+#include "MainMenu.hpp"
 #include "../utils/Utils.hpp"
 
 #include <memory>
@@ -13,18 +15,26 @@ struct SDL_MouseMotionEvent;
 struct SDL_MouseButtonEvent;
 
 class BomberPersonConfig;
+class MainMenuActionEvent;
+class KeyboardInput;
 class MainMenu;
 class MenuItem;
+enum class MainMenuItem;
 
-enum class UiItemId
+enum class MenuType
 {
-   MainMenu_NewGame,
-   MainMenu_ResumeGame,
-//   MainMenu_SetupGame,
-//   MainMenu_Options,
-//   MainMenu_Credits,
-   MainMenu_Exit
+   MainMenu
 };
+
+//enum class UiItemId
+//{
+//   MainMenu_NewGame,
+//   MainMenu_ResumeGame,
+//   MainMenu_SetupMatch,
+////   MainMenu_Options,
+////   MainMenu_Credits,
+//   MainMenu_Exit
+//};
 
 enum class ArenaId
 {
@@ -57,7 +67,7 @@ struct MatchSettings
    // Key config
 };
 
-class UserInterface
+class UserInterface : public EventListener
 {
 public:
     UserInterface(BomberPersonConfig& cfg);
@@ -71,28 +81,35 @@ public:
     void Input(const SDL_MouseButtonEvent& button);
 
     void Update(int elapsed_time);
+    void OnEvent(const Event& event) override;
 
     bool IsActive() const;
     bool IsDone() const;
+    MainMenuItem GetSelection() const;
 
     void ShowMainMenu(bool game_paused);
     void HideMainMenu();
-
-    UiItemId GetSelection() const;
 
     MatchSettings GetMatchSettings() const;
     EntitySet GetEntities() const;
 
 private:
+   void OnMainMenuAction(const MainMenuActionEvent& event);
+
+   void CreateInputEvents();
+   void UpdateEntities(int elapsed_time);
+
    BomberPersonConfig& mConfig;
    EventQueue mEventQueue;
    EntityManager mEntityManager;
-   MatchSettings mSettings;
+
+   std::shared_ptr<KeyboardInput> mKeyboard;
+
    bool mActive = false;
    bool mDone = false;
-   UiItemId mSelection;
+   MainMenuItem mSelection = MainMenuItem::NewGame;
 
-   std::shared_ptr<MainMenu> mMainMenu;
+   MatchSettings mSettings;
 };
 
 #endif // USER_INTERFACE_HPP

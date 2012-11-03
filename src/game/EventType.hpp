@@ -4,6 +4,8 @@
 #include "Arena.hpp"
 #include "../utils/Utils.hpp"
 
+enum class MenuType;
+enum class MainMenuItem;
 enum class ArenaType;
 enum class WallType;
 enum class ExtraType;
@@ -13,6 +15,8 @@ enum class PlayerType;
 
 enum class EventType
 {
+   CreateMainMenu,
+   CreateMainMenuItem,
    CreateArena,
    CreateScoreboard,
    CreateWall,
@@ -21,6 +25,8 @@ enum class EventType
    CreateExplosion,
    CreatePlayer,
 
+   RemoveMainMenu,
+   RemoveMainMenuItem,
    RemoveArena,
    RemoveScoreboard,
    RemoveWall,
@@ -29,6 +35,10 @@ enum class EventType
    RemoveExplosion,
    RemovePlayer,
 
+   MenuInput,           // From UserInterface to a menu.
+   MainMenuSelection,   // From MainMenu to MenuItems.
+   MainMenuEnable,      // From MainMenu to MenuItems.
+   MainMenuAction,      // From MainMenu to UserInterface.
    Input,               // From Match to the players.
    KillPlayer,          // From Player to other players and itself.
    DetonateBomb,        // From Bomb to other bombs to get a chain reaction.
@@ -49,6 +59,55 @@ public:
 private:
    const EventType mType;
    const unsigned int mSender;
+};
+
+class CreateMainMenuEvent : public Event
+{
+public:
+   CreateMainMenuEvent(Point pos, Size size)
+      : Event(EventType::CreateMainMenu, 0)
+      , mPosition(pos)
+      , mSize(size)
+   { }
+   virtual ~CreateMainMenuEvent() { }
+
+   Point GetPosition() const { return mPosition; }
+   Size GetSize() const { return mSize; }
+
+private:
+   const Point mPosition;
+   const Size mSize;
+};
+
+class CreateMainMenuItemEvent : public Event
+{
+public:
+   CreateMainMenuItemEvent(MainMenuItem item, Point pos, Size size,
+                           const std::string& text, bool enabled, bool selected)
+      : Event(EventType::CreateMainMenuItem, 0)
+      , mItem(item)
+      , mPosition(pos)
+      , mSize(size)
+      , mText(text)
+      , mIsEnabled(enabled)
+      , mIsSelected(selected)
+   { }
+   virtual ~CreateMainMenuItemEvent() { }
+
+   MainMenuItem GetItem() const { return mItem; }
+   Point GetPosition() const { return mPosition; }
+   Size GetSize() const { return mSize; }
+   std::string GetText() const { return mText; }
+   bool IsEnabled() const { return mIsEnabled; }
+   bool IsSelected() const { return mIsSelected; }
+
+private:
+   const MainMenuItem mItem;
+   const Point mPosition;
+   const Size mSize;
+   const std::string mText;
+   const bool mIsEnabled;
+   const bool mIsSelected;
 };
 
 class CreateArenaEvent : public Event
@@ -205,6 +264,24 @@ private:
    const PlayerType mPlayer;
 };
 
+class RemoveMainMenuEvent : public Event
+{
+public:
+   RemoveMainMenuEvent()
+      : Event(EventType::RemoveMainMenu, 0)
+   { }
+   virtual ~RemoveMainMenuEvent() { }
+};
+
+class RemoveMainMenuItemEvent : public Event
+{
+public:
+   RemoveMainMenuItemEvent()
+      : Event(EventType::RemoveMainMenuItem, 0)
+   { }
+   virtual ~RemoveMainMenuItemEvent() { }
+};
+
 class RemoveArenaEvent : public Event
 {
 public:
@@ -299,6 +376,92 @@ public:
 
 private:
    const PlayerType mPlayer;
+};
+
+class MenuInputEvent : public Event
+{
+public:
+   MenuInputEvent(MenuType menu, bool up, bool down,
+                                 bool left, bool right,
+                                 bool enter, bool escape)
+      : Event(EventType::MenuInput, 0)
+      , mMenu(menu)
+      , mUp(up)
+      , mDown(down)
+      , mLeft(left)
+      , mRight(right)
+      , mEnter(enter)
+      , mEscape(escape)
+   { }
+   virtual ~MenuInputEvent() { }
+
+   MenuType GetMenu() const { return mMenu; }
+   bool GetUp() const { return mUp; }
+   bool GetDown() const { return mDown; }
+   bool GetLeft() const { return mLeft; }
+   bool GetRight() const { return mRight; }
+   bool GetEnter() const { return mEnter; }
+   bool GetEscape() const { return mEscape; }
+
+private:
+   const MenuType mMenu;
+   const bool mUp;
+   const bool mDown;
+   const bool mLeft;
+   const bool mRight;
+   const bool mEnter;
+   const bool mEscape;
+};
+
+class MainMenuSelectionEvent : public Event
+{
+public:
+   MainMenuSelectionEvent(MainMenuItem unselected, MainMenuItem selected)
+      : Event(EventType::MainMenuSelection, 0)
+      , mUnselected(unselected)
+      , mSelected(selected)
+   { }
+   virtual ~MainMenuSelectionEvent() { }
+
+   MainMenuItem GetUnselected() const { return mUnselected; }
+   MainMenuItem GetSelected() const { return mSelected; }
+
+private:
+   const MainMenuItem mUnselected;
+   const MainMenuItem mSelected;
+};
+
+class MainMenuEnableEvent : public Event
+{
+public:
+   MainMenuEnableEvent(MainMenuItem item, bool status)
+      : Event(EventType::MainMenuEnable, 0)
+      , mItem(item)
+      , mStatus(status)
+   { }
+   virtual ~MainMenuEnableEvent() { }
+
+   MainMenuItem GetItem() const { return mItem; }
+   bool GetStatus() const { return mStatus; }
+
+private:
+   const MainMenuItem mItem;
+   const bool mStatus;
+};
+
+class MainMenuActionEvent : public Event
+{
+public:
+   MainMenuActionEvent(MainMenuItem item)
+      : Event(EventType::MainMenuAction, 0)
+      , mItem(item)
+   { }
+   virtual ~MainMenuActionEvent() { }
+
+   MainMenuItem GetItem() const { return mItem; }
+
+private:
+   const MainMenuItem mItem;
 };
 
 class InputEvent : public Event

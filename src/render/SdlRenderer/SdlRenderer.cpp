@@ -3,7 +3,7 @@
 #include "../../BomberPersonConfig.hpp"
 #include "../../game/UserInterface.hpp"
 #include "../../game/MenuItem.hpp"
-#include "../../game/MenuItemSelector.hpp"
+//#include "../../game/MenuItemSelector.hpp"
 #include "../../game/MainMenu.hpp"
 #include "../../game/Arena.hpp"
 #include "../../game/Scoreboard.hpp"
@@ -94,14 +94,19 @@ void SdlRenderer::Render(const std::shared_ptr<MenuItem>& obj)
                      0 };
    SDL_BlitSurface(surface, NULL, mScreen, &rect);
    SDL_FreeSurface(surface);
-}
 
-void SdlRenderer::Render(const std::shared_ptr<MenuItemSelector>& obj)
-{
-   const auto id = obj->GetId();
-   const auto anim_time = obj->GetAnimationTime();
-   const auto frame = mResCache->GetMenuResource(id).GetFrame(anim_time);
-   Render(obj, frame);
+   if (obj->IsSelected())
+   {
+      const auto id = obj->GetId();
+      const auto anim_time = obj->GetAnimationTime();
+      const auto frame = mResCache->GetMenuResource(id).GetFrame(anim_time);
+
+      SDL_Rect sel_rect = { static_cast<Sint16>(pos.X - 100),
+                            static_cast<Sint16>(pos.Y - 6),
+                            static_cast<Uint16>(48),
+                            static_cast<Uint16>(48) };
+      SDL_BlitSurface(frame, NULL, mScreen, &sel_rect);
+   }
 }
 
 void SdlRenderer::Render(const std::shared_ptr<MainMenu>& obj)

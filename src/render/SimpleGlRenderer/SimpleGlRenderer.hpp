@@ -19,7 +19,6 @@ public:
    void PostRender() override;
 
    void Render(const std::shared_ptr<MenuItem>& obj) override;
-   void Render(const std::shared_ptr<MenuItemSelector>& obj) override;
    void Render(const std::shared_ptr<MainMenu>& obj) override;
 
    void Render(const std::shared_ptr<Arena>& arena) override;

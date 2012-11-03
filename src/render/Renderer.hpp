@@ -6,7 +6,6 @@
 class SceneObject;
 
 class MenuItem;
-class MenuItemSelector;
 class MainMenu;
 
 class Arena;
@@ -28,7 +27,6 @@ public:
    virtual void Render(const std::shared_ptr<SceneObject>& obj);
 
    virtual void Render(const std::shared_ptr<MenuItem>& obj) = 0;
-   virtual void Render(const std::shared_ptr<MenuItemSelector>& obj) = 0;
    virtual void Render(const std::shared_ptr<MainMenu>& obj) = 0;
 
    virtual void Render(const std::shared_ptr<Arena>& arena) = 0;

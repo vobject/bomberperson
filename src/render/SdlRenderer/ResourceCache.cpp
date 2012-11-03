@@ -115,11 +115,11 @@ PlayerResource ResourceCache::GetPlayerResource(const PlayerType type) const
 void ResourceCache::LoadMenuResources()
 {
    const auto id1 = EntityId::Menu;
-   const auto id_sel = EntityId::MenuItemSelector;
+   const auto id2 = EntityId::MenuItem;
    const Size size_sel = { 64, 84 };
 
    mMenuRes.insert({ id1, { id1, { LoadTexture("mainmenu.png", mResolution) } } });
-   mMenuRes.insert({ id_sel, { id_sel,
+   mMenuRes.insert({ id2, { id2,
                                { LoadTexture("menu_selector_1.png", size_sel),
                                  LoadTexture("menu_selector_2.png", size_sel),
                                  LoadTexture("menu_selector_3.png", size_sel),

@@ -204,7 +204,7 @@ void Match::CreateInputEvents()
                                                 mMouse_1.second->TestAction2()));
 }
 
-void Match::UpdateEntities(int elapsed_time)
+void Match::UpdateEntities(const int elapsed_time)
 {
    for (auto& ent : mEntityManager.GetEntities())
    {
@@ -215,7 +215,7 @@ void Match::UpdateEntities(int elapsed_time)
    }
 
    // TODO: NOW is the time for collision detection.
-   // TODO: Update all entities againg after collisions were detected.
+   // TODO: Update all entities again after collisions were detected.
 }
 
 ArenaType Match::ArenaTypeFromArenaId(const ArenaId id)

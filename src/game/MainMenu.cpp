@@ -1,107 +1,105 @@
 #include "MainMenu.hpp"
+#include "EventQueue.hpp"
+#include "EventType.hpp"
 #include "UserInterface.hpp"
 #include "MenuItem.hpp"
-#include "MenuItemSelector.hpp"
+//#include "MenuItemSelector.hpp"
 
-MainMenu::MainMenu(EntityManager& entity_factory)
+MainMenu::MainMenu(EventQueue& queue)
    : SceneObject(EntityId::Menu, ZOrder::Menu)
-   , mEntityFactory(entity_factory)
+   , mEventQueue(queue)
 {
-   // TODO: The mainmenu object itself is not yet constructed.
+   mEventQueue.Register(this);
+
+   // FIXME: The mainmenu object itself is not yet constructed.
    //  This call to GetPosition() may be dangerous.
    const auto mainmenu_pos = GetPosition();
 
-   mSelector = mEntityFactory.CreateMenuItemSelector();
-   mSelector->SetPosition({ mainmenu_pos.X + 144, mainmenu_pos.Y + 158 + (96 * 1) });
+   mEventQueue.Add(std::make_shared<CreateMainMenuItemEvent>(
+      MainMenuItem::ResumeGame,
+      Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 0)),
+      Size(256, 32),
+      "Resume Game",
+      false,
+      false)
+   );
 
-   auto resume_game = mEntityFactory.CreateMenuItem(UiItemId::MainMenu_ResumeGame);
-   resume_game->SetPosition({ mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 0) });
-   resume_game->SetEnabled(false);
-   resume_game->SetText("Resume Game");
-   mItems.push_back(resume_game);
+   mEventQueue.Add(std::make_shared<CreateMainMenuItemEvent>(
+      MainMenuItem::NewGame,
+      Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 1)),
+      Size(256, 32),
+      "New Game",
+      true,
+      true)
+   );
 
-   auto new_game = mEntityFactory.CreateMenuItem(UiItemId::MainMenu_NewGame);
-   new_game->SetPosition({ mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 1) });
-   new_game->SetEnabled(true);
-   new_game->SetText("New Game");
-   mItems.push_back(new_game);
+   mEventQueue.Add(std::make_shared<CreateMainMenuItemEvent>(
+      MainMenuItem::Exit,
+      Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 2)),
+      Size(256, 32),
+      "Exit",
+      true,
+      false)
+   );
 
-   auto exit_app = mEntityFactory.CreateMenuItem(UiItemId::MainMenu_Exit);
-   exit_app->SetPosition({ mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 2) });
-   exit_app->SetEnabled(true);
-   exit_app->SetText("Exit");
-   mItems.push_back(exit_app);
-
-   mSelectionMarker = 1; // Select "New Game" by default.
+   mCurrentSelection = 1; // Select "New Game" by default.
 }
 
 MainMenu::~MainMenu()
 {
-
+   mEventQueue.UnRegister(this);
 }
 
 void MainMenu::Update(const int elapsed_time)
 {
-   // TODO: Animate the menu background.
-}
+   (void) elapsed_time;
 
-void MainMenu::SelectionUp()
-{
-   mSound = MenuSound::Switch;
-
-   if (0 == mSelectionMarker) {
-      mSelectionMarker = mItems.size() - 1;
+   if (mInputEscape) {
+      Choose(MainMenuItem::Exit);
    }
-   else {
-      mSelectionMarker--;
+   else if (mInputEnter) {
+      Choose(mItems.at(mCurrentSelection));
    }
-
-   if (mItems[mSelectionMarker]->IsEnabled())
-   {
-      mSelector->SetPosition({ mSelector->GetPosition().X,
-                               mItems[mSelectionMarker]->GetPosition().Y });
-   }
-   else
-   {
+   else if (mInputUp) {
       SelectionUp();
    }
-}
-
-void MainMenu::SelectionDown()
-{
-   mSound = MenuSound::Switch;
-
-   if ((mItems.size() - 1) == mSelectionMarker) {
-      mSelectionMarker = 0;
-   }
-   else {
-      mSelectionMarker++;
-   }
-
-   if (mItems[mSelectionMarker]->IsEnabled())
-   {
-      mSelector->SetPosition({ mSelector->GetPosition().X,
-                               mItems[mSelectionMarker]->GetPosition().Y - 8 });
-   }
-   else
-   {
+   else if (mInputDown) {
       SelectionDown();
    }
 }
 
-void MainMenu::Choose()
+void MainMenu::OnEvent(const Event& event)
 {
-   mSound = MenuSound::Choose;
+   switch (event.GetType())
+   {
+      case EventType::CreateMainMenuItem:
+         OnCreateMainMenuItem(dynamic_cast<const CreateMainMenuItemEvent&>(event));
+         break;
+      case EventType::MenuInput:
+         OnMenuInput(dynamic_cast<const MenuInputEvent&>(event));
+         break;
+      default:
+         break;
+   }
 }
 
-std::shared_ptr<MenuItem> MainMenu::GetSelection()
+void MainMenu::OnCreateMainMenuItem(const CreateMainMenuItemEvent& event)
 {
-   return mItems[mSelectionMarker];
+   mItems.push_back(event.GetItem());
 }
 
-std::vector<std::shared_ptr<MenuItem>> MainMenu::GetMenuItems() const
+void MainMenu::OnMenuInput(const MenuInputEvent& event)
 {
-   return mItems;
+   if (MenuType::MainMenu != event.GetMenu()) {
+      return;
+   }
+
+   mInputUp = event.GetUp();
+   mInputDown = event.GetDown();
+   mInputLeft = event.GetLeft();
+   mInputRight = event.GetRight();
+   mInputEnter = event.GetEnter();
+   mInputEscape = event.GetEscape();
 }
 
 MenuSound MainMenu::GetSound(const bool reset)
@@ -114,7 +112,40 @@ MenuSound MainMenu::GetSound(const bool reset)
    return ret;
 }
 
-void MainMenu::SetResumeStatus(const bool enabled)
+void MainMenu::SelectionUp()
 {
-   mItems[0]->SetEnabled(enabled);
+   mSound = MenuSound::Switch;
+   const auto old_selection = mItems[mCurrentSelection];
+
+   if (0 == mCurrentSelection) {
+      mCurrentSelection = mItems.size() - 1;
+   }
+   else {
+      mCurrentSelection--;
+   }
+
+   mEventQueue.Add(std::make_shared<MainMenuSelectionEvent>
+      (old_selection, mItems[mCurrentSelection]));
+}
+
+void MainMenu::SelectionDown()
+{
+   mSound = MenuSound::Switch;
+   const auto old_selection = mItems[mCurrentSelection];
+
+   if ((mItems.size() - 1) == mCurrentSelection) {
+      mCurrentSelection = 0;
+   }
+   else {
+      mCurrentSelection++;
+   }
+
+   mEventQueue.Add(std::make_shared<MainMenuSelectionEvent>
+      (old_selection, mItems[mCurrentSelection]));
+}
+
+void MainMenu::Choose(const MainMenuItem item)
+{
+   mSound = MenuSound::Choose;
+   mEventQueue.Add(std::make_shared<MainMenuActionEvent>(item));
 }

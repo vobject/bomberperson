@@ -4,7 +4,8 @@
 // These turned out to be worthless.
 enum class EntityId
 {
-   MenuItemSelector,
+//   MenuItemSelector,
+   MenuItem,
    Menu,
    Arena,
    Scoreboard,

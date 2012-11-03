@@ -1,6 +1,5 @@
 #include "Renderer.hpp"
 #include "../game/MenuItem.hpp"
-#include "../game/MenuItemSelector.hpp"
 #include "../game/MainMenu.hpp"
 #include "../game/Arena.hpp"
 #include "../game/Scoreboard.hpp"
@@ -39,9 +38,6 @@ void Renderer::Render(const std::shared_ptr<SceneObject>& obj)
    // So we'll be using good old dynamic_cast (sort of).
 
    if (const auto ptr = std::dynamic_pointer_cast<MenuItem>(obj)) {
-      Render(ptr);
-   }
-   else if (const auto ptr = std::dynamic_pointer_cast<MenuItemSelector>(obj)) {
       Render(ptr);
    }
    else if (const auto ptr = std::dynamic_pointer_cast<MainMenu>(obj)) {

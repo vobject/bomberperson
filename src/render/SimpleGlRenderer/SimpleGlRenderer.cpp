@@ -1,7 +1,6 @@
 #include "SimpleGlRenderer.hpp"
 #include "../../game/UserInterface.hpp"
 #include "../../game/MenuItem.hpp"
-#include "../../game/MenuItemSelector.hpp"
 #include "../../game/MainMenu.hpp"
 #include "../../game/Arena.hpp"
 #include "../../game/Scoreboard.hpp"
@@ -66,11 +65,6 @@ void SimpleGlRenderer::PostRender()
 }
 
 void SimpleGlRenderer::Render(const std::shared_ptr<MenuItem>& obj)
-{
-   // TODO: Implement Me!
-}
-
-void SimpleGlRenderer::Render(const std::shared_ptr<MenuItemSelector>& obj)
 {
    // TODO: Implement Me!
 }

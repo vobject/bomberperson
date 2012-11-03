@@ -5,7 +5,7 @@
 
 #include "MainMenu.hpp"
 #include "MenuItem.hpp"
-#include "MenuItemSelector.hpp"
+//#include "MenuItemSelector.hpp"
 #include "Arena.hpp"
 #include "ArenaGenerator.hpp"
 #include "Scoreboard.hpp"
@@ -31,6 +31,15 @@ void EntityManager::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
+      case EventType::CreateMainMenu:
+         OnCreateMainMenu(dynamic_cast<const CreateMainMenuEvent&>(event));
+         break;
+      case EventType::CreateMainMenuItem:
+         OnCreateMainMenuItem(dynamic_cast<const CreateMainMenuItemEvent&>(event));
+         break;
+//      case EventType::CreateMenuItemSelector:
+//         OnCreateMenuItemSelector(dynamic_cast<const CreateMenuItemSelectorEvent&>(event));
+//         break;
       case EventType::CreateArena:
          OnCreateArena(dynamic_cast<const CreateArenaEvent&>(event));
          break;
@@ -53,6 +62,15 @@ void EntityManager::OnEvent(const Event& event)
          OnCreatePlayer(dynamic_cast<const CreatePlayerEvent&>(event));
          break;
 
+      case EventType::RemoveMainMenu:
+         OnRemoveMainMenu(dynamic_cast<const RemoveMainMenuEvent&>(event));
+         break;
+      case EventType::RemoveMainMenuItem:
+         OnRemoveMainMenuItem(dynamic_cast<const RemoveMainMenuItemEvent&>(event));
+         break;
+//      case EventType::RemoveMenuItemSelector:
+//         OnRemoveMenuItemSelector(dynamic_cast<const RemoveMenuItemSelectorEvent&>(event));
+//         break;
       case EventType::RemoveArena:
          OnRemoveArena(dynamic_cast<const RemoveArenaEvent&>(event));
          break;
@@ -80,32 +98,57 @@ void EntityManager::OnEvent(const Event& event)
    }
 }
 
-std::shared_ptr<MainMenu> EntityManager::CreateMainmenu()
+//std::shared_ptr<MainMenu> EntityManager::CreateMainmenu()
+//{
+//   auto menu = std::make_shared<MainMenu>(*this);
+//   menu->SetSize(mConfig.GetResolution());
+
+//   mEntities.insert(menu);
+//   return menu;
+//}
+
+//std::shared_ptr<MenuItem> EntityManager::CreateMenuItem(const UiItemId id)
+//{
+//   auto item = std::make_shared<MenuItem>(id);
+//   item->SetSize({ 256, 32 });
+
+//   mEntities.insert(item);
+//   return item;
+//}
+
+//std::shared_ptr<MenuItemSelector> EntityManager::CreateMenuItemSelector()
+//{
+//   auto selector = std::make_shared<MenuItemSelector>();
+//   selector->SetSize({ 48, 48 });
+
+//   mEntities.insert(selector);
+//   return selector;
+//}
+
+void EntityManager::OnCreateMainMenu(const CreateMainMenuEvent& event)
 {
-   auto menu = std::make_shared<MainMenu>(*this);
-   menu->SetSize(mConfig.GetResolution());
+   auto menu = std::make_shared<MainMenu>(mEventQueue);
+   menu->SetPosition(event.GetPosition());
+   menu->SetSize(event.GetSize());
 
    mEntities.insert(menu);
-   return menu;
 }
 
-std::shared_ptr<MenuItem> EntityManager::CreateMenuItem(const UiItemId id)
+void EntityManager::OnCreateMainMenuItem(const CreateMainMenuItemEvent& event)
 {
-   auto item = std::make_shared<MenuItem>(id);
-   item->SetSize({ 256, 32 });
+   auto item = std::make_shared<MenuItem>(event.GetItem(), mEventQueue);
+   item->SetPosition(event.GetPosition());
+   item->SetSize(event.GetSize());
+   item->SetText(event.GetText());
+   item->SetEnabled(event.IsEnabled());
+   item->SetSelected(event.IsSelected());
 
    mEntities.insert(item);
-   return item;
 }
 
-std::shared_ptr<MenuItemSelector> EntityManager::CreateMenuItemSelector()
-{
-   auto selector = std::make_shared<MenuItemSelector>();
-   selector->SetSize({ 48, 48 });
-
-   mEntities.insert(selector);
-   return selector;
-}
+//void EntityManager::OnCreateMenuItemSelector(const CreateMenuItemSelectorEvent& event)
+//{
+//}
 
 void EntityManager::OnCreateArena(const CreateArenaEvent& event)
 {
@@ -219,6 +262,21 @@ void EntityManager::OnCreatePlayer(const CreatePlayerEvent& event)
 
    mEntities.insert(player);
 }
+
+void EntityManager::OnRemoveMainMenu(const RemoveMainMenuEvent& event)
+{
+   (void) event;
+}
+
+void EntityManager::OnRemoveMainMenuItem(const RemoveMainMenuItemEvent& event)
+{
+   (void) event;
+}
+
+//void EntityManager::OnRemoveMenuItemSelector(const RemoveMenuItemSelectorEvent& event)
+//{
+//   (void) event;
+//}
 
 void EntityManager::OnRemoveArena(const RemoveArenaEvent& event)
 {

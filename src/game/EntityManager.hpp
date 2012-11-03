@@ -9,6 +9,9 @@
 class BomberPersonConfig;
 class EventQueue;
 
+class CreateMainMenuEvent;
+class CreateMainMenuItemEvent;
+//class CreateMenuItemSelectorEvent;
 class CreateArenaEvent;
 class CreateScoreboardEvent;
 class CreateWallEvent;
@@ -17,6 +20,9 @@ class CreateBombEvent;
 class CreateExplosionEvent;
 class CreatePlayerEvent;
 
+class RemoveMainMenuEvent;
+class RemoveMainMenuItemEvent;
+//class RemoveMenuItemSelectorEvent;
 class RemoveArenaEvent;
 class RemoveScoreboardEvent;
 class RemoveWallEvent;
@@ -31,7 +37,7 @@ class MenuItem;
 class MenuItemSelector;
 class Arena;
 
-enum class UiItemId;
+//enum class UiItemId;
 
 template<class T>
 struct Sort_Dereferenced_SharedPtr
@@ -53,9 +59,9 @@ public:
 
    void OnEvent(const Event& event);
 
-   std::shared_ptr<MainMenu> CreateMainmenu();
-   std::shared_ptr<MenuItem> CreateMenuItem(UiItemId id);
-   std::shared_ptr<MenuItemSelector> CreateMenuItemSelector();
+//   std::shared_ptr<MainMenu> CreateMainmenu();
+//   std::shared_ptr<MenuItem> CreateMenuItem(UiItemId id);
+//   std::shared_ptr<MenuItemSelector> CreateMenuItemSelector();
 
    EntitySet GetEntities() const;
 
@@ -63,6 +69,9 @@ public:
    void Reset();
 
 private:
+   void OnCreateMainMenu(const CreateMainMenuEvent& event);
+   void OnCreateMainMenuItem(const CreateMainMenuItemEvent& event);
+//   void OnCreateMenuItemSelector(const CreateMenuItemSelectorEvent& event);
    void OnCreateArena(const CreateArenaEvent& event);
    void OnCreateScoreboard(const CreateScoreboardEvent& event);
    void OnCreateWall(const CreateWallEvent& event);
@@ -71,6 +80,9 @@ private:
    void OnCreateExplosion(const CreateExplosionEvent& event);
    void OnCreatePlayer(const CreatePlayerEvent& event);
 
+   void OnRemoveMainMenu(const RemoveMainMenuEvent& event);
+   void OnRemoveMainMenuItem(const RemoveMainMenuItemEvent &event);
+//   void OnRemoveMenuItemSelector(const RemoveMenuItemSelectorEvent& event);
    void OnRemoveArena(const RemoveArenaEvent& event);
    void OnRemoveScoreboard(const RemoveScoreboardEvent& event);
    void OnRemoveWall(const RemoveWallEvent& event);
