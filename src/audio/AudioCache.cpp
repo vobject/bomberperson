@@ -99,7 +99,7 @@ Mix_Chunk* AudioCache::GetSound(const PlayerSound type) const
 
 void AudioCache::LoadMenuResources()
 {
-   mMenuMusic.insert({ MenuMusic::MainmenuTrack, LoadMusic("menu_main.mp3") });
+   mMenuMusic.insert({ MenuMusic::MainMenuTrack, LoadMusic("menu_main.mp3") });
 
    mMenuSound.insert({ MenuSound::Switch, LoadSound("menu_switch.wav") });
    mMenuSound.insert({ MenuSound::Choose, LoadSound("menu_choose.wav") });

@@ -1,85 +1,75 @@
-#include "MainMenu.hpp"
+#include "PrepareGameMenu.hpp"
 #include "EventQueue.hpp"
 #include "EventType.hpp"
 #include "UserInterface.hpp"
 #include "MenuItem.hpp"
 
-MainMenu::MainMenu(EventQueue& queue)
+PrepareGameMenu::PrepareGameMenu(EventQueue& queue)
    : SceneObject(EntityId::Menu, ZOrder::Menu)
    , mEventQueue(queue)
-   , mSound(MenuSound::None)
 {
    mEventQueue.Register(this);
 
    // FIXME: The mainmenu object itself is not yet constructed.
    //  This call to GetPosition() may be dangerous.
-   const auto mainmenu_pos = GetPosition();
+   const auto pos = GetPosition();
 
    mEventQueue.Add(std::make_shared<CreateMenuItemEvent>(
-      MenuType::MainMenu,
-      MenuItemId::MainMenu_ResumeGame,
-      Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 0)),
+      MenuType::PrepareGame,
+      MenuItemId::PrepareGame_Arena,
+      Point(pos.X + 224, pos.Y + 164 + (96 * 0)),
       Size(256, 32),
-      "Resume Game",
+      "Test 1",
       false)
    );
 
    mEventQueue.Add(std::make_shared<CreateMenuItemEvent>(
-      MenuType::MainMenu,
-      MenuItemId::MainMenu_NewGame,
-      Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 1)),
+      MenuType::PrepareGame,
+      MenuItemId::PrepareGame_ArenaSize,
+      Point(pos.X + 224, pos.Y + 164 + (96 * 1)),
       Size(256, 32),
-      "New Game",
+      "Test 2",
       true)
    );
 
    mEventQueue.Add(std::make_shared<CreateMenuItemEvent>(
-      MenuType::MainMenu,
-      MenuItemId::MainMenu_PrepareGame,
-      Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 2)),
+      MenuType::PrepareGame,
+      MenuItemId::PrepareGame_PlayerCount,
+      Point(pos.X + 224, pos.Y + 164 + (96 * 2)),
       Size(256, 32),
-      "Prepare Game",
+      "Test 3",
       true)
    );
 
-   mEventQueue.Add(std::make_shared<CreateMenuItemEvent>(
-      MenuType::MainMenu,
-      MenuItemId::MainMenu_Exit,
-      Point(mainmenu_pos.X + 224, mainmenu_pos.Y + 164 + (96 * 3)),
-      Size(256, 32),
-      "Exit",
-      true)
-   );
-
-   mCurrentSelection = 1; // Select "New Game" by default.
+   mCurrentSelection = 0;
    mEventQueue.Add(std::make_shared<MenuItemSelectionEvent>
-      (MenuItemId::MainMenu_NewGame, MenuItemId::MainMenu_NewGame));
+      (MenuItemId::PrepareGame_Arena, MenuItemId::PrepareGame_Arena));
 }
 
-MainMenu::~MainMenu()
+PrepareGameMenu::~PrepareGameMenu()
 {
    mEventQueue.UnRegister(this);
 }
 
-void MainMenu::Update(const int elapsed_time)
+void PrepareGameMenu::Update(const int elapsed_time)
 {
    (void) elapsed_time;
 
-   if (mInputEscape) {
-      Choose(MenuItemId::MainMenu_Exit);
-   }
-   else if (mInputEnter) {
-      Choose(mItems.at(mCurrentSelection));
-   }
-   else if (mInputUp) {
-      SelectionUp();
-   }
-   else if (mInputDown) {
-      SelectionDown();
-   }
+//   if (mInputEscape) {
+//      Choose(MenuItemId::MainMenu_Exit);
+//   }
+//   else if (mInputEnter) {
+//      Choose(mItems.at(mCurrentSelection));
+//   }
+//   else if (mInputUp) {
+//      SelectionUp();
+//   }
+//   else if (mInputDown) {
+//      SelectionDown();
+//   }
 }
 
-void MainMenu::OnEvent(const Event& event)
+void PrepareGameMenu::OnEvent(const Event& event)
 {
    switch (event.GetType())
    {
@@ -97,18 +87,18 @@ void MainMenu::OnEvent(const Event& event)
    }
 }
 
-void MainMenu::OnCreateMenuItem(const CreateMenuItemEvent& event)
+void PrepareGameMenu::OnCreateMenuItem(const CreateMenuItemEvent& event)
 {
-   if (MenuType::MainMenu != event.GetOwner()) {
+   if (MenuType::PrepareGame != event.GetOwner()) {
       return;
    }
 
    mItems.push_back(event.GetItem());
 }
 
-void MainMenu::OnMenuInput(const MenuInputEvent& event)
+void PrepareGameMenu::OnMenuInput(const MenuInputEvent& event)
 {
-   if (MenuType::MainMenu != event.GetTarget()) {
+   if (MenuType::PrepareGame != event.GetTarget()) {
       return;
    }
 
@@ -120,24 +110,13 @@ void MainMenu::OnMenuInput(const MenuInputEvent& event)
    mInputEscape = event.GetEscape();
 }
 
-void MainMenu::OnMenuItemAction(const MenuItemActionEvent& event)
+void PrepareGameMenu::OnMenuItemAction(const MenuItemActionEvent& event)
 {
-   (void) event;
+
 }
 
-MenuSound MainMenu::GetSound(const bool reset)
+void PrepareGameMenu::SelectionUp()
 {
-   const auto ret = mSound;
-
-   if (reset) {
-      mSound = MenuSound::None;
-   }
-   return ret;
-}
-
-void MainMenu::SelectionUp()
-{
-   mSound = MenuSound::Switch;
    const auto old_selection = mItems[mCurrentSelection];
 
    if (0 == mCurrentSelection) {
@@ -151,9 +130,8 @@ void MainMenu::SelectionUp()
       (old_selection, mItems[mCurrentSelection]));
 }
 
-void MainMenu::SelectionDown()
+void PrepareGameMenu::SelectionDown()
 {
-   mSound = MenuSound::Switch;
    const auto old_selection = mItems[mCurrentSelection];
 
    if ((mItems.size() - 1) == mCurrentSelection) {
@@ -167,8 +145,7 @@ void MainMenu::SelectionDown()
       (old_selection, mItems[mCurrentSelection]));
 }
 
-void MainMenu::Choose(const MenuItemId item)
+void PrepareGameMenu::Choose(const MenuItemId item)
 {
-   mSound = MenuSound::Choose;
    mEventQueue.Add(std::make_shared<MenuItemActionEvent>(item));
 }

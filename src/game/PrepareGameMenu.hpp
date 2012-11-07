@@ -1,5 +1,5 @@
-#ifndef MAIN_MENU_HPP
-#define MAIN_MENU_HPP
+#ifndef PREPARE_GAME_MENU_HPP
+#define PREPARE_GAME_MENU_HPP
 
 #include "SceneObject.hpp"
 #include "EventListener.hpp"
@@ -11,21 +11,18 @@ class CreateMenuItemEvent;
 class MenuInputEvent;
 class MenuItemActionEvent;
 enum class MenuItemId;
-enum class MenuSound;
 
-class MainMenu : public SceneObject, public EventListener
+class PrepareGameMenu : public SceneObject, public EventListener
 {
 public:
-    MainMenu(EventQueue& queue);
-    virtual ~MainMenu();
+    PrepareGameMenu(EventQueue& queue);
+    virtual ~PrepareGameMenu();
 
-    MainMenu(const MainMenu&) = delete;
-    MainMenu& operator=(const MainMenu&) = delete;
+    PrepareGameMenu(const PrepareGameMenu&) = delete;
+    PrepareGameMenu& operator=(const PrepareGameMenu&) = delete;
 
     void Update(int elapsed_time) override;
     void OnEvent(const Event& event) override;
-
-    MenuSound GetSound(bool reset);
 
 private:
     void OnCreateMenuItem(const CreateMenuItemEvent& event);
@@ -38,7 +35,6 @@ private:
 
     EventQueue& mEventQueue;
 
-    // Input handling:
     bool mInputUp = false;
     bool mInputDown = false;
     bool mInputLeft = false;
@@ -48,7 +44,6 @@ private:
 
     unsigned int mCurrentSelection = 0;
     std::vector<MenuItemId> mItems;
-    MenuSound mSound;
 };
 
-#endif // MAIN_MENU_HPP
+#endif // PREPARE_GAME_MENU_HPP

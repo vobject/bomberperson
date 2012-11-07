@@ -85,7 +85,7 @@ void Audio::Play(const std::shared_ptr<MainMenu>& mainmenu)
    if (!Mix_PlayingMusic())
    {
       // Play mainmenu music if it is not already running.
-      if (Mix_PlayMusic(mCache->GetMusic(MenuMusic::MainmenuTrack), -1) == -1) {
+      if (Mix_PlayMusic(mCache->GetMusic(MenuMusic::MainMenuTrack), -1) == -1) {
          throw "Sound music failed.";
       }
       mPlayingMenuMusic = true;

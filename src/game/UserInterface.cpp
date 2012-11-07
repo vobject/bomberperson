@@ -20,6 +20,11 @@ UserInterface::UserInterface(BomberPersonConfig& cfg)
       mConfig.GetResolution())
    );
 
+   mEventQueue.Add(std::make_shared<CreateSetupMenuEvent>(
+      Point{0, 0},
+      mConfig.GetResolution())
+   );
+
    mSettings = {
       ArenaId::Arena_1,
       {
@@ -121,6 +126,10 @@ EntitySet UserInterface::GetEntities() const
 
 void UserInterface::OnMenuItemAction(const MenuItemActionEvent& event)
 {
+   if (MenuItemId::MainMenu_PrepareGame == event.GetItem()) {
+      return;
+   }
+
    mSelection = event.GetItem();
    mDone = true;
 }

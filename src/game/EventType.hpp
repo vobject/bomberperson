@@ -17,6 +17,7 @@ enum class PlayerType;
 enum class EventType
 {
    CreateMainMenu,
+   CreateSetupMenu,
    CreateMenuItem,
    CreateArena,
    CreateScoreboard,
@@ -27,6 +28,7 @@ enum class EventType
    CreatePlayer,
 
    RemoveMainMenu,
+   RemoveSetupMenu,
    RemoveMenuItem,
    RemoveArena,
    RemoveScoreboard,
@@ -80,11 +82,29 @@ private:
    const Size mSize;
 };
 
+class CreateSetupMenuEvent : public Event
+{
+public:
+   CreateSetupMenuEvent(Point pos, Size size)
+      : Event(EventType::CreateSetupMenu, 0)
+      , mPosition(pos)
+      , mSize(size)
+   { }
+   virtual ~CreateSetupMenuEvent() { }
+
+   Point GetPosition() const { return mPosition; }
+   Size GetSize() const { return mSize; }
+
+private:
+   const Point mPosition;
+   const Size mSize;
+};
+
 class CreateMenuItemEvent : public Event
 {
 public:
    CreateMenuItemEvent(MenuType owner, MenuItemId item, Point pos, Size size,
-                       const std::string& text, bool enabled, bool selected)
+                       const std::string& text, bool enabled)
       : Event(EventType::CreateMenuItem, 0)
       , mOwner(owner)
       , mItem(item)
@@ -92,7 +112,6 @@ public:
       , mSize(size)
       , mText(text)
       , mIsEnabled(enabled)
-      , mIsSelected(selected)
    { }
    virtual ~CreateMenuItemEvent() { }
 
@@ -102,7 +121,6 @@ public:
    Size GetSize() const { return mSize; }
    std::string GetText() const { return mText; }
    bool IsEnabled() const { return mIsEnabled; }
-   bool IsSelected() const { return mIsSelected; }
 
 private:
    const MenuType mOwner;
@@ -111,7 +129,6 @@ private:
    const Size mSize;
    const std::string mText;
    const bool mIsEnabled;
-   const bool mIsSelected;
 };
 
 class CreateArenaEvent : public Event
@@ -275,6 +292,15 @@ public:
       : Event(EventType::RemoveMainMenu, 0)
    { }
    virtual ~RemoveMainMenuEvent() { }
+};
+
+class RemoveSetupMenuEvent : public Event
+{
+public:
+   RemoveSetupMenuEvent()
+      : Event(EventType::RemoveSetupMenu, 0)
+   { }
+   virtual ~RemoveSetupMenuEvent() { }
 };
 
 class RemoveMenuItemEvent : public Event

@@ -10,6 +10,7 @@ class BomberPersonConfig;
 class EventQueue;
 
 class CreateMainMenuEvent;
+class CreateSetupMenuEvent;
 class CreateMenuItemEvent;
 class CreateArenaEvent;
 class CreateScoreboardEvent;
@@ -20,6 +21,7 @@ class CreateExplosionEvent;
 class CreatePlayerEvent;
 
 class RemoveMainMenuEvent;
+class RemoveSetupMenuEvent;
 class RemoveMenuItemEvent;
 class RemoveArenaEvent;
 class RemoveScoreboardEvent;
@@ -30,9 +32,6 @@ class RemoveExplosionEvent;
 class RemovePlayerEvent;
 
 class SceneObject;
-class MainMenu;
-class MenuItem;
-class MenuItemSelector;
 class Arena;
 
 //enum class UiItemId;
@@ -57,10 +56,6 @@ public:
 
    void OnEvent(const Event& event);
 
-//   std::shared_ptr<MainMenu> CreateMainmenu();
-//   std::shared_ptr<MenuItem> CreateMenuItem(UiItemId id);
-//   std::shared_ptr<MenuItemSelector> CreateMenuItemSelector();
-
    EntitySet GetEntities() const;
 
    void Cleanup();
@@ -68,6 +63,7 @@ public:
 
 private:
    void OnCreateMainMenu(const CreateMainMenuEvent& event);
+   void OnCreateSetupMenu(const CreateSetupMenuEvent& event);
    void OnCreateMenuItem(const CreateMenuItemEvent& event);
    void OnCreateArena(const CreateArenaEvent& event);
    void OnCreateScoreboard(const CreateScoreboardEvent& event);
@@ -78,6 +74,7 @@ private:
    void OnCreatePlayer(const CreatePlayerEvent& event);
 
    void OnRemoveMainMenu(const RemoveMainMenuEvent& event);
+   void OnRemoveSetupMenu(const RemoveSetupMenuEvent& event);
    void OnRemoveMenuItem(const RemoveMenuItemEvent &event);
    void OnRemoveArena(const RemoveArenaEvent& event);
    void OnRemoveScoreboard(const RemoveScoreboardEvent& event);

@@ -21,22 +21,28 @@ class MenuItemActionEvent;
 enum class MenuType
 {
    MainMenu,
-   Options
+   PrepareGame,
+//   Options
 };
 
 enum class MenuItemId
 {
    MainMenu_ResumeGame,
    MainMenu_NewGame,
-//   MainMenu_SetupMatch,
+   MainMenu_PrepareGame,
 ////   MainMenu_Options,
 ////   MainMenu_Credits,
-   MainMenu_Exit
+   MainMenu_Exit,
+
+   PrepareGame_Arena,
+   PrepareGame_ArenaSize,
+   PrepareGame_PlayerCount,
+   PrepareGame_Exit
 };
 
 enum class MenuMusic
 {
-   MainmenuTrack
+   MainMenuTrack
 };
 
 enum class MenuSound
