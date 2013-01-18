@@ -52,7 +52,7 @@ SdlRenderer::SdlRenderer(const BomberPersonConfig& app_cfg)
 
    const auto menu_font_path = mAppConfig.GetResourceDir() + "/render/SdlRenderer/font/menu.ttf";
    mMenuFont = TTF_OpenFont(menu_font_path.c_str(), 72);
-   if (!mFont) {
+   if (!mMenuFont) {
       TTF_Quit();
       throw "TTF_OpenFont() failed!";
    }
